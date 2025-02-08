@@ -1,0 +1,33 @@
+{
+  "cSpell.words": [
+    "clsx",
+    "Freshdesk",
+    "hookform",
+    "isbot",
+    "oidc",
+    "passwordless",
+    "signup",
+    "Signup",
+    "tailwindcss",
+    "typecheck",
+    "zammad",
+    "Zammad",
+    "zitadel",
+    "Zitadel"
+  ],
+  "[javascript]": {
+    "editor.defaultFormatter": "dprint.dprint"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "dprint.dprint"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "dprint.dprint"
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "never",
+    "source.fixAll.eslint": "always"
+  },
+  "editor.formatOnSave": true,
+  "typescript.tsdk": "node_modules/typescript/lib"
+}
