@@ -26,7 +26,8 @@ Pour construire l’application pour la production, lancez :
 pnpm build
 ```
 
-Cela génèrera les dossiers :
+Cela générera les dossiers :
+
 - client
 - server
 
@@ -41,6 +42,7 @@ pnpm start
 ## Déploiement
 
 Assurez-vous de déployer les dossiers de build :
+
 - server
 - client
 
