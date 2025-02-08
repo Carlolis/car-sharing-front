@@ -1,43 +1,59 @@
-# Welcome to Remix!
+# Bienvenue dans notre application Car-Sharing
 
-- 📖 [Remix docs](https://remix.run/docs)
+Ce projet est une application Remix basée sur React Router. Ce README vous explique comment développer, construire et déployer votre application en utilisant pnpm.
 
-## Development
+## Installation
 
-Run the dev server:
+Installez les dépendances avec pnpm :
 
-```shellscript
-npm run dev
+```shell
+pnpm install
 ```
 
-## Deployment
+## Développement
 
-First, build your app for production:
+Pour démarrer le serveur de développement, utilisez :
 
-```sh
-npm run build
+```shell
+pnpm dev
 ```
 
-Then run the app in production mode:
+## Construction
 
-```sh
-npm start
+Pour construire l’application pour la production, lancez :
+
+```shell
+pnpm build
 ```
 
-Now you'll need to pick a host to deploy it to.
+Cela génèrera les dossiers :
+- client
+- server
 
-### DIY
+## Démarrage en production
 
-If you're familiar with deploying Node applications, the built-in Remix app server is production-ready.
+Pour exécuter l’application en mode production, lancez :
 
-Make sure to deploy the output of `npm run build`
+```shell
+pnpm start
+```
 
-- `build/server`
-- `build/client`
+## Déploiement
 
-## Styling
+Assurez-vous de déployer les dossiers de build :
+- server
+- client
 
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever css framework you prefer. See the [Vite docs on css](https://vitejs.dev/guide/features.html#css) for more information.
+Si vous déployez sur une infrastructure Node.js, le serveur Remix intégré, via `react-router-serve`, est prêt pour la production.
 
+## Configuration de style
 
-Base on https://github.com/stevebluck/chuz/
+Ce projet intègre [Tailwind CSS](https://tailwindcss.com/) pour une configuration CSS rapide et simple. Pour en savoir plus sur l'utilisation du CSS avec Vite, consultez les [Vite docs sur le CSS](https://vitejs.dev/guide/features.html#css).
+
+## Documentation supplémentaire
+
+Pour plus d’informations sur Remix (React Router v7), consultez la [documentation React Router v7](https://reactrouter.com/home).
+
+## Remerciements
+
+Basé sur [Chuz](https://github.com/stevebluck/chuz/).
