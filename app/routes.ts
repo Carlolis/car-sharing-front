@@ -7,7 +7,8 @@ export default [
   route("/dashboard", "./routes/dashboard.tsx"),
   route("/login", "./routes/login.tsx"),
   route("trip/new","./routes/trip.new.tsx"),
-  route("/ia","./routes/ia.tsx")
+  route("/ia","./routes/ia.tsx"),
+  route("/health","./routes/health.tsx"),
 
   // pattern ^           ^ module file
 ] satisfies RouteConfig;
