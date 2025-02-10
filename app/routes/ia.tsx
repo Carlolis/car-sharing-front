@@ -40,6 +40,8 @@ export const action = Remix.action(
       Config.withDefault('localhost:11434')
     )
 
+    yield* T.logInfo(`Ollama Host: ${ollamaHost}`)
+
     const ollama = new Ollama({
       host: ollamaHost
     })
