@@ -1,5 +1,5 @@
 import { HttpServerRequest } from '@effect/platform'
-import { pipe, Schema as Sc } from 'effect'
+import { Config, pipe, Schema as Sc } from 'effect'
 import * as A from 'effect/Array'
 import * as T from 'effect/Effect'
 import * as O from 'effect/Option'
@@ -35,9 +35,13 @@ export const action = Remix.action(
         model: Sc.String
       })
     )
+    const ollamaHost = yield* pipe(
+      Config.string('OLLAMA_HOST'),
+      Config.withDefault('localhost:11434')
+    )
 
     const ollama = new Ollama({
-      host: process.env.OLLAMA_HOST
+      host: ollamaHost
     })
 
     const chatResponse = yield* pipe(
@@ -151,13 +155,6 @@ export default function IA() {
                     <SelectItem value="mistral-small:24b">
                       <FaCircle className="inline-block mr-1 text-yellow-600" />
                       🇫🇷 Mistral Small 3 24B
-                    </SelectItem>
-                    <SelectItem value="milkey/Simplescaling-S1:latest">
-                      <div>
-                        <FaCircle className="inline-block mr-1 text-red-600" />
-                        <GiBrain className="inline-block mr-1 text-purple-600" />
-                        🇺🇸 Simplescaling S1
-                      </div>
                     </SelectItem>
                     <SelectItem value="deepseek-coder-v2:latest">
                       <div>
