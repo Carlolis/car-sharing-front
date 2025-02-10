@@ -21,6 +21,7 @@ export async function streamResponse(
       return { type: 'done' }
     }
     firstChunkContent = firstChunk.value.message.content ?? ''
+    // eslint-disable-next-line no-unused-vars
     content += firstChunkContent
   } catch (reason) {
     return { type: 'error', reason }
@@ -46,6 +47,7 @@ export async function streamResponse(
           next: nextNext.promise
         })
         next = nextNext
+        // eslint-disable-next-line no-constant-condition
       } while (true)
     } catch (reason) {
       next.resolve({ type: 'error', reason })
@@ -61,8 +63,10 @@ export async function streamResponse(
 
 export class Deferred<T,> {
   promise: Promise<T>
+  // eslint-disable-next-line no-unused-vars
   resolve!: (value: T) => void
-  reject!: (reason?: any) => void
+  // eslint-disable-next-line no-unused-vars
+  reject!: (reason?: unknown) => void
   constructor() {
     this.promise = new Promise<T>((resolve, reject) => {
       this.resolve = resolve

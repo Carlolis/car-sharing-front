@@ -9,18 +9,18 @@ import { stringify } from 'effect/FastCheck'
 import { NotFound } from '~/runtime/ServerResponse'
 
 import { useEffect, useMemo, useState } from 'react'
-import { TripCreate } from '~/types/api'
+import type { TripCreate } from '~/types/api'
 
 import {
-  ColumnDef,
+  type ColumnDef,
   flexRender,
   getCoreRowModel,
-  RowData,
+  type RowData,
   useReactTable
 } from '@tanstack/react-table'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
-import { Route } from './+types/dashboard'
+import type { Route } from './+types/dashboard'
 
 function StatsCard({ title, value }: { title: string; value: string | number }) {
   return (

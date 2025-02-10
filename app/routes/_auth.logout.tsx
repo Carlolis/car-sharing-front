@@ -1,4 +1,4 @@
-import { ActionFunctionArgs, redirect } from 'react-router'
+import { type ActionFunctionArgs, redirect } from 'react-router'
 
 export async function action({ request: _ }: ActionFunctionArgs) {
   return redirect('/login', {

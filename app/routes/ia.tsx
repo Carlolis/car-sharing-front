@@ -16,7 +16,8 @@ import { Form, useActionData } from 'react-router'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { atomOneDark } from 'react-syntax-highlighter/dist/cjs/styles/hljs'
 
-import { ChatChunk, streamResponse } from '~/contexts/ia.util'
+import type { ChatChunk } from '~/contexts/ia.util'
+import { streamResponse } from '~/contexts/ia.util'
 import { Remix } from '~/runtime/Remix'
 import {
   Select,

@@ -93,6 +93,7 @@ export default [{
     },
 
     settings: {
+        "import/no-import-type": 'error',
         "import/internal-regex": "^~/",
 
         "import/resolver": {
@@ -107,6 +108,8 @@ export default [{
     },
 
     rules: {
+        "import/no-duplicates": ["error"],
+        "@typescript-eslint/consistent-type-imports": "error",
         "@typescript-eslint/no-unsafe-argument": "error",
         "object-shorthand": ["error", "always"],
 

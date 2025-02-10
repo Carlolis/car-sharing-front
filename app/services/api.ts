@@ -2,7 +2,8 @@ import { HttpBody, HttpClient, HttpClientRequest } from '@effect/platform'
 import { Context, pipe, Schema as Sc } from 'effect'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
-import { Trip, TripCreate, TripStats } from '../types/api'
+import type { Trip, TripStats } from '../types/api'
+import { TripCreate } from '../types/api'
 
 const API_URL = 'http://localhost:8080/api'
 

@@ -1,5 +1,5 @@
 import { Data } from 'effect'
-import { ParseIssue } from 'effect/ParseResult'
+import type { ParseIssue } from 'effect/ParseResult'
 
 export interface FormErrorValue {
   values: unknown

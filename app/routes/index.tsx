@@ -4,7 +4,7 @@ import { Link } from 'react-router'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import { Remix } from '~/runtime/Remix'
 // eslint-disable-next-line import/no-unresolved
-import { Route } from './+types'
+import { type Route } from './+types'
 
 export const meta: MetaFunction = () => {
   return [
