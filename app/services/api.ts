@@ -1,14 +1,11 @@
 import { HttpBody, HttpClient, HttpClientRequest } from '@effect/platform'
-import { Context, pipe, Schema as Sc } from 'effect'
+import { Config, Context, pipe, Schema as Sc } from 'effect'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import type { Trip, TripStats } from '../types/api'
 import { TripCreate } from '../types/api'
 
-const API_URL = 'http://localhost:8080/api'
-
 export class ApiError extends Error {
-  // eslint-disable-next-line no-unused-vars
   constructor(public statusCode: number, message: string) {
     super(message)
   }
@@ -26,9 +23,13 @@ async function handleResponse<T,>(response: Response): Promise<T> {
 export class ApiService extends T.Service<ApiService>()('ApiService', {
   effect: T.gen(function* () {
     const defaultClient = yield* HttpClient.HttpClient
-
+    const API_URL = yield* pipe(
+      Config.string('API_URL'),
+      Config.withDefault('http://localhost:8080/api')
+    )
     const login = (login: string) => {
       return T.gen(function* () {
+        yield* T.logInfo(`login url : ${API_URL}/login`)
         const loginUrl = HttpClientRequest.post(`${API_URL}/login`)
 
         const body = yield* HttpBody.json({ name: login })
@@ -108,6 +109,8 @@ export class Api extends Context.Tag('ApiService')<
 }
 
 export const ApiLayer = ApiService.Default
+
+const API_URL = 'TODELETE'
 
 export const api = {
   login(login: string) {
