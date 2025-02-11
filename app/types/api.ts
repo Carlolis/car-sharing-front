@@ -1,6 +1,6 @@
 import { DateTime, identity, pipe, Schema as Sc } from 'effect'
 import { ensure } from 'effect/Array'
-import { format, formatIsoDateUtc } from 'effect/DateTime'
+import { formatIsoDateUtc } from 'effect/DateTime'
 
 export interface Trip {
   id: string
@@ -35,16 +35,6 @@ const LocalDate = Sc.transform(
     // Reverse transformation
 
     encode: date => {
-      console.log(pipe(
-        date,
-        DateTime.unsafeFromDate,
-        format({
-          year: 'numeric',
-          day: '2-digit',
-          month: '2-digit'
-        })
-      ))
-
       return pipe(
         date,
         DateTime.unsafeFromDate,

@@ -128,7 +128,6 @@ export const loader = <A extends Serializable, R extends AppEnv | RequestEnv,>(
 })
 
 const handleFailedResponse = <E extends Serializable,>(cause: Cause.Cause<E>) => {
-  console.log('handleFailedResponse', cause)
   if (Cause.isFailType(cause)) {
     throw cause.error
   }
@@ -146,7 +145,6 @@ export const action = <A extends Serializable, R extends AppEnv | RequestEnv,>(
           Unexpected: () => data({ status: 500 }),
           FormError: () => data({ status: 400 }),
           Redirect: e => {
-            console.log('Redirect', e)
             return redirect(e.location, { headers: e.headers, status: 302 })
           },
           ParseError: () => data({ status: 400 }),

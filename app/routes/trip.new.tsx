@@ -35,7 +35,7 @@ export const action = Remix.action(
 
 export default function CreateTrip() {
   const actionData = useActionData<typeof action>()
-  console.log(actionData)
+
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
   const [userName, setUserName] = useState<string | undefined>(undefined)
 

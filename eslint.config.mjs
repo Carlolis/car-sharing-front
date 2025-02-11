@@ -118,6 +118,10 @@ export default [{
             varsIgnorePattern: "^_",
             caughtErrorsIgnorePattern: "^_",
         }],
+        "arrow-body-style": ["error", "as-needed"],
+        "no-console": ["warn"],
+        "@typescript-eslint/no-unsafe-member-access": "error",
+        "@typescript-eslint/no-unsafe-return": "error",
 
     },
 }, {
