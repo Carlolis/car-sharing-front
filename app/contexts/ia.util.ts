@@ -21,7 +21,7 @@ export async function streamResponse(
       return { type: 'done' }
     }
     firstChunkContent = firstChunk.value.message.content ?? ''
-    // eslint-disable-next-line no-unused-vars
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
     content += firstChunkContent
   } catch (reason) {
     return { type: 'error', reason }

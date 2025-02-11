@@ -33,9 +33,7 @@ function StatsCard({ title, value }: { title: string; value: string | number }) 
   )
 }
 declare module '@tanstack/react-table' {
-  // eslint-disable-next-line no-unused-vars
   interface TableMeta<TData extends RowData,> {
-    // eslint-disable-next-line no-unused-vars
     updateData: (rowIndex: number, columnId: string, value: unknown) => void
   }
 }

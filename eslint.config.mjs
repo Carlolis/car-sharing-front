@@ -119,10 +119,6 @@ export default [{
             caughtErrorsIgnorePattern: "^_",
         }],
 
-        "no-unused-vars": [2, {
-            argsIgnorePattern: "^_",
-            varsIgnorePattern: "^_",
-        }],
     },
 }, {
     files: ["**/.eslintrc.cjs"],
