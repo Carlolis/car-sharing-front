@@ -21,6 +21,7 @@ export const links: LinksFunction = () => [
 ]
 
 import { HttpServerRequest } from '@effect/platform'
+import { pipe } from 'effect'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import { useEffect } from 'react'
@@ -84,25 +85,28 @@ const Navigation = ({ isAuthenticated }: NavigationPros) => (
 
 export const loader = Remix.loader(
   T.gen(function* () {
-    const request = yield* HttpServerRequest.HttpServerRequest
-    const url = HttpServerRequest.toURL(request)
-    console.log('URL:', url)
     const cookieSession = yield* CookieSessionStorage
-    const token = yield* cookieSession.getUserToken()
 
-    return { isAuthenticated: token !== undefined, url: O.getOrNull(url) }
-  }).pipe(T.catchAll(_ => T.succeed({ isAuthenticated: false, url: null })))
+    const request = yield* HttpServerRequest.HttpServerRequest
+    const url = yield* HttpServerRequest.toURL(request)
+
+    const isAuthenticated = pipe(
+      cookieSession.getUserToken(),
+      T.map(_ => true),
+      T.catchAll(_ => T.succeed(false))
+    )
+    return { isAuthenticated, url }
+  })
 )
 
 export default function App() {
   const { isAuthenticated, url } = useLoaderData<typeof loader>()
-  console.log('App rendered with url:', stringify(url))
+
   const isIAUrl = url && url.hostname === 'ia.ilieff.fr'
   const navigate = useNavigate()
 
   useEffect(() => {
     if (isIAUrl) {
-      console.log('Navigating to /ia')
       navigate('/ia')
     }
   }, [])
