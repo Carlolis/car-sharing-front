@@ -22,6 +22,7 @@ export const links: LinksFunction = () => [
 
 import { HttpServerRequest } from '@effect/platform'
 import * as T from 'effect/Effect'
+import { stringify } from 'effect/FastCheck'
 import { useEffect } from 'react'
 import { CookieSessionStorage } from './runtime/CookieSessionStorage'
 
@@ -94,11 +95,13 @@ export const loader = Remix.loader(
 
 export default function App() {
   const { isAuthenticated, url } = useLoaderData<typeof loader>()
+  console.log('App rendered with url:', stringify(url))
   const isIAUrl = url && url.hostname === 'ia.ilieff.fr'
   const navigate = useNavigate()
 
   useEffect(() => {
     if (isIAUrl) {
+      console.log('Navigating to /ia')
       navigate('/ia')
     }
   }, [])
