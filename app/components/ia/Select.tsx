@@ -50,6 +50,15 @@ export const ModelSelect = ({ setSelectedModel }: ModelSSelectProps) => (
               <GiBrain className="inline-block mr-1 text-purple-600" />
               🇨🇳 DeepSeek R1 14B Distill
             </SelectItem>
+
+            <SelectItem value="qwen2.5-coder:14b">
+              <FaCircle className="inline-block mr-1 text-green-600" />
+              🇨🇳 Qwen 2.5 Coder 14b
+            </SelectItem>
+            <SelectItem value="qwen2.5-coder:7b">
+              <FaCircle className="inline-block mr-1 text-blue-600" />
+              🇨🇳 Qwen 2.5 Coder 7b
+            </SelectItem>
             <SelectItem value="deepseek-r1:latest">
               <MdOutlineGppBad className="inline-block mr-1 text-red-600" />
               <FaCircle className="inline-block mr-1 text-blue-600" />

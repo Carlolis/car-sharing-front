@@ -29,6 +29,7 @@ export const action = Remix.action(
     )
 
     yield* T.logInfo(`Ollama Host: ${ollamaHost}`)
+    yield* T.logInfo(`Ollama Model: ${model}`)
 
     const ollama = new Ollama({
       host: ollamaHost

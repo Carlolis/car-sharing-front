@@ -34,7 +34,7 @@ export const Chat: React.FC<ChatProps> = ({ isLoading, responses, selectedModel 
               {O.match({
                 onNone: () => (
                   <>
-                    <LuLoaderCircle className="text-indigo-600 animate-spin" size={24} />
+                    <LuLoaderCircle className="text-indigo-600 animate-spin m-2" size={24} />
                   </>
                 ),
                 onSome: (res: string) => (

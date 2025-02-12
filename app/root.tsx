@@ -90,7 +90,7 @@ export const loader = Remix.loader(
     const request = yield* HttpServerRequest.HttpServerRequest
     const url = yield* HttpServerRequest.toURL(request)
 
-    const isAuthenticated = pipe(
+    const isAuthenticated = yield* pipe(
       cookieSession.getUserToken(),
       T.map(_ => true),
       T.catchAll(_ => T.succeed(false))
