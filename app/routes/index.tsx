@@ -1,16 +1,8 @@
 import * as T from 'effect/Effect'
-import type { MetaFunction } from 'react-router'
 import { Link } from 'react-router'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import { Remix } from '~/runtime/Remix'
 import type { Route } from './+types'
-
-export const meta: MetaFunction = () => {
-  return [
-    { title: 'CarShare - Partagez vos trajets' },
-    { name: 'description', content: 'Application de partage de trajets' }
-  ]
-}
 
 export const loader = Remix.loader(
   T.gen(function* () {

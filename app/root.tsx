@@ -1,3 +1,4 @@
+import * as O from 'effect/Option'
 import type { LinksFunction } from 'react-router'
 import {
   Links,
@@ -7,6 +8,7 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useNavigate,
   useRouteError
 } from 'react-router'
 
@@ -18,78 +20,88 @@ export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: stylesheet }
 ]
 
+import { HttpServerRequest } from '@effect/platform'
 import * as T from 'effect/Effect'
+import { useEffect } from 'react'
 import { CookieSessionStorage } from './runtime/CookieSessionStorage'
 
 interface NavigationPros {
   isAuthenticated: boolean
 }
 
-const Navigation = ({ isAuthenticated }: NavigationPros) => {
-  return (
-    <nav className="bg-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <NavLink to="/" className="text-white font-bold text-xl">
-                Car Share
-              </NavLink>
-            </div>
-            {isAuthenticated && (
-              <div className="ml-10 flex items-baseline space-x-4">
-                <NavLink
-                  to="/dashboard"
-                  className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Tableau de bord
-                </NavLink>
-                <NavLink
-                  to="/trip/new"
-                  className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Nouveau trajet
-                </NavLink>
-              </div>
-            )}
-            <NavLink
-              to="/ia"
-              className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-            >
-              IA
+const Navigation = ({ isAuthenticated }: NavigationPros) => (
+  <nav className="bg-gray-800">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-between h-16">
+        <div className="flex items-center">
+          <div className="flex-shrink-0">
+            <NavLink to="/" className="text-white font-bold text-xl">
+              Car Share
             </NavLink>
           </div>
-          <div className="flex items-center">
-            {isAuthenticated ?
-              (
-                <NavLink to="/logout">
-                  <button
-                    type="submit"
-                    className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                  >
-                    Déconnexion
-                  </button>
-                </NavLink>
-              ) :
-              null}
-          </div>
+          {isAuthenticated && (
+            <div className="ml-10 flex items-baseline space-x-4">
+              <NavLink
+                to="/dashboard"
+                className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+              >
+                Tableau de bord
+              </NavLink>
+              <NavLink
+                to="/trip/new"
+                className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+              >
+                Nouveau trajet
+              </NavLink>
+            </div>
+          )}
+          <NavLink
+            to="/ia"
+            className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+          >
+            IA
+          </NavLink>
+        </div>
+        <div className="flex items-center">
+          {isAuthenticated ?
+            (
+              <NavLink to="/logout">
+                <button
+                  type="submit"
+                  className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Déconnexion
+                </button>
+              </NavLink>
+            ) :
+            null}
         </div>
       </div>
-    </nav>
-  )
-}
+    </div>
+  </nav>
+)
 
 export const loader = Remix.loader(
   T.gen(function* () {
+    const request = yield* HttpServerRequest.HttpServerRequest
+    const url = HttpServerRequest.toURL(request)
     const cookieSession = yield* CookieSessionStorage
     const token = yield* cookieSession.getUserToken()
 
-    return { isAuthenticated: token !== undefined }
-  }).pipe(T.catchAll(_ => T.succeed({ isAuthenticated: false })))
+    return { isAuthenticated: token !== undefined, url: O.getOrNull(url) }
+  }).pipe(T.catchAll(_ => T.succeed({ isAuthenticated: false, url: null })))
 )
 
 export default function App() {
-  const { isAuthenticated } = useLoaderData<typeof loader>()
+  const { isAuthenticated, url } = useLoaderData<typeof loader>()
+  const isIAUrl = url && url.hostname === 'ia.ilieff.fr'
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (isIAUrl) {
+      navigate('/ia')
+    }
+  }, [])
 
   return (
     <html lang="fr">
@@ -101,9 +113,10 @@ export default function App() {
       </head>
       <body>
         <div className="min-h-screen bg-gray-100">
-          <Navigation isAuthenticated={isAuthenticated} />
+          {!isIAUrl && <Navigation isAuthenticated={isAuthenticated} />}
           <Outlet />
         </div>
+
         <ScrollRestoration />
         <Scripts />
       </body>
