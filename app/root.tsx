@@ -86,6 +86,7 @@ export const loader = Remix.loader(
   T.gen(function* () {
     const request = yield* HttpServerRequest.HttpServerRequest
     const url = HttpServerRequest.toURL(request)
+    console.log('URL:', url)
     const cookieSession = yield* CookieSessionStorage
     const token = yield* cookieSession.getUserToken()
 
