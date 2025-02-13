@@ -34,8 +34,8 @@ const LocalDate = Sc.transform(
 
     // Reverse transformation
 
-    encode: date => {
-      return pipe(
+    encode: date =>
+      pipe(
         date,
         DateTime.unsafeFromDate,
         formatIsoDateUtc
@@ -45,7 +45,6 @@ const LocalDate = Sc.transform(
         //   month: '2-digit'
         // })
       )
-    }
   }
 )
 

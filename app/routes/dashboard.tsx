@@ -231,45 +231,39 @@ export default function Dashboard({ loaderData: { totalStats, user } }: Route.Co
                 <thead className="bg-gray-50">
                   {table.getHeaderGroups().map(headerGroup => (
                     <tr key={headerGroup.id}>
-                      {headerGroup.headers.map(header => {
-                        return (
-                          <th key={header.id} colSpan={header.colSpan}>
-                            {header.isPlaceholder ? null : (
-                              <div>
-                                {flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext()
-                                )}
-                              </div>
-                            )}
-                          </th>
-                        )
-                      })}
+                      {headerGroup.headers.map(header => (
+                        <th key={header.id} colSpan={header.colSpan}>
+                          {header.isPlaceholder ? null : (
+                            <div>
+                              {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                            </div>
+                          )}
+                        </th>
+                      ))}
                     </tr>
                   ))}
                 </thead>
                 <tbody>
-                  {table.getRowModel().rows.map(row => {
-                    return (
-                      <tr key={row.id} className="border-b border-gray-200">
-                        {row.getVisibleCells().map(cell => {
-                          return (
-                            <td
-                              key={cell.id}
-                              className={`border-r border-gray-200 p-4 ${
-                                cell.column.id === 'distance' ? 'w-32' : ''
-                              }`}
-                            >
-                              {flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext()
-                              )}
-                            </td>
-                          )
-                        })}
-                      </tr>
-                    )
-                  })}
+                  {table.getRowModel().rows.map(row => (
+                    <tr key={row.id} className="border-b border-gray-200">
+                      {row.getVisibleCells().map(cell => (
+                        <td
+                          key={cell.id}
+                          className={`border-r border-gray-200 p-4 ${
+                            cell.column.id === 'distance' ? 'w-32' : ''
+                          }`}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             )}

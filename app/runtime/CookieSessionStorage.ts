@@ -7,10 +7,6 @@ import { redirect } from 'react-router'
 import { commitSession, getSession } from '~/session'
 import { NotAuthenticated } from './NotAuthenticatedError'
 import { ServerResponse } from './ServerResponse'
-// import { JwtUserInfo } from '~/routes/callback'
-// import { commitSession, getSession } from '~/session'
-// import { NotAuthenticated } from '../models/NotAuthenticatedError'
-// import { Redirect, ServerResponse } from '../ServerResponse'
 
 const UserInfo = Sc.Struct({
   username: Sc.String,
@@ -55,11 +51,11 @@ export class CookieSessionStorage
         T.gen(function* (_) {
           const cookies = yield* _(
             optionalCookies,
-            T.catchAll(() => {
-              return ServerResponse.Redirect({
+            T.catchAll(() =>
+              ServerResponse.Redirect({
                 location: '/login'
               })
-            })
+            )
           )
 
           const session = yield* _(T.promise(() =>
@@ -87,9 +83,7 @@ export class CookieSessionStorage
         T.gen(function* (_) {
           const cookies = yield* _(
             optionalCookies,
-            T.catchAll(() => {
-              return T.succeed(undefined)
-            })
+            T.catchAll(() => T.succeed(undefined))
           )
 
           const session = yield* _(T.promise(() =>

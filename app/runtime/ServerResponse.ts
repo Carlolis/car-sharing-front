@@ -15,7 +15,7 @@ export class NotFound extends Data.TaggedError('NotFound')<{
   message: string
 }> {}
 
-export class Unexpected extends Data.TaggedError('Unexpected')<{ error: string }> {}
+class Unexpected extends Data.TaggedError('Unexpected')<{ error: string }> {}
 
 export const ServerResponse = {
   FormError: (params: FormErrorValue) => new FormError(params),
@@ -23,7 +23,6 @@ export const ServerResponse = {
     new FormError({ errors: { root: { type: 'Type', message } }, values: {} }),
   Unexpected: <E extends { _tag: string },>(e: E) => new Unexpected({ error: e._tag }),
   NotFound: (message: string) => new NotFound({ message }),
-  Redirect: (p: { location: string; headers?: { 'Set-Cookie': string } }) => {
-    return new Redirect({ location: p.location, headers: p.headers })
-  }
+  Redirect: (p: { location: string; headers?: { 'Set-Cookie': string } }) =>
+    new Redirect({ location: p.location, headers: p.headers })
 }

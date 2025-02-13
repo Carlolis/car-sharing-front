@@ -87,7 +87,7 @@ const makeRequestContext = (
 
 const runtime = ManagedRuntime.make(AppLayer)
 
-export const loader = <A extends Serializable, R extends AppEnv | RequestEnv,>(
+const loader = <A extends Serializable, R extends AppEnv | RequestEnv,>(
   effect: RemixLoaderHandler<A, R>
 ) => ((args: LoaderFunctionArgs) => {
   const runnable = effect.pipe(
@@ -135,7 +135,7 @@ const handleFailedResponse = <E extends Serializable,>(cause: Cause.Cause<E>) =>
   throw Cause.pretty(cause)
 }
 
-export const action = <A extends Serializable, R extends AppEnv | RequestEnv,>(
+const action = <A extends Serializable, R extends AppEnv | RequestEnv,>(
   effect: RemixActionHandler<A, R>
 ) => ((args: ActionFunctionArgs) => {
   const runnable = effect.pipe(
@@ -144,13 +144,9 @@ export const action = <A extends Serializable, R extends AppEnv | RequestEnv,>(
         matchActionError({
           Unexpected: () => data({ status: 500 }),
           FormError: () => data({ status: 400 }),
-          Redirect: e => {
-            return redirect(e.location, { headers: e.headers, status: 302 })
-          },
+          Redirect: e => redirect(e.location, { headers: e.headers, status: 302 }),
           ParseError: () => data({ status: 400 }),
-          NotFound: () => {
-            return data({ status: 404 })
-          }
+          NotFound: () => data({ status: 404 })
         })(e)
       )
     ),
@@ -167,7 +163,7 @@ export const action = <A extends Serializable, R extends AppEnv | RequestEnv,>(
   >
 })
 
-export const unwrapLoader = <
+const unwrapLoader = <
   A1 extends Serializable,
   R1 extends AppEnv | RequestEnv,
   E,
@@ -177,12 +173,10 @@ export const unwrapLoader = <
 ) => {
   const awaitedHandler = runtime.runPromise(effect).then(loader)
 
-  return (args: LoaderArgs): Promise<A1> => {
-    return awaitedHandler.then(handler => handler(args))
-  }
+  return (args: LoaderArgs): Promise<A1> => awaitedHandler.then(handler => handler(args))
 }
 
-export const unwrapAction = <
+const unwrapAction = <
   A1 extends Serializable,
   R1 extends AppEnv | RequestEnv,
   E,

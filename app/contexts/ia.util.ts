@@ -62,7 +62,7 @@ export async function streamResponse(
   }
 }
 
-export class Deferred<T,> {
+class Deferred<T,> {
   promise: Promise<T>
 
   resolve!: (value: T) => void
