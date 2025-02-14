@@ -119,7 +119,8 @@ export default function IA() {
             setIsLoading(true)
 
             setTimeout(() => {
-              form.reset()
+              const messageInput = form.elements.namedItem('message') as HTMLTextAreaElement
+              messageInput.value = ''
             })
           }}
         >

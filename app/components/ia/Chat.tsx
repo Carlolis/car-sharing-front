@@ -5,7 +5,7 @@ import { GiBrain } from 'react-icons/gi'
 import { LuLoaderCircle } from 'react-icons/lu'
 import Markdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { atomOneDark } from 'react-syntax-highlighter/dist/cjs/styles/hljs'
+import { materialDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 
 interface ChatProps {
   isLoading: boolean
@@ -48,7 +48,7 @@ export const Chat: React.FC<ChatProps> = ({ isLoading, responses, selectedModel 
                           return match ?
                             (
                               <SyntaxHighlighter
-                                style={atomOneDark}
+                                style={materialDark}
                                 language={match[1]}
                                 PreTag="div"
                               >
