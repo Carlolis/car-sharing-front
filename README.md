@@ -59,3 +59,4 @@ Pour plus d’informations sur Remix (React Router v7), consultez la [documentat
 ## Remerciements
 
 Basé sur [Chuz](https://github.com/stevebluck/chuz/).
+Partie IA basé sur [locallama](https://github.com/jacob-ebey/localllama).

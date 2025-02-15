@@ -11,9 +11,12 @@ interface ChatProps {
   isLoading: boolean
   responses: { question: string; response: O.Option<string> }[]
   selectedModel: string | null
+  isWritingResponse: boolean
 }
 
-export const Chat: React.FC<ChatProps> = ({ isLoading, responses, selectedModel }) => (
+export const Chat: React.FC<ChatProps> = (
+  { isLoading, responses, selectedModel, isWritingResponse }
+) => (
   <>
     <div className="mt-8 text-center">
       {isLoading ?
@@ -40,31 +43,36 @@ export const Chat: React.FC<ChatProps> = ({ isLoading, responses, selectedModel 
                 onSome: (res: string) => (
                   <>
                     <GiBrain className="flex-shrink-0 mr-2 text-indigo-600 mt-1" size={24} />
-                    <Markdown
-                      components={{
-                        code({ className, children, ...props }) {
-                          const match = /language-(\w+)/.exec(className || '')
+                    <div className="flex items-end">
+                      <div className="w-full">
+                        <Markdown
+                          components={{
+                            code({ className, children, ...props }) {
+                              const match = /language-(\w+)/.exec(className || '')
 
-                          return match ?
-                            (
-                              <SyntaxHighlighter
-                                style={materialDark}
-                                language={match[1]}
-                                PreTag="div"
-                              >
-                                {String(children)}
-                              </SyntaxHighlighter>
-                            ) :
-                            (
-                              <code className={className} {...props}>
-                                {children}
-                              </code>
-                            )
-                        }
-                      }}
-                    >
-                      {res}
-                    </Markdown>
+                              return match ?
+                                (
+                                  <SyntaxHighlighter
+                                    style={materialDark}
+                                    language={match[1]}
+                                    PreTag="div"
+                                  >
+                                    {String(children)}
+                                  </SyntaxHighlighter>
+                                ) :
+                                (
+                                  <code className={className} {...props}>
+                                    {children}
+                                  </code>
+                                )
+                            }
+                          }}
+                        >
+                          {res}
+                        </Markdown>
+                      </div>
+                      {isWritingResponse && <span className="animate-pulse">...</span>}
+                    </div>
                   </>
                 )
               })(response)}

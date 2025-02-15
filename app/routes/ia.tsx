@@ -61,12 +61,15 @@ export default function IA() {
   const [responses, setAIResponses] = useState<{ response: O.Option<string>; question: string }[]>(
     []
   )
+  const [isWritingResponse, setIsWritingResponse] = useState<boolean>(false)
   const [selectedModel, setSelectedModel] = useState<string | null>(null)
 
   useEffect(() => {
     if (actionData) {
       const handleChatChunk = (chat: ChatChunk) => {
         if (chat.type === 'text') {
+          setIsWritingResponse(true)
+
           setIsLoading(false)
           setAIResponses(contents => {
             const lastContents: {
@@ -93,6 +96,9 @@ export default function IA() {
           chat.next?.then(nextChat => {
             handleChatChunk(nextChat)
           })
+        }
+        if (chat.type === 'done') {
+          setIsWritingResponse(false)
         }
       }
       handleChatChunk(actionData)
@@ -130,6 +136,7 @@ export default function IA() {
             isLoading={isLoading}
             responses={responses}
             selectedModel={selectedModel}
+            isWritingResponse={isWritingResponse}
           />
         </Form>
         <Info />
