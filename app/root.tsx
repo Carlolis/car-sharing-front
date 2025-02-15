@@ -117,6 +117,8 @@ export default function App() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
+        <link rel="icon" href="/favicon.svg" />
+        {isIAUrl ? <title>AI by Charles</title> : <title>Partage</title>}
       </head>
       <body>
         <div className="min-h-screen bg-gray-100">

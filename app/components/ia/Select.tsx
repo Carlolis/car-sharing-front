@@ -73,6 +73,11 @@ export const ModelSelect = ({ setSelectedModel }: ModelSSelectProps) => (
               <FaCircle className="inline-block mr-1 text-blue-600" />
               🇺🇸 Llama 3.2 3b
             </SelectItem>
+            <SelectItem value="openthinker:latest">
+              <FaCircle className="inline-block mr-1 text-blue-600" />
+              <GiBrain className="inline-block mr-1 text-purple-600" />
+              🇺🇸🇨🇳 Open Thinker 7b
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
