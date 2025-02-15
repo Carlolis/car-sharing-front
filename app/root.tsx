@@ -1,4 +1,3 @@
-import * as O from 'effect/Option'
 import type { LinksFunction } from 'react-router'
 import {
   Links,
@@ -23,7 +22,6 @@ export const links: LinksFunction = () => [
 import { HttpServerRequest } from '@effect/platform'
 import { pipe } from 'effect'
 import * as T from 'effect/Effect'
-import { stringify } from 'effect/FastCheck'
 import { useEffect } from 'react'
 import { CookieSessionStorage } from './runtime/CookieSessionStorage'
 
@@ -109,6 +107,7 @@ export default function App() {
     if (isIAUrl) {
       navigate('/ia')
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
