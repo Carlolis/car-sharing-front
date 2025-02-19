@@ -6,7 +6,7 @@ export default [
   route("/", "./routes/index.tsx"),
   route("/dashboard", "./routes/dashboard.tsx"),
   route("/login", "./routes/login.tsx"),
-  route("trip/new","./routes/trip.new.tsx"),
+  route("/trip/new","./routes/trip.new.tsx"),
   route("/ia","./routes/ia.tsx"),
   route("/health","./routes/health.tsx"),
 

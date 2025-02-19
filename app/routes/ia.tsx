@@ -4,6 +4,7 @@ import * as A from 'effect/Array'
 import * as T from 'effect/Effect'
 import * as O from 'effect/Option'
 import { Unexpected } from 'effect/ParseResult'
+import { ChartLineIcon, MessageSquare, MessageSquareDiff } from 'lucide-react'
 import { Ollama } from 'ollama'
 import { useEffect, useState } from 'react'
 import { Form, useActionData } from 'react-router'
@@ -63,6 +64,10 @@ export default function IA() {
   )
   const [isWritingResponse, setIsWritingResponse] = useState<boolean>(false)
   const [selectedModel, setSelectedModel] = useState<string | null>(null)
+  const [chatHistory, setChatHistory] = useState<{ question: string; response: string }[]>([
+    { question: 'Hello', response: 'Hi there!' },
+    { question: 'How are you?', response: 'I am good, thank you!' }
+  ])
 
   useEffect(() => {
     if (actionData) {
@@ -106,8 +111,30 @@ export default function IA() {
   }, [actionData])
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl w-full space-y-8">
+    <div className="flex bg-white dark:bg-gray-900 space-x-4">
+      <div className="min-h-screen w-1/4 p-4 bg-gray-100 dark:bg-gray-800 h-full border-r border-gray-300 dark:border-gray-700 flex flex-col">
+        <div>
+          <button
+            className="bg-white text-blue-500 px-4 py-1 rounded my-2 flex items-center space-x-2 hover:bg-blue-500 hover:text-white transition-colors duration-300"
+            onClick={() => {
+              setChatHistory([])
+            }}
+          >
+            <MessageSquareDiff className="w-5 h-5" />
+            <div>Nouveau Chat</div>
+          </button>
+        </div>
+
+        <ul className=" space-y-2 flex-grow overflow-y-auto">
+          {chatHistory.map((chat, index) => (
+            <li key={index} className="p-2 bg-white dark:bg-gray-700 rounded">
+              <p className="font-bold">Question: {chat.question}</p>
+              <p>Réponse: {chat.response}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="w-3/4  space-y-8 p-16">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
             Demandez à l&apos;IA

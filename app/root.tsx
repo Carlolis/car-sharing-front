@@ -1,5 +1,6 @@
 import type { LinksFunction } from 'react-router'
 import {
+  href,
   Links,
   Meta,
   NavLink,
@@ -24,7 +25,6 @@ import { pipe } from 'effect'
 import * as T from 'effect/Effect'
 import { useEffect } from 'react'
 import { CookieSessionStorage } from './runtime/CookieSessionStorage'
-
 interface NavigationPros {
   isAuthenticated: boolean
 }
@@ -42,13 +42,13 @@ const Navigation = ({ isAuthenticated }: NavigationPros) => (
           {isAuthenticated && (
             <div className="ml-10 flex items-baseline space-x-4">
               <NavLink
-                to="/dashboard"
+                to={href('/dashboard')}
                 className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
               >
                 Tableau de bord
               </NavLink>
               <NavLink
-                to="/trip/new"
+                to={href('/trip/new')}
                 className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
               >
                 Nouveau trajet
@@ -56,7 +56,7 @@ const Navigation = ({ isAuthenticated }: NavigationPros) => (
             </div>
           )}
           <NavLink
-            to="/ia"
+            to={href('/ia')}
             className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
           >
             IA
@@ -65,7 +65,7 @@ const Navigation = ({ isAuthenticated }: NavigationPros) => (
         <div className="flex items-center">
           {isAuthenticated ?
             (
-              <NavLink to="/logout">
+              <NavLink to={href('/logout')}>
                 <button
                   type="submit"
                   className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"

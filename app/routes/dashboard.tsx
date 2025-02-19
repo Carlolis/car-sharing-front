@@ -126,6 +126,7 @@ export default function Dashboard({ loaderData: { totalStats, user } }: Route.Co
             accessorKey: 'drivers',
             header: () => <span>Personnes</span>,
             footer: props => props.column.id,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
             cell: info => info.getValue().join(', ')
           }
         ]
