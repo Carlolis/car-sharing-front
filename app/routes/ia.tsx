@@ -200,7 +200,6 @@ export default function IA() {
 
                   setAIResponses(responses => [...responses, { question, response: O.none() }])
                   setIsLoading(true)
-                  form.append('_tag', 'ask')
                   setTimeout(() => {
                     const messageInput = form.elements.namedItem('message') as HTMLTextAreaElement
                     messageInput.value = ''
