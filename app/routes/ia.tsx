@@ -48,11 +48,15 @@ export const action = Remix.action(
   T.gen(function* () {
     const request = yield* HttpServerRequest.schemaBodyForm(IArguments)
 
+    const macAddress = yield* pipe(
+      Config.string('MAC_ADDRESS_HOST')
+    )
+
     const match = Match.type<IArguments>().pipe(
       Match.tag('wakeUp', () =>
         T.gen(function* () {
           yield* T.logInfo('Waking up Ollama...')
-          yield* pipe(Command.make('wakeonlan', '10:ff:e0:21:7f:b2'), Command.start)
+          yield* pipe(Command.make('wakeonlan', macAddress), Command.start)
 
           const ollamaHost = yield* pipe(
             Config.string('OLLAMA_HOST'),
