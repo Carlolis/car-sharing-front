@@ -5,7 +5,9 @@ FROM node:22-alpine
 RUN npm install -g pnpm
 
 # Installer wakeonlan
-RUN apk add --no-cache awake
+RUN apk add python3 py3-pip
+RUN pip install --break-system-packages wakeonlan
+
 
 # Définir le répertoire de travail dans le conteneur
 WORKDIR /app
