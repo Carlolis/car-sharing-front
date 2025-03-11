@@ -1,5 +1,5 @@
 import { Command, HttpServerRequest } from '@effect/platform'
-import { Config, Match, pipe, Schedule, Schema as Sc } from 'effect'
+import { Config, Match, pipe, Schedule } from 'effect'
 import * as A from 'effect/Array'
 import * as T from 'effect/Effect'
 import * as O from 'effect/Option'
