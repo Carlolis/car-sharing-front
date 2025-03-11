@@ -52,7 +52,7 @@ export const action = Remix.action(
       Match.tag('wakeUp', () =>
         T.gen(function* () {
           yield* T.logInfo('Waking up Ollama...')
-          yield* pipe(pipe(
+          yield* pipe(
             T.tryPromise(
               {
                 try: () =>
@@ -65,11 +65,8 @@ export const action = Remix.action(
                   return T.fail(error)
                 }
               }
-            ),
-            T.tapError(response => T.logError('Wake up response error', response)),
-            T.as(true),
-            T.catchAll(() => T.succeed(false))
-          ))
+            )
+          )
 
           const ollamaHost = yield* pipe(
             Config.string('OLLAMA_HOST'),
@@ -92,10 +89,10 @@ export const action = Remix.action(
             T.catchAll(() => T.succeed(false))
           )
           const policy = Schedule.fixed('500 millis')
-          // yield* T.repeat(task, {
-          //   schedule: policy,
-          //   until: isOllamaAvailable => isOllamaAvailable
-          // })
+          yield* T.repeat(task, {
+            schedule: policy,
+            until: isOllamaAvailable => isOllamaAvailable
+          })
 
           yield* T.logInfo('Ollama is awake!')
           return true
