@@ -1,5 +1,5 @@
-import { HttpServerRequest } from '@effect/platform'
-import { Config, Match, pipe, Schema as Sc } from 'effect'
+import { Command, HttpServerRequest } from '@effect/platform'
+import { Config, Match, pipe, Schedule, Schema as Sc } from 'effect'
 import * as A from 'effect/Array'
 import * as T from 'effect/Effect'
 import * as O from 'effect/Option'
@@ -7,7 +7,9 @@ import { Unexpected } from 'effect/ParseResult'
 import { MessageSquareDiff } from 'lucide-react'
 import { Ollama } from 'ollama'
 import { useEffect, useState } from 'react'
-import { Form, useActionData, useLoaderData } from 'react-router'
+import { FiCommand } from 'react-icons/fi'
+import { LuLoaderCircle } from 'react-icons/lu'
+import { Form, useActionData, useLoaderData, useSubmit } from 'react-router'
 import { Chat } from '~/components/ia/Chat'
 import { Info } from '~/components/ia/Info'
 
@@ -29,7 +31,7 @@ export const loader = Remix.loader(
         () => fetch(`http://${ollamaHost}`)
       ),
       T.flatMap(response => T.tryPromise(() => (response.text()))),
-      T.tap(response => T.logInfo(response)),
+      T.tap(response => T.logInfo('Remix loader', response)),
       T.as(true),
       T.catchAll(() => T.succeed(false))
     )
@@ -47,12 +49,33 @@ export const action = Remix.action(
     const request = yield* HttpServerRequest.schemaBodyForm(IArguments)
 
     const match = Match.type<IArguments>().pipe(
-      Match.tag('wakeUp', () => {
-        console.log('action')
-        return T.succeed(`Ok!`)
-      }),
-      // Match "error" and extract the error message
+      Match.tag('wakeUp', () =>
+        T.gen(function* () {
+          yield* T.logInfo('Waking up Ollama...')
+          yield* pipe(Command.make('wakeonlan', '10:ff:e0:21:7f:b2'), Command.start)
 
+          const ollamaHost = yield* pipe(
+            Config.string('OLLAMA_HOST'),
+            Config.withDefault('localhost:11434')
+          )
+
+          const task = pipe(
+            T.tryPromise(
+              () => fetch(`http://${ollamaHost}`)
+            ),
+            T.flatMap(response => T.tryPromise(() => (response.text()))),
+            T.as(true),
+            T.catchAll(() => T.succeed(false))
+          )
+          const policy = Schedule.fixed('500 millis')
+          yield* T.repeat(task, {
+            schedule: policy,
+            until: isOllamaAvailable => isOllamaAvailable
+          })
+
+          yield* T.logInfo('Ollama is awake!')
+          return true
+        })),
       Match.tag('ask', ({ message, model }) =>
         T.gen(function* () {
           const ollamaHost = yield* pipe(
@@ -82,9 +105,9 @@ export const action = Remix.action(
         })),
       Match.exhaustive
     )
-    const toto = yield* match(request)
-    console.log('toto', toto)
-    return { toto }
+    const response = yield* match(request)
+
+    return { response }
   }).pipe(
     T.scoped,
     T.tapError(T.logError),
@@ -94,13 +117,15 @@ export const action = Remix.action(
 
 export default function IA() {
   const actionData = useActionData<typeof action>()
-  console.log('actionData', actionData)
+  const submit = useSubmit()
   const { isOllamaAvailable } = useLoaderData<typeof loader>()
 
+  const [isChatReady, setIsChatReady] = useState<boolean>(isOllamaAvailable)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [responses, setAIResponses] = useState<{ response: O.Option<string>; question: string }[]>(
     []
   )
+
   const [isWritingResponse, setIsWritingResponse] = useState<boolean>(false)
   const [selectedModel, setSelectedModel] = useState<string | null>(null)
   const [chatHistory, setChatHistory] = useState<{ question: string; response: string }[]>([
@@ -109,12 +134,13 @@ export default function IA() {
   ])
 
   useEffect(() => {
-    console.log('actionData2', actionData)
-
     if (actionData) {
-      const match = Match.type<typeof actionData.toto>().pipe(
-        Match.when(Match.string, () => console.log('toto')),
-        Match.orElse(response => {
+      const match = Match.type<typeof actionData.response>().pipe(
+        Match.when(Match.boolean, () => {
+          setIsLoading(false)
+          setIsChatReady(true)
+        }),
+        Match.orElse(async response => {
           const handleChatChunk = (chat: ChatChunk) => {
             if (chat.type === 'text') {
               setIsWritingResponse(true)
@@ -150,16 +176,17 @@ export default function IA() {
               setIsWritingResponse(false)
             }
           }
-          handleChatChunk(response)
+          const chatResponse = await response
+          handleChatChunk(chatResponse)
         })
       )
-      match(actionData.toto)
+      match(actionData.response)
     }
-  }, [actionData?.toto])
+  }, [actionData])
 
   return (
     <>
-      {isOllamaAvailable ?
+      {isChatReady ?
         (
           <div className="flex bg-white dark:bg-gray-900 space-x-4">
             <div className="min-h-screen w-1/4 p-4 bg-gray-100 dark:bg-gray-800 h-full border-r border-gray-300 dark:border-gray-700 flex flex-col">
@@ -221,21 +248,26 @@ export default function IA() {
         ) :
         (
           <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
-            <button
-              onClick={() => {
-                const formData = new FormData()
-                formData.append('_tag', 'wakeUp')
-                fetch('/ia', {
-                  method: 'POST',
-                  body: formData
-                })
-              }}
-              className="mt-4 px-6 py-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition duration-300 ease-in-out"
-            >
-              <h1 className="text-4xl font-bold text-white">
-                Réveiller le chat !
-              </h1>
-            </button>
+            {isLoading ?
+              <LuLoaderCircle className="mx-auto my-4 text-indigo-600 animate-spin" size={48} /> :
+              <FiCommand className="mx-auto my-4 text-indigo-600" size={48} />}
+            {isLoading ? null : (
+              <button
+                onClick={() => {
+                  setIsLoading(true)
+                  const formData = new FormData()
+                  formData.append('_tag', 'wakeUp')
+                  submit(formData, {
+                    method: 'POST'
+                  })
+                }}
+                className="mt-4 px-6 py-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition duration-300 ease-in-out"
+              >
+                <h1 className="text-4xl font-bold text-white">
+                  Réveiller le chat !
+                </h1>
+              </button>
+            )}
           </div>
         )}
     </>

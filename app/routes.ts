@@ -8,6 +8,7 @@ export default [
   route("/login", "./routes/login.tsx"),
   route("/trip/new","./routes/trip.new.tsx"),
   route("/ia","./routes/ia.tsx"),
+  route("/ia-test","./routes/ia-test.tsx"),
   route("/health","./routes/health.tsx"),
 
   // pattern ^           ^ module file
