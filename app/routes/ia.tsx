@@ -62,12 +62,13 @@ export const action = Remix.action(
             Config.string('OLLAMA_HOST'),
             Config.withDefault('localhost:11434')
           )
+          yield* T.logInfo(`Ollama Host: ${ollamaHost}`)
 
           const task = pipe(
             T.tryPromise(
               () => fetch(`http://${ollamaHost}`)
             ),
-            T.flatMap(response => T.tryPromise(() => (response.text()))),
+            T.tapError(response => T.logInfo('Ollama response error', response)),
             T.as(true),
             T.catchAll(() => T.succeed(false))
           )
