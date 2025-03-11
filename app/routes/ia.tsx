@@ -48,15 +48,28 @@ export const action = Remix.action(
   T.gen(function* () {
     const request = yield* HttpServerRequest.schemaBodyForm(IArguments)
 
-    const macAddress = yield* pipe(
-      Config.string('MAC_ADDRESS_HOST')
-    )
-
     const match = Match.type<IArguments>().pipe(
       Match.tag('wakeUp', () =>
         T.gen(function* () {
           yield* T.logInfo('Waking up Ollama...')
-          yield* pipe(Command.make('wakeonlan', macAddress), Command.start)
+          yield* pipe(pipe(
+            T.tryPromise(
+              {
+                try: () =>
+                  fetch(`http://192.168.1.101:3333`, {
+                    method: 'POST',
+                    body: 'wake'
+                  }),
+                catch: error => {
+                  console.error(error)
+                  return T.fail(error)
+                }
+              }
+            ),
+            T.tapError(response => T.logError('Wake up response error', response)),
+            T.as(true),
+            T.catchAll(() => T.succeed(false))
+          ))
 
           const ollamaHost = yield* pipe(
             Config.string('OLLAMA_HOST'),
@@ -66,21 +79,23 @@ export const action = Remix.action(
 
           const task = pipe(
             T.tryPromise(
-              () =>
-                fetch(`http://${ollamaHost}`).catch(error => {
+              {
+                try: () => fetch(`http://${ollamaHost}`),
+                catch: error => {
                   console.error(error)
-                  throw new Error('Ollama is not awake yet')
-                })
+                  return T.fail(error)
+                }
+              }
             ),
             T.tapError(response => T.logInfo('Ollama response error', response)),
             T.as(true),
             T.catchAll(() => T.succeed(false))
           )
           const policy = Schedule.fixed('500 millis')
-          yield* T.repeat(task, {
-            schedule: policy,
-            until: isOllamaAvailable => isOllamaAvailable
-          })
+          // yield* T.repeat(task, {
+          //   schedule: policy,
+          //   until: isOllamaAvailable => isOllamaAvailable
+          // })
 
           yield* T.logInfo('Ollama is awake!')
           return true
