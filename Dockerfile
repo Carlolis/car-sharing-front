@@ -16,8 +16,12 @@ COPY package.json pnpm-lock.yaml ./
 # Installer les dépendances
 RUN pnpm install
 
+
 # Copier le reste de l'application
 COPY . .
+
+# Build l'application
+RUN pnpm build
 
 # Exposer le port sur lequel l'application va tourner
 EXPOSE 3001
