@@ -66,7 +66,11 @@ export const action = Remix.action(
 
           const task = pipe(
             T.tryPromise(
-              () => fetch(`http://${ollamaHost}`)
+              () =>
+                fetch(`http://${ollamaHost}`).catch(error => {
+                  console.error(error)
+                  throw new Error('Ollama is not awake yet')
+                })
             ),
             T.tapError(response => T.logInfo('Ollama response error', response)),
             T.as(true),
