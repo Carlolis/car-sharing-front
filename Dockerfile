@@ -20,7 +20,7 @@ RUN pnpm install
 COPY . .
 
 # Exposer le port sur lequel l'application va tourner
-EXPOSE 3000
+EXPOSE 3001
 
 # Commande pour lancer l'application
 CMD ["pnpm", "start"]
