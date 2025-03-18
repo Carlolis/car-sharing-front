@@ -18,6 +18,7 @@ import type { ChatChunk } from '~/contexts/ia.util'
 import { streamResponse } from '~/contexts/ia.util'
 import { IArguments } from '~/lib/models/IA'
 import { Remix } from '~/runtime/Remix'
+import { ApiService } from '~/services/api'
 
 export const loader = Remix.loader(
   T.gen(function* () {
@@ -58,7 +59,7 @@ export const action = Remix.action(
                 try: () =>
                   fetch(`http://192.168.1.101:3333`, {
                     method: 'POST',
-                    body: 'wake'
+                    body: 'ertttyujivovpvlghl'
                   }),
                 catch: error => {
                   console.error(error)
@@ -124,6 +125,12 @@ export const action = Remix.action(
 
           return chatResponse
         })),
+      Match.tag('newChat', ({ name }) =>
+        T.gen(function* () {
+          const api = yield* ApiService
+          const response = yield* api.createChat('da57890c-ed4f-11ef-ade3-1f987dffad35', name)
+          return response
+        })),
       Match.exhaustive
     )
     const response = yield* match(request)
@@ -158,6 +165,10 @@ export default function IA() {
     if (actionData) {
       const match = Match.type<typeof actionData.response>().pipe(
         Match.when(Match.boolean, () => {
+          setIsLoading(false)
+          setIsChatReady(true)
+        }),
+        Match.when(Match.string, () => {
           setIsLoading(false)
           setIsChatReady(true)
         }),
@@ -216,6 +227,13 @@ export default function IA() {
                   className="bg-white text-blue-500 px-4 py-1 rounded my-2 flex items-center space-x-2 hover:bg-blue-500 hover:text-white transition-colors duration-300"
                   onClick={() => {
                     setChatHistory([])
+
+                    const formData = new FormData()
+                    formData.append('_tag', 'newChat')
+                    formData.append('name', 'Nouveau Chat')
+                    submit(formData, {
+                      method: 'POST'
+                    })
                   }}
                 >
                   <MessageSquareDiff className="w-5 h-5" />

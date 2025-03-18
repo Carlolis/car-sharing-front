@@ -5,6 +5,9 @@ export const IArguments = Sc.Union(
   Sc.TaggedStruct('ask', {
     message: Sc.String,
     model: Sc.String
+  }),
+  Sc.TaggedStruct('newChat', {
+    name: Sc.String
   })
 )
 

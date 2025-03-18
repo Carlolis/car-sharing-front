@@ -26,7 +26,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
     const defaultClient = yield* HttpClient.HttpClient
     const API_URL = yield* pipe(
       Config.string('API_URL'),
-      Config.withDefault('http://localhost:8080/api')
+      Config.withDefault('http://localhost:8081/api')
     )
     const login = (login: string) =>
       T.gen(function* () {
@@ -81,19 +81,37 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
     const getTotalStats = () =>
       T.gen(function* () {
         const defaultClient = yield* HttpClient.HttpClient
-        const toto = HttpClientRequest.get(`${API_URL}/trips/total`)
+        const httpClient = HttpClientRequest.get(`${API_URL}/trips/total`)
 
-        const response = yield* defaultClient.execute(toto)
+        const response = yield* defaultClient.execute(httpClient)
         const responseJson = yield* response.json
         return responseJson as TripStats
       })
 
     const getAllTrips = () => []
+
+    const createChat = (writerId: string, name: string) =>
+      T.gen(function* () {
+        const defaultClient = yield* HttpClient.HttpClient
+        const httpClient = HttpClientRequest.post(`${API_URL}/createChat`)
+        const body = yield* HttpBody.json({ writerId, name })
+        const createChatRequest = pipe(
+          httpClient,
+          HttpClientRequest.setHeader('Content-Type', 'application/json'),
+          HttpClientRequest.setBody(body)
+        )
+        const response = yield* defaultClient.execute(createChatRequest)
+        const responseJson = yield* response.json
+        yield* T.logInfo('responseJson', responseJson)
+        return responseJson as string
+      })
+
     return ({
       login,
       createTrip,
       getTotalStats,
-      getAllTrips
+      getAllTrips,
+      createChat
     })
   })
 }) {}
