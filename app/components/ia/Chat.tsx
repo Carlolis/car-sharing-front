@@ -12,10 +12,11 @@ interface ChatProps {
   responses: { question: string; response: O.Option<string> }[]
   selectedModel: string | null
   isWritingResponse: boolean
+  chatUuid: string
 }
 
 export const Chat: React.FC<ChatProps> = (
-  { isLoading, responses, selectedModel, isWritingResponse }
+  { isLoading, responses, selectedModel, isWritingResponse, chatUuid }
 ) => (
   <>
     <div className="mt-8 text-center">
@@ -97,6 +98,14 @@ export const Chat: React.FC<ChatProps> = (
         required
         placeholder="Tag"
         defaultValue={'ask'}
+      />
+      <input
+        id="chatUuid"
+        name="chatUuid"
+        type="hidden"
+        required
+        placeholder="chatUuid"
+        defaultValue={chatUuid}
       />
       <button
         type="submit"

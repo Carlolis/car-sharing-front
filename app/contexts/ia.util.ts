@@ -10,8 +10,10 @@ export type ChatChunk =
   }
 
 export async function streamResponse(
-  response: AsyncIterable<ChatResponse>
+  response: AsyncIterable<ChatResponse>,
+  chatUuid: string
 ): Promise<ChatChunk> {
+  console.log(chatUuid)
   let content = ''
   let firstChunkContent = ''
   const iterable = response[Symbol.asyncIterator]()

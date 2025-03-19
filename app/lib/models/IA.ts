@@ -4,7 +4,8 @@ export const IArguments = Sc.Union(
   Sc.TaggedStruct('wakeUp', {}),
   Sc.TaggedStruct('ask', {
     message: Sc.String,
-    model: Sc.String
+    model: Sc.String,
+    chatUuid: Sc.String
   }),
   Sc.TaggedStruct('newChat', {
     name: Sc.String

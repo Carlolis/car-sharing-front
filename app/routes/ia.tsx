@@ -98,7 +98,7 @@ export const action = Remix.action(
           yield* T.logInfo('Ollama is awake!')
           return true
         })),
-      Match.tag('ask', ({ message, model }) =>
+      Match.tag('ask', ({ message, model, chatUuid }) =>
         T.gen(function* () {
           const ollamaHost = yield* pipe(
             Config.string('OLLAMA_HOST'),
@@ -120,7 +120,7 @@ export const action = Remix.action(
                 stream: true
               })
             ),
-            T.map(streamResponse)
+            T.map(ollamaResponse => streamResponse(ollamaResponse, chatUuid))
           )
 
           return chatResponse
@@ -128,8 +128,9 @@ export const action = Remix.action(
       Match.tag('newChat', ({ name }) =>
         T.gen(function* () {
           const api = yield* ApiService
-          const response = yield* api.createChat('da57890c-ed4f-11ef-ade3-1f987dffad35', name)
-          return response
+          const chatUuid = yield* api.createChat('da57890c-ed4f-11ef-ade3-1f987dffad35', name)
+
+          return chatUuid
         })),
       Match.exhaustive
     )
@@ -153,6 +154,7 @@ export default function IA() {
   const [responses, setAIResponses] = useState<{ response: O.Option<string>; question: string }[]>(
     []
   )
+  const [currentChatUuid, setCurrentChatUuid] = useState<O.Option<string>>(O.none())
 
   const [isWritingResponse, setIsWritingResponse] = useState<boolean>(false)
   const [selectedModel, setSelectedModel] = useState<string | null>(null)
@@ -168,9 +170,10 @@ export default function IA() {
           setIsLoading(false)
           setIsChatReady(true)
         }),
-        Match.when(Match.string, () => {
+        Match.when(Match.string, chatUuid => {
           setIsLoading(false)
           setIsChatReady(true)
+          setCurrentChatUuid(O.some(chatUuid))
         }),
         Match.orElse(async response => {
           const handleChatChunk = (chat: ChatChunk) => {
@@ -256,31 +259,39 @@ export default function IA() {
                   Demandez à l&apos;IA
                 </h2>
               </div>
-              <Form
-                className="mt-8 space-y-6"
-                method="post"
-                onSubmit={event => {
-                  const form = event.currentTarget
+              {O.isSome(currentChatUuid) && (
+                <Form
+                  className="mt-8 space-y-6"
+                  method="post"
+                  onSubmit={event => {
+                    const form = event.currentTarget
 
-                  const question = (form.elements.namedItem('message') as HTMLTextAreaElement).value
+                    const question =
+                      (form.elements.namedItem('message') as HTMLTextAreaElement).value
 
-                  setAIResponses(responses => [...responses, { question, response: O.none() }])
-                  setIsLoading(true)
-                  setTimeout(() => {
-                    const messageInput = form.elements.namedItem('message') as HTMLTextAreaElement
-                    messageInput.value = ''
-                  })
-                }}
-              >
-                <ModelSelect setSelectedModel={setSelectedModel} />
+                    form.append(
+                      'chatUuid',
+                      currentChatUuid.value
+                    )
+                    setAIResponses(responses => [...responses, { question, response: O.none() }])
+                    setIsLoading(true)
+                    setTimeout(() => {
+                      const messageInput = form.elements.namedItem('message') as HTMLTextAreaElement
+                      messageInput.value = ''
+                    })
+                  }}
+                >
+                  <ModelSelect setSelectedModel={setSelectedModel} />
 
-                <Chat
-                  isLoading={isLoading}
-                  responses={responses}
-                  selectedModel={selectedModel}
-                  isWritingResponse={isWritingResponse}
-                />
-              </Form>
+                  <Chat
+                    isLoading={isLoading}
+                    responses={responses}
+                    selectedModel={selectedModel}
+                    isWritingResponse={isWritingResponse}
+                    chatUuid={currentChatUuid.value}
+                  />
+                </Form>
+              )}
               <Info />
             </div>
           </div>
@@ -296,6 +307,7 @@ export default function IA() {
                   setIsLoading(true)
                   const formData = new FormData()
                   formData.append('_tag', 'wakeUp')
+
                   submit(formData, {
                     method: 'POST'
                   })

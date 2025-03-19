@@ -29,5 +29,25 @@
     "source.fixAll.eslint": "always"
   },
   "editor.formatOnSave": true,
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#f7e1e6",
+    "activityBar.background": "#f7e1e6",
+    "activityBar.foreground": "#15202b",
+    "activityBar.inactiveForeground": "#15202b99",
+    "activityBarBadge.background": "#4cb02f",
+    "activityBarBadge.foreground": "#15202b",
+    "commandCenter.border": "#15202b99",
+    "sash.hoverBorder": "#f7e1e6",
+    "statusBar.background": "#ecb9c5",
+    "statusBar.foreground": "#15202b",
+    "statusBarItem.hoverBackground": "#e191a4",
+    "statusBarItem.remoteBackground": "#ecb9c5",
+    "statusBarItem.remoteForeground": "#15202b",
+    "titleBar.activeBackground": "#ecb9c5",
+    "titleBar.activeForeground": "#15202b",
+    "titleBar.inactiveBackground": "#ecb9c599",
+    "titleBar.inactiveForeground": "#15202b99"
+  },
+  "peacock.color": "#ecb9c5"
 }
