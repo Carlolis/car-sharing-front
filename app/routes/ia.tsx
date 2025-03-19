@@ -269,10 +269,6 @@ export default function IA() {
                     const question =
                       (form.elements.namedItem('message') as HTMLTextAreaElement).value
 
-                    form.append(
-                      'chatUuid',
-                      currentChatUuid.value
-                    )
                     setAIResponses(responses => [...responses, { question, response: O.none() }])
                     setIsLoading(true)
                     setTimeout(() => {
