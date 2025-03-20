@@ -1,5 +1,5 @@
-import type { HttpClient } from '@effect/platform'
-import type { Scope } from 'effect'
+import { FetchHttpClient, type HttpClient } from '@effect/platform'
+import { pipe, type Scope } from 'effect'
 import * as T from 'effect/Effect'
 import type { ChatResponse } from 'ollama'
 import { ApiService } from '~/services/api'
@@ -116,7 +116,14 @@ export class IaService extends T.Service<IaService>()('IaService', {
             do {
               const chunk = await iterable.next()
               if (chunk.done || chunk.value.done) {
+                pipe(
+                  api.addMessageToChat(chatUuid, { question: answer, answer: content }),
+                  T.provide(FetchHttpClient.layer),
+                  T.scoped,
+                  T.runFork
+                )
                 next.resolve({ type: 'done' as const })
+
                 return
               }
               const nextNext = new Deferred<ChatChunk>()
