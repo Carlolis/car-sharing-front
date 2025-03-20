@@ -152,14 +152,14 @@ export const api = {
       const toto = HttpClientRequest.get(`${API_URL}/login`)
 
       const body = yield* HttpBody.json({ name: login })
-      const titi = pipe(
+      const loginRequest = pipe(
         toto,
         HttpClientRequest.setHeader('Content-Type', 'application/json'),
         HttpClientRequest.setBody(body),
         HttpClientRequest.setMethod('POST')
       )
 
-      const response = yield* defaultClient.execute(titi)
+      const response = yield* defaultClient.execute(loginRequest)
       yield* T.logInfo(response)
       const responseJson = yield* response.json
 

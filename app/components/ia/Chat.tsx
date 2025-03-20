@@ -84,8 +84,8 @@ export const Chat: React.FC<ChatProps> = (
     </div>
     <div className="flex">
       <input
-        id="message"
-        name="message"
+        id="question"
+        name="question"
         type="text"
         required
         className="appearance-none rounded-none w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-l-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"

@@ -17,7 +17,6 @@ export async function streamResponse(
   response: AsyncIterable<ChatResponse>,
   chatUuid: string
 ): Promise<ChatChunk> {
-  console.log(chatUuid)
   let content = ''
   let firstChunkContent = ''
   const iterable = response[Symbol.asyncIterator]()
@@ -83,7 +82,7 @@ class Deferred<T,> {
 }
 
 export class IaService extends T.Service<IaService>()('IaService', {
-  succeed: T.gen(function* () {
+  effect: T.gen(function* () {
     const api = yield* ApiService
     const streamEffectResponse = (
       response: AsyncIterable<ChatResponse>,
@@ -99,7 +98,10 @@ export class IaService extends T.Service<IaService>()('IaService', {
           try: () => iterable.next(),
           catch: reason => ({ type: 'error' as const, reason })
         })
+        yield* T.log('TEXT', firstChunk)
         if (firstChunk.done || firstChunk.value.done) {
+          yield* T.log('DONE')
+          yield* T.log(content)
           yield* api.addMessageToChat(chatUuid, { question: answer, answer: content })
           return { type: 'done' as const }
         }
@@ -114,6 +116,7 @@ export class IaService extends T.Service<IaService>()('IaService', {
             do {
               const chunk = await iterable.next()
               if (chunk.done || chunk.value.done) {
+                console.log(chunk)
                 next.resolve({ type: 'done' as const })
                 return
               }

@@ -1,4 +1,4 @@
-import { Command, HttpServerRequest } from '@effect/platform'
+import { HttpServerRequest } from '@effect/platform'
 import { Config, Match, pipe, Schedule } from 'effect'
 import * as A from 'effect/Array'
 import * as T from 'effect/Effect'
@@ -15,7 +15,7 @@ import { Info } from '~/components/ia/Info'
 
 import { ModelSelect } from '~/components/ia/Select'
 import type { ChatChunk } from '~/contexts/ia.util'
-import { IaService, streamResponse } from '~/contexts/ia.util'
+import { IaService } from '~/contexts/ia.util'
 import { IArguments } from '~/lib/models/IA'
 import { Remix } from '~/runtime/Remix'
 import { ApiService } from '~/services/api'
@@ -98,7 +98,7 @@ export const action = Remix.action(
           yield* T.logInfo('Ollama is awake!')
           return true
         })),
-      Match.tag('ask', ({ message, model, chatUuid }) =>
+      Match.tag('ask', ({ question, model, chatUuid }) =>
         T.gen(function* () {
           const ollamaHost = yield* pipe(
             Config.string('OLLAMA_HOST'),
@@ -111,17 +111,19 @@ export const action = Remix.action(
           const ollama = new Ollama({
             host: ollamaHost
           })
-          const tyty = yield* IaService
+          const iaService = yield* IaService
 
           const chatResponse = yield* pipe(
             T.promise(() =>
               ollama.chat({
                 model,
-                messages: [{ content: message, role: 'user' }],
+                messages: [{ content: question, role: 'user' }],
                 stream: true
               })
             ),
-            T.map(ollamaResponse => streamResponse(ollamaResponse, chatUuid))
+            T.flatMap(ollamaResponse =>
+              iaService.streamEffectResponse(ollamaResponse, chatUuid, question)
+            )
           )
 
           return chatResponse
@@ -156,6 +158,7 @@ export default function IA() {
     []
   )
   const [currentChatUuid, setCurrentChatUuid] = useState<O.Option<string>>(O.none())
+  console.log('currentChatUuid', currentChatUuid)
 
   const [isWritingResponse, setIsWritingResponse] = useState<boolean>(false)
   const [selectedModel, setSelectedModel] = useState<string | null>(null)
@@ -179,6 +182,7 @@ export default function IA() {
         Match.orElse(async response => {
           const handleChatChunk = (chat: ChatChunk) => {
             if (chat.type === 'text') {
+              console.log('text')
               setIsWritingResponse(true)
 
               setIsLoading(false)
@@ -209,6 +213,7 @@ export default function IA() {
               })
             }
             if (chat.type === 'done') {
+              console.log('done')
               setIsWritingResponse(false)
             }
           }

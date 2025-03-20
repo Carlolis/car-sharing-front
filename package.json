@@ -9,7 +9,7 @@
     "lint": "eslint",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc",
-    "check": "pnpm run lint && pnpm run typecheck",
+    "check": "pnpm run typecheck && pnpm run lint",
     "knip": "knip",
     "prepare": "husky"
   },
