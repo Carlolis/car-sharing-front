@@ -116,7 +116,6 @@ export class IaService extends T.Service<IaService>()('IaService', {
             do {
               const chunk = await iterable.next()
               if (chunk.done || chunk.value.done) {
-                console.log(chunk)
                 next.resolve({ type: 'done' as const })
                 return
               }

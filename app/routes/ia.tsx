@@ -158,7 +158,6 @@ export default function IA() {
     []
   )
   const [currentChatUuid, setCurrentChatUuid] = useState<O.Option<string>>(O.none())
-  console.log('currentChatUuid', currentChatUuid)
 
   const [isWritingResponse, setIsWritingResponse] = useState<boolean>(false)
   const [selectedModel, setSelectedModel] = useState<string | null>(null)
@@ -182,7 +181,6 @@ export default function IA() {
         Match.orElse(async response => {
           const handleChatChunk = (chat: ChatChunk) => {
             if (chat.type === 'text') {
-              console.log('text')
               setIsWritingResponse(true)
 
               setIsLoading(false)
@@ -213,7 +211,6 @@ export default function IA() {
               })
             }
             if (chat.type === 'done') {
-              console.log('done')
               setIsWritingResponse(false)
             }
           }
@@ -273,7 +270,7 @@ export default function IA() {
                     const form = event.currentTarget
 
                     const question =
-                      (form.elements.namedItem('message') as HTMLTextAreaElement).value
+                      (form.elements.namedItem('question') as HTMLTextAreaElement).value
 
                     setAIResponses(responses => [...responses, { question, response: O.none() }])
                     setIsLoading(true)
