@@ -15,7 +15,7 @@ import { Info } from '~/components/ia/Info'
 
 import { ModelSelect } from '~/components/ia/Select'
 import type { ChatChunk } from '~/contexts/ia.util'
-import { streamResponse } from '~/contexts/ia.util'
+import { IaService, streamResponse } from '~/contexts/ia.util'
 import { IArguments } from '~/lib/models/IA'
 import { Remix } from '~/runtime/Remix'
 import { ApiService } from '~/services/api'
@@ -111,6 +111,7 @@ export const action = Remix.action(
           const ollama = new Ollama({
             host: ollamaHost
           })
+          const tyty = yield* IaService
 
           const chatResponse = yield* pipe(
             T.promise(() =>

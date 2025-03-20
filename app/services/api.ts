@@ -93,8 +93,24 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
     const createChat = (writerId: string, name: string) =>
       T.gen(function* () {
         const defaultClient = yield* HttpClient.HttpClient
-        const httpClient = HttpClientRequest.post(`${API_URL}/createChat`)
+        const httpClient = HttpClientRequest.post(`${API_URL}/ia/createChat`)
         const body = yield* HttpBody.json({ writerId, name })
+        const createChatRequest = pipe(
+          httpClient,
+          HttpClientRequest.setHeader('Content-Type', 'application/json'),
+          HttpClientRequest.setBody(body)
+        )
+        const response = yield* defaultClient.execute(createChatRequest)
+        const responseJson = yield* response.json
+        yield* T.logInfo('responseJson', responseJson)
+        return responseJson as string
+      })
+
+    const addMessageToChat = (chatUuid: string, message: { question: string; answer: string }) =>
+      T.gen(function* () {
+        const defaultClient = yield* HttpClient.HttpClient
+        const httpClient = HttpClientRequest.post(`${API_URL}/ia/addMessage`)
+        const body = yield* HttpBody.json({ chatUuid, message })
         const createChatRequest = pipe(
           httpClient,
           HttpClientRequest.setHeader('Content-Type', 'application/json'),
@@ -111,7 +127,8 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
       createTrip,
       getTotalStats,
       getAllTrips,
-      createChat
+      createChat,
+      addMessageToChat
     })
   })
 }) {}
