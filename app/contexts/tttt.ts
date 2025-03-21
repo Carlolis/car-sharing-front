@@ -2,6 +2,8 @@ import * as Deferred from 'effect/Deferred'
 import * as Effect from 'effect/Effect'
 import * as Ref from 'effect/Ref'
 
+import { FetchHttpClient } from '@effect/platform'
+import { pipe } from 'effect'
 import type { ChatResponse } from 'ollama'
 import type { ApiService } from '~/services/api'
 import type { ChatChunk } from './ia.util'
@@ -50,7 +52,7 @@ export function transformIterable(
         }
       })
 
-      Effect.runPromise(loop)
+      pipe(loop, Effect.provide(FetchHttpClient.layer), Effect.scoped, Effect.runPromise)
         .then(() => {
           // No need to resume here, as the loop completes with a return
         })
