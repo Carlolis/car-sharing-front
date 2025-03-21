@@ -126,7 +126,7 @@ export const action = Remix.action(
             )
           )
 
-          return chatResponse
+          return T.runPromise(chatResponse)
         })),
       Match.tag('newChat', ({ name }) =>
         T.gen(function* () {
