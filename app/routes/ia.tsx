@@ -1,5 +1,5 @@
 import { HttpServerRequest } from '@effect/platform'
-import { Config, Match, pipe, Schedule } from 'effect'
+import { Config, Match, pipe, Schedule, String } from 'effect'
 import * as A from 'effect/Array'
 import * as T from 'effect/Effect'
 import * as O from 'effect/Option'
@@ -161,7 +161,7 @@ export default function IA() {
 
   const [isWritingResponse, setIsWritingResponse] = useState<boolean>(false)
   const [selectedModel, setSelectedModel] = useState<string | null>(null)
-  const [chatHistory, setChatHistory] = useState<{ question: string; response: string }[]>([])
+  const [chatHistory, setChatHistory] = useState<{ title: string; chatUuid: string }[]>([])
 
   useEffect(() => {
     if (actionData) {
@@ -207,14 +207,25 @@ export default function IA() {
                 handleChatChunk(nextChat)
               })
             }
-            if (chat.type === 'done') {
+
+            const isEquivalent = O.getEquivalence(String.Equivalence)
+            const lastChatUuid = pipe(
+              A.last(chatHistory),
+              O.map(({ chatUuid }) => chatUuid)
+            )
+            const isNewChat = isEquivalent(lastChatUuid, currentChatUuid)
+
+            if (chat.type === 'done' && isNewChat) {
               pipe(
                 A.last(responses),
+                O.flatMap(
+                  ({ question }) => O.all({ currentChatUuid, question: O.some(question) })
+                ),
                 O.map(
                   (
-                    { question, response }
+                    { question, currentChatUuid }
                   ) => (setChatHistory(
-                    history => [...history, { question, response: O.getOrElse(response, () => '') }]
+                    history => [...history, { title: question, chatUuid: currentChatUuid }]
                   ))
                 )
               )
@@ -258,8 +269,7 @@ export default function IA() {
               <ul className=" space-y-2 flex-grow overflow-y-auto">
                 {chatHistory.map((chat, index) => (
                   <li key={index} className="p-2 bg-white dark:bg-gray-700 rounded">
-                    <p className="font-bold">Question: {chat.question}</p>
-                    <p>Réponse: {chat.response}</p>
+                    <p className="font-bold">{chat.title}</p>
                   </li>
                 ))}
               </ul>
