@@ -80,7 +80,6 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
 
     const getTotalStats = () =>
       T.gen(function* () {
-        const defaultClient = yield* HttpClient.HttpClient
         const httpClient = HttpClientRequest.get(`${API_URL}/trips/total`)
 
         const response = yield* defaultClient.execute(httpClient)
@@ -92,7 +91,6 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
 
     const createChat = (writerId: string, name: string) =>
       T.gen(function* () {
-        const defaultClient = yield* HttpClient.HttpClient
         const httpClient = HttpClientRequest.post(`${API_URL}/ia/createChat`)
         const body = yield* HttpBody.json({ writerId, name })
         const createChatRequest = pipe(
@@ -108,7 +106,6 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
 
     const addMessageToChat = (chatUuid: string, message: { question: string; answer: string }) =>
       T.gen(function* () {
-        const defaultClient = yield* HttpClient.HttpClient
         const httpClient = HttpClientRequest.post(`${API_URL}/ia/addMessage`)
         const body = yield* HttpBody.json({ chatUuid, message })
         const createChatRequest = pipe(

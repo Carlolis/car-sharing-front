@@ -2,30 +2,35 @@ import * as Deferred from 'effect/Deferred'
 import * as Effect from 'effect/Effect'
 import * as Ref from 'effect/Ref'
 
-import { FetchHttpClient } from '@effect/platform'
 import { pipe } from 'effect'
 import type { ChatResponse } from 'ollama'
-import type { ApiService } from '~/services/api'
+import { ApiService } from '~/services/api'
 import type { ChatChunk } from './ia.util'
 
 export function transformIterable(
   iterable: AsyncIterator<ChatResponse, unknown, unknown>,
   next: Deferred.Deferred<ChatChunk>,
-  api: ApiService
-): Effect.Effect<void, never, never> {
+  chatUuid: string,
+  question: string,
+  firstChunkContent: string
+): Effect.Effect<void, never, ApiService> {
   return Effect.gen(function* () {
     // const nextDeferred = yield* (Deferred.make<ChatChunk>())
-
+    const api = yield* (ApiService)
     const contentRef = yield* Ref.make('')
 
-    yield* (Effect.async(resume => {
+    yield* (Effect.async(_ => {
       const loop = Effect.gen(function* () {
         while (true) {
           const chunkResult = yield* (Effect.promise(() => iterable.next()))
 
-          if (chunkResult.done) {
+          if (chunkResult.done || chunkResult.value.done) {
             yield* (Deferred.succeed(next, { type: 'done' as const }))
-            yield* (api.addMessageToChat('chatUuid', { question: 'answer', answer: 'content' }))
+            const currentContent = yield* (Ref.get(contentRef))
+            yield* (api.addMessageToChat(chatUuid, {
+              question,
+              answer: firstChunkContent + currentContent
+            }))
             return
           }
 
@@ -52,7 +57,7 @@ export function transformIterable(
         }
       })
 
-      pipe(loop, Effect.provide(FetchHttpClient.layer), Effect.scoped, Effect.runPromise)
+      pipe(loop, Effect.runPromise)
         .then(() => {
           // No need to resume here, as the loop completes with a return
         })

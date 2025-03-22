@@ -1,5 +1,6 @@
-import { type HttpClient } from '@effect/platform'
-import { Deferred, type Scope } from 'effect'
+import type { HttpClient } from '@effect/platform'
+import { FetchHttpClient } from '@effect/platform'
+import { Deferred, pipe, type Scope } from 'effect'
 import * as T from 'effect/Effect'
 import type { ChatResponse } from 'ollama'
 import { ApiService } from '~/services/api'
@@ -74,7 +75,7 @@ export class IaService extends T.Service<IaService>()('IaService', {
     const streamEffectResponse = (
       response: AsyncIterable<ChatResponse>,
       chatUuid: string,
-      answer: string
+      question: string
     ): T.Effect<T.Effect<ChatChunk>, never, ApiService | HttpClient.HttpClient | Scope.Scope> =>
       T.gen(function* () {
         let content = ''
@@ -89,7 +90,7 @@ export class IaService extends T.Service<IaService>()('IaService', {
         if (firstChunk.done || firstChunk.value.done) {
           yield* T.log('DONE')
           yield* T.log(content)
-          yield* api.addMessageToChat(chatUuid, { question: answer, answer: content })
+          yield* api.addMessageToChat(chatUuid, { question, answer: content })
           return T.succeed({ type: 'done' as const })
         }
         firstChunkContent = firstChunk.value.message.content ?? ''
@@ -98,7 +99,13 @@ export class IaService extends T.Service<IaService>()('IaService', {
 
         const next = yield* Deferred.make<ChatChunk>()
         const firstPromise = T.runPromise(Deferred.await(next))
-        T.runPromise(transformIterable(iterable, next, api))
+
+        pipe(
+          transformIterable(iterable, next, chatUuid, question, firstChunkContent),
+          T.provide(ApiService.Default),
+          T.provide(FetchHttpClient.layer),
+          T.runPromise
+        )
         // ;(async () => {
         //   try {
         //     do {
