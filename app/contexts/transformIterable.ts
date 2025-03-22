@@ -15,7 +15,6 @@ export function transformIterable(
   firstChunkContent: string
 ): Effect.Effect<void, never, ApiService> {
   return Effect.gen(function* () {
-    // const nextDeferred = yield* (Deferred.make<ChatChunk>())
     const api = yield* (ApiService)
     const contentRef = yield* Ref.make('')
 

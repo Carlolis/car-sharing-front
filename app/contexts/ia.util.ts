@@ -4,7 +4,7 @@ import { Deferred, pipe, type Scope } from 'effect'
 import * as T from 'effect/Effect'
 import type { ChatResponse } from 'ollama'
 import { ApiService } from '~/services/api'
-import { transformIterable } from './tttt'
+import { transformIterable } from './transformIterable'
 
 export type ChatChunk =
   | { type: 'done' }

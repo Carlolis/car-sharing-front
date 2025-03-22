@@ -161,10 +161,7 @@ export default function IA() {
 
   const [isWritingResponse, setIsWritingResponse] = useState<boolean>(false)
   const [selectedModel, setSelectedModel] = useState<string | null>(null)
-  const [chatHistory, setChatHistory] = useState<{ question: string; response: string }[]>([
-    { question: 'Hello', response: 'Hi there!' },
-    { question: 'How are you?', response: 'I am good, thank you!' }
-  ])
+  const [chatHistory, setChatHistory] = useState<{ question: string; response: string }[]>([])
 
   useEffect(() => {
     if (actionData) {
@@ -211,6 +208,17 @@ export default function IA() {
               })
             }
             if (chat.type === 'done') {
+              pipe(
+                A.last(responses),
+                O.map(
+                  (
+                    { question, response }
+                  ) => (setChatHistory(
+                    history => [...history, { question, response: O.getOrElse(response, () => '') }]
+                  ))
+                )
+              )
+
               setIsWritingResponse(false)
             }
           }
