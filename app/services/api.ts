@@ -2,6 +2,7 @@ import { HttpBody, HttpClient, HttpClientRequest } from '@effect/platform'
 import { Config, Context, pipe, Schema as Sc } from 'effect'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
+import * as O from 'effect/Option'
 import type { Trip, TripStats } from '../types/api'
 import { TripCreate } from '../types/api'
 
@@ -89,6 +90,8 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
 
     const getAllTrips = () => []
 
+    pipe(O.some('token'), O.map(toke => O.some(toke + '1')))
+
     const createChat = (writerId: string, name: string) =>
       T.gen(function* () {
         const httpClient = HttpClientRequest.post(`${API_URL}/ia/createChat`)
@@ -98,6 +101,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
           HttpClientRequest.setHeader('Content-Type', 'application/json'),
           HttpClientRequest.setBody(body)
         )
+
         const response = yield* defaultClient.execute(createChatRequest)
         const responseJson = yield* response.json
         yield* T.logInfo('responseJson', responseJson)

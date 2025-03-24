@@ -9,6 +9,11 @@
     ".react-router/types/**/*"
   ],
   "compilerOptions": {
+    "plugins": [
+      {
+        "name": "@effect/language-service"
+      }
+    ],
     "verbatimModuleSyntax": true,
     "lib": [
       "DOM",
