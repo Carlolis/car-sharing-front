@@ -135,6 +135,7 @@ export default function App() {
 
 export function ErrorBoundary() {
   const error = useRouteError()
+  // eslint-disable-next-line no-console
   console.error(error)
   return (
     <html lang="fr">
