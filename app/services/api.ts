@@ -4,7 +4,7 @@ import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import * as O from 'effect/Option'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
-import type { Trip, TripStats } from '../types/api'
+import type { Trip, TripStats, TripUpdate } from '../types/api'
 import { TripCreate } from '../types/api'
 
 class ApiError extends Error {
@@ -61,6 +61,35 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         const token = yield* cookieSession.getUserToken()
         yield* T.logInfo(`Token ?.... ${stringify(token)}`)
         const loginUrl = HttpClientRequest.post(`${API_URL}/trips`)
+
+        const body = yield* HttpBody.jsonSchema(TripCreate)({ ...trip, drivers: ['maé'] })
+        const createTrip = pipe(
+          loginUrl,
+          HttpClientRequest.setHeader('Content-Type', 'application/json'),
+          HttpClientRequest.setHeader('Authorization', `Bearer ${token}`),
+          HttpClientRequest.setBody(body)
+        )
+
+        const response = yield* defaultClient.execute(createTrip)
+
+        if (response.status === 401 || response.status === 400) {
+          const error = yield* response.text
+          yield* T.logInfo('Unauthorized Error', error)
+          yield* T.logInfo('Error status :', response.status)
+        }
+
+        const responseJson = yield* response.json
+
+        return Sc.decodeUnknownSync(Sc.String)(responseJson)
+      })
+
+    const updateTrip = (trip: TripUpdate) =>
+      T.gen(function* () {
+        const cookieSession = yield* CookieSessionStorage
+        yield* T.logInfo(`Getting token....`)
+        const token = yield* cookieSession.getUserToken()
+        yield* T.logInfo(`Token ?.... ${stringify(token)}`)
+        const loginUrl = HttpClientRequest.put(`${API_URL}/trips`)
 
         const body = yield* HttpBody.jsonSchema(TripCreate)({ ...trip, drivers: ['maé'] })
         const createTrip = pipe(
@@ -146,6 +175,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
       })
 
     return ({
+      updateTrip,
       login,
       createTrip,
       getTotalStats,

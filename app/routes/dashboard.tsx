@@ -6,10 +6,11 @@ import { ApiService } from '../services/api'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 
 import { stringify } from 'effect/FastCheck'
-import { NotFound } from '~/runtime/ServerResponse'
+import { NotFound, Redirect } from '~/runtime/ServerResponse'
 
 import { useEffect, useMemo, useState } from 'react'
 import type { TripCreate } from '~/types/api'
+import { TripUpdate } from '~/types/api'
 
 import {
   type ColumnDef,
@@ -22,7 +23,8 @@ import {
 import DatePicker from 'react-datepicker'
 
 import 'react-datepicker/dist/react-datepicker.css'
-import { useLoaderData } from 'react-router'
+import { HttpServerRequest } from '@effect/platform'
+import { useLoaderData, useSubmit } from 'react-router'
 import type { Route } from './+types/dashboard'
 
 function StatsCard({ title, value }: { title: string; value: string | number }) {
@@ -54,6 +56,25 @@ export const loader = Remix.loader(
     // Return the data as an object
     return { totalStats, user, trips }
   }).pipe(T.catchAll(error => T.fail(new NotFound({ message: stringify(error) }))))
+)
+
+export const action = Remix.action(
+  T.gen(function* () {
+    yield* T.logInfo(`Updating Trip....`)
+
+    const api = yield* ApiService
+
+    const tripUpdate = yield* HttpServerRequest.schemaBodyForm(
+      TripUpdate
+    )
+
+    const tripId = yield* api.updateTrip(tripUpdate)
+    yield* T.logInfo(`Trip updated .... ${stringify(tripId)}`)
+    return { tripId }
+  }).pipe(
+    T.tapError(T.logError),
+    T.catchAll(() => new Redirect({ location: '/dashboard' }))
+  )
 )
 
 export default function Dashboard(
@@ -88,6 +109,8 @@ export default function Dashboard(
   //   }
   // }
 
+  const submit = useSubmit()
+
   const [trips, setTrips] = useState<TripCreate[]>([])
   const columnHelper = createColumnHelper<TripCreate>()
   const columns = useMemo<ColumnDef<TripCreate>[]>(
@@ -116,8 +139,6 @@ export default function Dashboard(
                   value={value as string}
                   onChange={e => {
                     setValue(e.target.value)
-
-                    table.options.meta?.updateData(index, id, e.target.value)
                   }}
                   onBlur={onBlur}
                 />
@@ -181,7 +202,6 @@ export default function Dashboard(
           columnHelper.accessor('drivers', {
             header: () => <span>Personnes</span>,
             footer: props => props.column.id,
-
             cell: ({ getValue, row: { index }, column: { id }, table }) => {
               const initialValue = getValue<TripCreate['drivers']>().join(', ')
               // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -215,33 +235,25 @@ export default function Dashboard(
   const table = useReactTable({
     data: trips,
     columns,
-    // defaultColumn,
     getCoreRowModel: getCoreRowModel(),
-    // getFilteredRowModel: getFilteredRowModel(),
-    // getPaginationRowModel: getPaginationRowModel(),
 
-    // Provide our updateData function to our table meta
-    // meta: {
-    //   updateData: (rowIndex, columnId, value) => {
-    //     setTrips(old =>
-    //       old.map((row, index) => {
-    //         if (index === rowIndex) {
-    //           return {
-    //             ...old[rowIndex]!,
-    //             [columnId]: value
-    //           }
-    //         }
-    //         return row
-    //       })
-    //     )
-    //   }
-    // },
+    meta: {
+      updateData: async (rowIndex, columnId, value) => {
+        const updatedTrip = { ...trips[rowIndex], [columnId]: value }
+
+        setTrips(old => old.map((row, index) => (index === rowIndex ? updatedTrip : row)))
+
+        // @ts-expect-error date is a string
+        submit(updatedTrip, {
+          action: '/dashboard',
+          method: 'post'
+        })
+      }
+    },
     debugTable: true
   })
 
   useEffect(() => {
-    // Fetch trips data from API or any other source
-    // For demonstration, using static data
     const fetchTrips = async () => {
       setTrips(loaderTrips.trips)
     }

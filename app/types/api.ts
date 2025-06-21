@@ -67,6 +67,16 @@ export const TripCreate = Sc.Struct({
 
 export type TripCreate = Sc.Schema.Type<typeof TripCreate>
 
+export const TripUpdate = Sc.Struct({
+  id: Sc.String,
+  name: Sc.String,
+  date: LocalDate,
+  distance: Sc.NumberFromString,
+  drivers: ArrayEnsure
+})
+
+export type TripUpdate = Sc.Schema.Type<typeof TripCreate>
+
 export interface TripStats {
   trips: {
     id: string
