@@ -3,6 +3,7 @@ import { Config, Context, pipe, Schema as Sc } from 'effect'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import * as O from 'effect/Option'
+import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import type { Trip, TripStats } from '../types/api'
 import { TripCreate } from '../types/api'
 
@@ -53,34 +54,38 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         return responseJson as { token: string }
       })
 
-    const createTrip = (token: string) =>
-      (trip: TripCreate) =>
-        T.gen(function* () {
-          const loginUrl = HttpClientRequest.post(`${API_URL}/trips`)
+    const createTrip = (trip: TripCreate) =>
+      T.gen(function* () {
+        const cookieSession = yield* CookieSessionStorage
+        yield* T.logInfo(`Getting token....`)
+        const token = yield* cookieSession.getUserToken()
+        yield* T.logInfo(`Token ?.... ${stringify(token)}`)
+        const loginUrl = HttpClientRequest.post(`${API_URL}/trips`)
 
-          const body = yield* HttpBody.jsonSchema(TripCreate)({ ...trip, drivers: ['maé'] })
-          const createTrip = pipe(
-            loginUrl,
-            HttpClientRequest.setHeader('Content-Type', 'application/json'),
-            HttpClientRequest.setHeader('Authorization', `Bearer ${token}`),
-            HttpClientRequest.setBody(body)
-          )
+        const body = yield* HttpBody.jsonSchema(TripCreate)({ ...trip, drivers: ['maé'] })
+        const createTrip = pipe(
+          loginUrl,
+          HttpClientRequest.setHeader('Content-Type', 'application/json'),
+          HttpClientRequest.setHeader('Authorization', `Bearer ${token}`),
+          HttpClientRequest.setBody(body)
+        )
 
-          const response = yield* defaultClient.execute(createTrip)
+        const response = yield* defaultClient.execute(createTrip)
 
-          if (response.status === 401 || response.status === 400) {
-            const error = yield* response.text
-            yield* T.logInfo('Unauthorized Error', error)
-            yield* T.logInfo('Error status :', response.status)
-          }
+        if (response.status === 401 || response.status === 400) {
+          const error = yield* response.text
+          yield* T.logInfo('Unauthorized Error', error)
+          yield* T.logInfo('Error status :', response.status)
+        }
 
-          const responseJson = yield* response.json
+        const responseJson = yield* response.json
 
-          return Sc.decodeUnknownSync(Sc.String)(responseJson)
-        })
+        return Sc.decodeUnknownSync(Sc.String)(responseJson)
+      })
 
     const getTotalStats = () =>
       T.gen(function* () {
+        yield* T.logInfo(`Getting trips....`)
         const httpClient = HttpClientRequest.get(`${API_URL}/trips/total`)
 
         const response = yield* defaultClient.execute(httpClient)
@@ -88,7 +93,24 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         return responseJson as TripStats
       })
 
-    const getAllTrips = () => []
+    const getAllTrips = () =>
+      T.gen(function* () {
+        const cookieSession = yield* CookieSessionStorage
+        yield* T.logInfo(`Getting token....`)
+        const token = yield* cookieSession.getUserToken()
+        yield* T.logInfo(`Found token....`, token)
+        const httpClient = HttpClientRequest.get(`${API_URL}/trips`)
+        const getAllTripsRequest = pipe(
+          httpClient,
+          HttpClientRequest.setHeader('Content-Type', 'application/json'),
+          HttpClientRequest.setHeader('Authorization', `Bearer ${token}`)
+        )
+        const response = yield* defaultClient.execute(getAllTripsRequest)
+
+        const responseJson = yield* response.json
+
+        return responseJson as { trips: TripCreate[]; totalKilometers: number }
+      })
 
     pipe(O.some('token'), O.map(toke => O.some(toke + '1')))
 

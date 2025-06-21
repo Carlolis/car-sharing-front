@@ -13,13 +13,16 @@ import type { TripCreate } from '~/types/api'
 
 import {
   type ColumnDef,
+  createColumnHelper,
   flexRender,
   getCoreRowModel,
   type RowData,
   useReactTable
 } from '@tanstack/react-table'
 import DatePicker from 'react-datepicker'
-// import 'react-datepicker/dist/react-datepicker.css'
+
+import 'react-datepicker/dist/react-datepicker.css'
+import { useLoaderData } from 'react-router'
 import type { Route } from './+types/dashboard'
 
 function StatsCard({ title, value }: { title: string; value: string | number }) {
@@ -48,11 +51,14 @@ export const loader = Remix.loader(
 
     const trips = yield* api.getAllTrips()
 
+    // Return the data as an object
     return { totalStats, user, trips }
   }).pipe(T.catchAll(error => T.fail(new NotFound({ message: stringify(error) }))))
 )
 
-export default function Dashboard({ loaderData: { totalStats, user } }: Route.ComponentProps) {
+export default function Dashboard(
+  { loaderData: { totalStats, user, trips: loaderTrips } }: Route.ComponentProps
+) {
   // Give our default column cell renderer editing superpowers!
   // const defaultColumn: Partial<ColumnDef<TripCreate>> = {
   //   cell: ({ getValue, row: { index }, column: { id }, table }) => {
@@ -83,52 +89,123 @@ export default function Dashboard({ loaderData: { totalStats, user } }: Route.Co
   // }
 
   const [trips, setTrips] = useState<TripCreate[]>([])
-
+  const columnHelper = createColumnHelper<TripCreate>()
   const columns = useMemo<ColumnDef<TripCreate>[]>(
     () => [
       {
         header: 'Trip Infos',
         footer: props => props.column.id,
         columns: [
-          {
-            accessorKey: 'name',
-            header: () => <span>Name</span>,
-            footer: props => props.column.id
-          },
-          {
-            accessorKey: 'date',
-            header: () => <span>Date</span>,
-            footer: props => props.column.id
-            // cell: ({ getValue, row, column }) => {
-            //   const initialValue = getValue<Date>()
-            //   // eslint-disable-next-line react-hooks/rules-of-hooks
-            //   const [startDate, setStartDate] = useState<null | Date>(
-            //     initialValue
-            //   )
-            //   return (
-            //     <DatePicker
-            //       selected={startDate}
-            //       onChange={date => {
-            //         setStartDate(date)
-            //         table.options.meta?.updateData(row.index, column.id, date)
-            //       }}
-            //     />
-            //   )
-            // }
-          },
+          columnHelper.accessor('name', {
+            header: () => <span>Nom</span>,
+            footer: props => props.column.id,
+            cell: ({ getValue, row: { index }, column: { id }, table }) => {
+              const initialValue = getValue()
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              const [value, setValue] = useState(initialValue)
+              const onBlur = () => {
+                table.options.meta?.updateData(index, id, value)
+              }
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              useEffect(() => {
+                setValue(initialValue)
+              }, [initialValue])
 
-          {
-            accessorKey: 'distance',
+              return (
+                <input
+                  value={value as string}
+                  onChange={e => {
+                    setValue(e.target.value)
+
+                    table.options.meta?.updateData(index, id, e.target.value)
+                  }}
+                  onBlur={onBlur}
+                />
+              )
+            }
+          }),
+
+          columnHelper.accessor('date', {
+            header: () => <span>Date</span>,
+            footer: props => props.column.id,
+            cell: ({ getValue, row: { index }, column: { id }, table }) => {
+              const initialValue = getValue<Date>()
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              const [startDate, setStartDate] = useState<null | Date>(
+                initialValue
+              )
+
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              useEffect(() => {
+                setStartDate(initialValue)
+              }, [initialValue])
+              return (
+                <DatePicker
+                  selected={startDate}
+                  onChange={date => {
+                    setStartDate(date)
+                    table.options.meta?.updateData(index, id, date)
+                  }}
+                />
+              )
+            }
+          }),
+
+          columnHelper.accessor('distance', {
             header: () => <span>Distance (km)</span>,
-            footer: props => props.column.id
-          },
-          {
-            accessorKey: 'drivers',
+            footer: props => props.column.id,
+            cell: ({ getValue, row: { index }, column: { id }, table }) => {
+              const initialValue = getValue()
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              const [value, setValue] = useState(initialValue)
+
+              const onBlur = () => {
+                table.options.meta?.updateData(index, id, value)
+              }
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              useEffect(() => {
+                setValue(initialValue)
+              }, [initialValue])
+
+              return (
+                <input
+                  value={value as string}
+                  onChange={e => {
+                    setValue(e.target.value)
+                  }}
+                  onBlur={onBlur}
+                />
+              )
+            }
+          }),
+          columnHelper.accessor('drivers', {
             header: () => <span>Personnes</span>,
             footer: props => props.column.id,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
-            cell: info => info.getValue().join(', ')
-          }
+
+            cell: ({ getValue, row: { index }, column: { id }, table }) => {
+              const initialValue = getValue<TripCreate['drivers']>().join(', ')
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              const [value, setValue] = useState(initialValue)
+
+              const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+                setValue(e.target.value)
+                table.options.meta?.updateData(index, id, e.target.value.split(', '))
+              }
+
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              useEffect(() => {
+                setValue(initialValue)
+              }, [initialValue])
+
+              return (
+                <select value={value} onChange={onChange} className="w-full">
+                  <option value="maé">maé</option>
+                  <option value="charles">charles</option>
+                  <option value="brigitte">brigitte</option>
+                </select>
+              )
+            }
+          })
         ]
       }
     ],
@@ -166,25 +243,11 @@ export default function Dashboard({ loaderData: { totalStats, user } }: Route.Co
     // Fetch trips data from API or any other source
     // For demonstration, using static data
     const fetchTrips = async () => {
-      const data: TripCreate[] = [
-        {
-          name: 'Trip to Paris',
-          date: new Date('2023-10-01'),
-          distance: 300,
-          drivers: ['John Doe', 'Jane Smith']
-        },
-        {
-          name: 'Trip to Berlin',
-          date: new Date('2023-10-05'),
-          distance: 500,
-          drivers: ['Alice Johnson']
-        }
-      ]
-      setTrips(data)
+      setTrips(loaderTrips.trips)
     }
 
     fetchTrips()
-  }, [])
+  }, [loaderTrips])
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -207,22 +270,8 @@ export default function Dashboard({ loaderData: { totalStats, user } }: Route.Co
         )}
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <StatsCard
-            title="Nombre total de trajets"
-            value={totalStats.trips.length}
-          />
-          <StatsCard
             title="Distance totale (km)"
             value={Math.round(totalStats.totalKilometers)}
-          />
-          <StatsCard
-            title="Passagers transportés"
-            value={totalStats.trips.reduce((acc, trip) => acc + trip.drivers.length, 0)}
-          />
-          <StatsCard
-            title="Distance moyenne (km)"
-            value={totalStats.trips.length === 0 ?
-              0 :
-              Math.round(totalStats.totalKilometers / totalStats.trips.length)}
           />
         </div>
         <div className="mt-8">

@@ -13,10 +13,7 @@ import { TripCreate } from '~/types/api'
 export const action = Remix.action(
   T.gen(function* () {
     yield* T.logInfo(`Creating Trip....`)
-    const cookieSession = yield* CookieSessionStorage
-    yield* T.logInfo(`Getting token....`)
-    const token = yield* cookieSession.getUserToken()
-    yield* T.logInfo(`Token ?.... ${stringify(token)}`)
+
     const api = yield* ApiService
 
     const tripCreate = yield* HttpServerRequest.schemaBodyForm(
@@ -24,7 +21,7 @@ export const action = Remix.action(
     )
 
     yield* T.logInfo(`Creating Trip.... ${stringify(tripCreate)}`)
-    const tripId = yield* api.createTrip(token)(tripCreate)
+    const tripId = yield* api.createTrip(tripCreate)
     yield* T.logInfo(`Trip created .... ${stringify(tripId)}`)
     return { tripId }
   }).pipe(
