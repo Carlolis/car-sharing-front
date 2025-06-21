@@ -47,7 +47,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
 
         if (response.status === 401) {
           yield* T.logInfo(response.status === 401)
-          yield* T.fail(stringify(responseJson))
+          return yield* T.fail(stringify(responseJson))
         }
 
         return responseJson as { token: string }
@@ -134,14 +134,6 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
   })
 }) {}
 
-export class ApiClass2 extends T.Tag('ApiService')<ApiService, ApiService>() {}
-
-export class Api extends Context.Tag('ApiService')<
-  ApiService,
-  ApiService
->() {
-}
-
 export const ApiLayer = ApiService.Default
 
 const API_URL = 'TO DELETE'
@@ -166,7 +158,7 @@ export const api = {
 
       if (response.status === 401) {
         yield* T.logInfo(response.status === 401)
-        yield* T.fail(stringify(responseJson))
+        return yield* T.fail(stringify(responseJson))
       }
 
       return responseJson as { token: string }

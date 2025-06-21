@@ -8,7 +8,7 @@ import { Form, useActionData } from 'react-router'
 import { Remix } from '~/runtime/Remix'
 
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
-import { Api } from '../services/api'
+import { ApiService } from '../services/api'
 
 const UserNotFound = Sc.TaggedStruct('NotFound', {
   message: Sc.String
@@ -16,7 +16,7 @@ const UserNotFound = Sc.TaggedStruct('NotFound', {
 
 export const action = Remix.action(
   T.gen(function* () {
-    const api = yield* Api
+    const api = yield* ApiService
     const cookieSession = yield* CookieSessionStorage
     const { username } = yield* HttpServerRequest.schemaBodyForm(
       Sc.Struct({

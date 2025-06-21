@@ -7,7 +7,7 @@ import { Form, useActionData } from 'react-router'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import { Remix } from '~/runtime/Remix'
 import { Redirect } from '~/runtime/ServerResponse'
-import { Api } from '~/services/api'
+import { ApiService } from '~/services/api'
 import { TripCreate } from '~/types/api'
 
 export const action = Remix.action(
@@ -17,7 +17,7 @@ export const action = Remix.action(
     yield* T.logInfo(`Getting token....`)
     const token = yield* cookieSession.getUserToken()
     yield* T.logInfo(`Token ?.... ${stringify(token)}`)
-    const api = yield* Api
+    const api = yield* ApiService
 
     const tripCreate = yield* HttpServerRequest.schemaBodyForm(
       TripCreate
