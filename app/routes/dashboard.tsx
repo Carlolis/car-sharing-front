@@ -19,7 +19,7 @@ import {
   useReactTable
 } from '@tanstack/react-table'
 import DatePicker from 'react-datepicker'
-import 'react-datepicker/dist/react-datepicker.css'
+// import 'react-datepicker/dist/react-datepicker.css'
 import type { Route } from './+types/dashboard'
 
 function StatsCard({ title, value }: { title: string; value: string | number }) {

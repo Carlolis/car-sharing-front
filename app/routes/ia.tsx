@@ -62,6 +62,7 @@ export const action = Remix.action(
                     body: 'ertttyujivovpvlghl'
                   }),
                 catch: error => {
+                  // eslint-disable-next-line no-console
                   console.error(error)
                   return T.fail(error)
                 }
@@ -80,6 +81,7 @@ export const action = Remix.action(
               {
                 try: () => fetch(`http://${ollamaHost}`),
                 catch: error => {
+                  // eslint-disable-next-line no-console
                   console.error(error)
                   return T.fail(error)
                 }
@@ -239,6 +241,7 @@ export default function IA() {
       )
       match(actionData.response)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actionData])
 
   return (
