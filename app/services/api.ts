@@ -4,7 +4,7 @@ import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import * as O from 'effect/Option'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
-import type { Trip, TripStats, TripUpdate } from '../types/api'
+import { type Trip, type TripStats, TripUpdate } from '../types/api'
 import { TripCreate } from '../types/api'
 
 class ApiError extends Error {
@@ -52,7 +52,9 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         }
 
         return responseJson as { token: string }
-      })
+      }).pipe(
+        T.annotateLogs('Api', 'login')
+      )
 
     const createTrip = (trip: TripCreate) =>
       T.gen(function* () {
@@ -81,26 +83,28 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         const responseJson = yield* response.json
 
         return Sc.decodeUnknownSync(Sc.String)(responseJson)
-      })
+      }).pipe(
+        T.annotateLogs('Api', 'createTrip')
+      )
 
     const updateTrip = (trip: TripUpdate) =>
       T.gen(function* () {
         const cookieSession = yield* CookieSessionStorage
         yield* T.logInfo(`Getting token....`)
         const token = yield* cookieSession.getUserToken()
-        yield* T.logInfo(`Token ?.... ${stringify(token)}`)
+
         const loginUrl = HttpClientRequest.put(`${API_URL}/trips`)
 
-        const body = yield* HttpBody.jsonSchema(TripCreate)({ ...trip, drivers: ['maé'] })
-        const createTrip = pipe(
+        const body = yield* HttpBody.jsonSchema(TripUpdate)({ ...trip, drivers: ['maé'] })
+        const updateTrip = pipe(
           loginUrl,
           HttpClientRequest.setHeader('Content-Type', 'application/json'),
           HttpClientRequest.setHeader('Authorization', `Bearer ${token}`),
           HttpClientRequest.setBody(body)
         )
-
-        const response = yield* defaultClient.execute(createTrip)
-
+        yield* T.logInfo(`About to update a trip.... ${stringify(trip)}`)
+        const response = yield* defaultClient.execute(updateTrip)
+        yield* T.logInfo(`Response status : ${response.status}`)
         if (response.status === 401 || response.status === 400) {
           const error = yield* response.text
           yield* T.logInfo('Unauthorized Error', error)
@@ -110,7 +114,9 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         const responseJson = yield* response.json
 
         return Sc.decodeUnknownSync(Sc.String)(responseJson)
-      })
+      }).pipe(
+        T.annotateLogs('Api', 'updateTrip')
+      )
 
     const getTotalStats = () =>
       T.gen(function* () {
@@ -138,7 +144,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
 
         const responseJson = yield* response.json
 
-        return responseJson as { trips: TripCreate[]; totalKilometers: number }
+        return responseJson as { trips: TripUpdate[]; totalKilometers: number }
       })
 
     pipe(O.some('token'), O.map(toke => O.some(toke + '1')))

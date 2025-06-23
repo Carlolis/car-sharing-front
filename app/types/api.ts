@@ -75,7 +75,7 @@ export const TripUpdate = Sc.Struct({
   drivers: ArrayEnsure
 })
 
-export type TripUpdate = Sc.Schema.Type<typeof TripCreate>
+export type TripUpdate = Sc.Schema.Type<typeof TripUpdate>
 
 export interface TripStats {
   trips: {

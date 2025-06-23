@@ -52,7 +52,7 @@ export const loader = Remix.loader(
     const totalStats = yield* api.getTotalStats()
 
     const trips = yield* api.getAllTrips()
-
+    yield* T.logInfo(`Trips fetched: ${stringify(trips.trips.length)}`)
     // Return the data as an object
     return { totalStats, user, trips }
   }).pipe(T.catchAll(error => T.fail(new NotFound({ message: stringify(error) }))))
@@ -67,7 +67,7 @@ export const action = Remix.action(
     const tripUpdate = yield* HttpServerRequest.schemaBodyForm(
       TripUpdate
     )
-
+    yield* T.logInfo(`Trip updating remix action .... ${stringify(tripUpdate)}`)
     const tripId = yield* api.updateTrip(tripUpdate)
     yield* T.logInfo(`Trip updated .... ${stringify(tripId)}`)
     return { tripId }
@@ -80,45 +80,23 @@ export const action = Remix.action(
 export default function Dashboard(
   { loaderData: { totalStats, user, trips: loaderTrips } }: Route.ComponentProps
 ) {
-  // Give our default column cell renderer editing superpowers!
-  // const defaultColumn: Partial<ColumnDef<TripCreate>> = {
-  //   cell: ({ getValue, row: { index }, column: { id }, table }) => {
-  //     const initialValue = getValue()
-  //     // We need to keep and update the state of the cell normally
-  //     // eslint-disable-next-line react-hooks/rules-of-hooks
-  //     const [value, setValue] = useState(initialValue)
-
-  //     // When the input is blurred, we'll call our table meta's updateData function
-  //     const onBlur = () => {
-  //       table.options.meta?.updateData(index, id, value)
-  //     }
-
-  //     // If the initialValue is changed external, sync it up with our state
-  //     // eslint-disable-next-line react-hooks/rules-of-hooks
-  //     useEffect(() => {
-  //       setValue(initialValue)
-  //     }, [initialValue])
-
-  //     return (
-  //       <input
-  //         value={value as string}
-  //         onChange={e => setValue(e.target.value)}
-  //         onBlur={onBlur}
-  //       />
-  //     )
-  //   }
-  // }
+  useEffect(() => {
+    setTrips(loaderTrips.trips)
+  }, [])
 
   const submit = useSubmit()
 
-  const [trips, setTrips] = useState<TripCreate[]>([])
-  const columnHelper = createColumnHelper<TripCreate>()
-  const columns = useMemo<ColumnDef<TripCreate>[]>(
+  const [trips, setTrips] = useState<TripUpdate[]>([])
+  const columnHelper = createColumnHelper<TripUpdate>()
+  const columns = useMemo<ColumnDef<TripUpdate>[]>(
     () => [
       {
         header: 'Trip Infos',
         footer: props => props.column.id,
         columns: [
+          columnHelper.accessor('id', {
+            header: () => <span>Id</span>
+          }),
           columnHelper.accessor('name', {
             header: () => <span>Nom</span>,
             footer: props => props.column.id,
@@ -240,7 +218,7 @@ export default function Dashboard(
     meta: {
       updateData: async (rowIndex, columnId, value) => {
         const updatedTrip = { ...trips[rowIndex], [columnId]: value }
-
+        console.log(updatedTrip)
         setTrips(old => old.map((row, index) => (index === rowIndex ? updatedTrip : row)))
 
         // @ts-expect-error date is a string
@@ -253,21 +231,13 @@ export default function Dashboard(
     debugTable: true
   })
 
-  useEffect(() => {
-    const fetchTrips = async () => {
-      setTrips(loaderTrips.trips)
-    }
-
-    fetchTrips()
-  }, [loaderTrips])
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="py-8">
         <h2 className="text-2xl font-semibold text-gray-900 mb-8">
           Statistiques Globales
         </h2>
-        <DatePicker />
+
         {user && (
           <div
             className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
@@ -286,11 +256,11 @@ export default function Dashboard(
             value={Math.round(totalStats.totalKilometers)}
           />
         </div>
-        <div className="mt-8">
-          <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        <div className="mt-8 ">
+          <div className="bg-white shadow-md rounded-lg overflow-hidden dark:bg-gray-700">
             {trips.length > 0 && (
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-50 dark:bg-gray-700">
                   {table.getHeaderGroups().map(headerGroup => (
                     <tr key={headerGroup.id}>
                       {headerGroup.headers.map(header => (
