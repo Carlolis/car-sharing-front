@@ -24,19 +24,11 @@ import DatePicker from 'react-datepicker'
 
 import 'react-datepicker/dist/react-datepicker.css'
 import { HttpServerRequest } from '@effect/platform'
-import { useLoaderData, useSubmit } from 'react-router'
+import { useSubmit } from 'react-router'
+import { StatsCard } from '~/components/car/StatsCard'
+import { useTripTable } from '~/components/car/useTripTable'
 import type { Route } from './+types/dashboard'
 
-function StatsCard({ title, value }: { title: string; value: string | number }) {
-  return (
-    <div className="bg-white overflow-hidden shadow rounded-lg">
-      <div className="px-4 py-5 sm:p-6">
-        <dt className="text-sm font-medium text-gray-500 truncate">{title}</dt>
-        <dd className="mt-1 text-3xl font-semibold text-gray-900">{value}</dd>
-      </div>
-    </div>
-  )
-}
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends RowData,> {
     updateData: (rowIndex: number, columnId: string, value: unknown) => void
@@ -48,12 +40,14 @@ export const loader = Remix.loader(
     const cookieSession = yield* CookieSessionStorage
     const user = yield* cookieSession.getUserName()
     const api = yield* ApiService
-    yield* T.logInfo('Fetching total stats')
+
     const totalStats = yield* api.getTotalStats()
 
     const trips = yield* api.getAllTrips()
-    yield* T.logInfo(`Trips fetched: ${stringify(trips.trips.length)}`)
-    // Return the data as an object
+    yield* T.logInfo(
+      `Trips and stats fetched: ${stringify(trips.trips.length), stringify(totalStats)}`
+    )
+
     return { totalStats, user, trips }
   }).pipe(T.catchAll(error => T.fail(new NotFound({ message: stringify(error) }))))
 )
@@ -68,8 +62,11 @@ export const action = Remix.action(
       TripUpdate
     )
     yield* T.logInfo(`Trip updating remix action .... ${stringify(tripUpdate)}`)
+
     const tripId = yield* api.updateTrip(tripUpdate)
+
     yield* T.logInfo(`Trip updated .... ${stringify(tripId)}`)
+
     return { tripId }
   }).pipe(
     T.tapError(T.logError),
@@ -78,158 +75,9 @@ export const action = Remix.action(
 )
 
 export default function Dashboard(
-  { loaderData: { totalStats, user, trips: loaderTrips } }: Route.ComponentProps
+  { loaderData: { totalStats, user, trips } }: Route.ComponentProps
 ) {
-  useEffect(() => {
-    setTrips(loaderTrips.trips)
-  }, [])
-
-  const submit = useSubmit()
-
-  const [trips, setTrips] = useState<TripUpdate[]>([])
-  const columnHelper = createColumnHelper<TripUpdate>()
-  const columns = useMemo<ColumnDef<TripUpdate>[]>(
-    () => [
-      {
-        header: 'Trip Infos',
-        footer: props => props.column.id,
-        columns: [
-          columnHelper.accessor('id', {
-            header: () => <span>Id</span>
-          }),
-          columnHelper.accessor('name', {
-            header: () => <span>Nom</span>,
-            footer: props => props.column.id,
-            cell: ({ getValue, row: { index }, column: { id }, table }) => {
-              const initialValue = getValue()
-              // eslint-disable-next-line react-hooks/rules-of-hooks
-              const [value, setValue] = useState(initialValue)
-              const onBlur = () => {
-                table.options.meta?.updateData(index, id, value)
-              }
-              // eslint-disable-next-line react-hooks/rules-of-hooks
-              useEffect(() => {
-                setValue(initialValue)
-              }, [initialValue])
-
-              return (
-                <input
-                  value={value as string}
-                  onChange={e => {
-                    setValue(e.target.value)
-                  }}
-                  onBlur={onBlur}
-                />
-              )
-            }
-          }),
-
-          columnHelper.accessor('date', {
-            header: () => <span>Date</span>,
-            footer: props => props.column.id,
-            cell: ({ getValue, row: { index }, column: { id }, table }) => {
-              const initialValue = getValue<Date>()
-              // eslint-disable-next-line react-hooks/rules-of-hooks
-              const [startDate, setStartDate] = useState<null | Date>(
-                initialValue
-              )
-
-              // eslint-disable-next-line react-hooks/rules-of-hooks
-              useEffect(() => {
-                setStartDate(initialValue)
-              }, [initialValue])
-              return (
-                <DatePicker
-                  selected={startDate}
-                  onChange={date => {
-                    setStartDate(date)
-                    table.options.meta?.updateData(index, id, date)
-                  }}
-                />
-              )
-            }
-          }),
-
-          columnHelper.accessor('distance', {
-            header: () => <span>Distance (km)</span>,
-            footer: props => props.column.id,
-            cell: ({ getValue, row: { index }, column: { id }, table }) => {
-              const initialValue = getValue()
-              // eslint-disable-next-line react-hooks/rules-of-hooks
-              const [value, setValue] = useState(initialValue)
-
-              const onBlur = () => {
-                table.options.meta?.updateData(index, id, value)
-              }
-              // eslint-disable-next-line react-hooks/rules-of-hooks
-              useEffect(() => {
-                setValue(initialValue)
-              }, [initialValue])
-
-              return (
-                <input
-                  value={value as string}
-                  onChange={e => {
-                    setValue(e.target.value)
-                  }}
-                  onBlur={onBlur}
-                />
-              )
-            }
-          }),
-          columnHelper.accessor('drivers', {
-            header: () => <span>Personnes</span>,
-            footer: props => props.column.id,
-            cell: ({ getValue, row: { index }, column: { id }, table }) => {
-              const initialValue = getValue<TripCreate['drivers']>().join(', ')
-              // eslint-disable-next-line react-hooks/rules-of-hooks
-              const [value, setValue] = useState(initialValue)
-
-              const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-                setValue(e.target.value)
-                table.options.meta?.updateData(index, id, e.target.value.split(', '))
-              }
-
-              // eslint-disable-next-line react-hooks/rules-of-hooks
-              useEffect(() => {
-                setValue(initialValue)
-              }, [initialValue])
-
-              return (
-                <select value={value} onChange={onChange} className="w-full">
-                  <option value="maé">maé</option>
-                  <option value="charles">charles</option>
-                  <option value="brigitte">brigitte</option>
-                </select>
-              )
-            }
-          })
-        ]
-      }
-    ],
-    []
-  )
-
-  const table = useReactTable({
-    data: trips,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-
-    meta: {
-      updateData: async (rowIndex, columnId, value) => {
-        const updatedTrip = { ...trips[rowIndex], [columnId]: value }
-        console.log(updatedTrip)
-        setTrips(old => old.map((row, index) => (index === rowIndex ? updatedTrip : row)))
-
-        // @ts-expect-error date is a string
-        submit(updatedTrip, {
-          action: '/dashboard',
-          method: 'post'
-        })
-      }
-    },
-    debugTable: true
-  })
+  const table = useTripTable(trips.trips)
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -258,7 +106,7 @@ export default function Dashboard(
         </div>
         <div className="mt-8 ">
           <div className="bg-white shadow-md rounded-lg overflow-hidden dark:bg-gray-700">
-            {trips.length > 0 && (
+            {trips.trips.length > 0 && (
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50 dark:bg-gray-700">
                   {table.getHeaderGroups().map(headerGroup => (
