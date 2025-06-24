@@ -8,23 +8,15 @@ import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import { stringify } from 'effect/FastCheck'
 import { NotFound, Redirect } from '~/runtime/ServerResponse'
 
-import { useEffect, useMemo, useState } from 'react'
-import type { TripCreate } from '~/types/api'
 import { TripUpdate } from '~/types/api'
 
 import {
-  type ColumnDef,
-  createColumnHelper,
   flexRender,
-  getCoreRowModel,
-  type RowData,
-  useReactTable
+  type RowData
 } from '@tanstack/react-table'
-import DatePicker from 'react-datepicker'
 
-import 'react-datepicker/dist/react-datepicker.css'
 import { HttpServerRequest } from '@effect/platform'
-import { useSubmit } from 'react-router'
+import 'react-datepicker/dist/react-datepicker.css'
 import { StatsCard } from '~/components/car/StatsCard'
 import { useTripTable } from '~/components/car/useTripTable'
 import type { Route } from './+types/dashboard'
