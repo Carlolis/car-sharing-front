@@ -36,7 +36,7 @@ const Navigation = ({ isAuthenticated }: NavigationPros) => (
         <div className="flex items-center">
           <div className="flex-shrink-0">
             <NavLink to="/" className="text-white font-bold text-xl">
-              Car Share
+              PartageAuto
             </NavLink>
           </div>
           {isAuthenticated && (
@@ -121,7 +121,7 @@ export default function App() {
         {isIAUrl ? <title>AI by Charles</title> : <title>Partage</title>}
       </head>
       <body>
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-white">
           {!isIAUrl && <Navigation isAuthenticated={isAuthenticated} />}
           <Outlet />
         </div>
