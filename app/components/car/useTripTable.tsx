@@ -106,13 +106,12 @@ export function useTripTable(loaderTrips: TripUpdate[]) {
             footer: props => props.column.id,
             cell: ({ getValue, row: { index }, column: { id }, table }) => {
               const initialValues = getValue<TripUpdate['drivers']>()
-             
+
               // eslint-disable-next-line react-hooks/rules-of-hooks
               const [value, setValue] = useState<Drivers>([...initialValues])
               const onChange = (e: Drivers) => {
-
                 setValue(e)
-                console.log("ONCHAGE",e)
+                console.log('ONCHAGE', e)
                 table.options.meta?.updateData(index, id, e)
               }
               // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -131,12 +130,9 @@ export function useTripTable(loaderTrips: TripUpdate[]) {
                   {personnes.map(personne => (
                     <div key={personne.id} className="flex items-center gap-3">
                       <Checkbox
-                      checked={A.contains(personne.id)(value)}
-                        
+                        checked={A.contains(personne.id)(value)}
                         onCheckedChange={checked => {
-                         
                           if (A.contains(personne.id)(value) && !checked) {
-                            
                             const personneIndex = pipe(
                               value,
                               A.findFirstIndex(v =>
@@ -145,12 +141,11 @@ export function useTripTable(loaderTrips: TripUpdate[]) {
                               O.getOrElse(() => -1)
                             )
                             const newDrivers = A.remove(personneIndex)(value)
-                             
+
                             onChange(newDrivers)
                             return
                           }
                           if (!A.contains(personne.id)(value) && checked) {
-                            
                             const newDrivers = A.append(personne.id)(value)
                             onChange(newDrivers)
                           }
@@ -178,12 +173,12 @@ export function useTripTable(loaderTrips: TripUpdate[]) {
         const updatedTrip = { ...trips[rowIndex], [columnId]: value }
 
         setTrips(old => old.map((row, index) => (index === rowIndex ? updatedTrip : row)))
-        console.log({...updatedTrip,drivers:A.join(updatedTrip.drivers,", ")})
+
         // @ts-expect-error date is a string
         submit(updatedTrip, {
           action: '/dashboard',
           method: 'post',
-          encType:'application/json'
+          encType: 'application/json'
         })
       }
     },
