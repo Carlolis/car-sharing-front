@@ -1,1 +1,2 @@
-/home/carlos/.volta/bin/pnpm check
+export PATH="/home/carlos/.volta/bin:$PATH"
+pnpm check
