@@ -50,7 +50,7 @@ export const action = Remix.action(
 
     const api = yield* ApiService
 
-    const tripUpdate = yield* HttpServerRequest.schemaBodyForm(
+    const tripUpdate = yield* HttpServerRequest.schemaBodyJson(
       TripUpdate
     )
     yield* T.logInfo(`Trip updating remix action .... ${stringify(tripUpdate)}`)

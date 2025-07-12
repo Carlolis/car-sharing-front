@@ -63,7 +63,7 @@ export const TripCreate = Sc.Struct({
   name: Sc.String,
   date: LocalDate,
   distance: Sc.NumberFromString,
-  drivers: ArrayEnsure
+  drivers: Drivers
 })
 
 export type TripCreate = Sc.Schema.Type<typeof TripCreate>
@@ -72,7 +72,7 @@ export const TripUpdate = Sc.Struct({
   id: Sc.String,
   name: Sc.String,
   date: LocalDate,
-  distance: Sc.NumberFromString,
+  distance: Sc.Number,
   drivers: ArrayEnsure
 })
 

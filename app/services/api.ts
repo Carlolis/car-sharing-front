@@ -95,7 +95,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
 
         const loginUrl = HttpClientRequest.put(`${API_URL}/trips`)
 
-        const body = yield* HttpBody.jsonSchema(TripUpdate)({ ...trip, drivers: ['maé'] })
+        const body = yield* HttpBody.jsonSchema(TripUpdate)(trip)
         const updateTrip = pipe(
           loginUrl,
           HttpClientRequest.setHeader('Content-Type', 'application/json'),

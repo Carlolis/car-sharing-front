@@ -110,9 +110,9 @@ export function useTripTable(loaderTrips: TripUpdate[]) {
               // eslint-disable-next-line react-hooks/rules-of-hooks
               const [value, setValue] = useState<Drivers>([...initialValues])
               const onChange = (e: Drivers) => {
-                console.log(e)
-                setValue(e)
 
+                setValue(e)
+                console.log("ONCHAGE",e)
                 table.options.meta?.updateData(index, id, e)
               }
               // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -178,11 +178,12 @@ export function useTripTable(loaderTrips: TripUpdate[]) {
         const updatedTrip = { ...trips[rowIndex], [columnId]: value }
 
         setTrips(old => old.map((row, index) => (index === rowIndex ? updatedTrip : row)))
-
+        console.log({...updatedTrip,drivers:A.join(updatedTrip.drivers,", ")})
         // @ts-expect-error date is a string
         submit(updatedTrip, {
           action: '/dashboard',
-          method: 'post'
+          method: 'post',
+          encType:'application/json'
         })
       }
     },
