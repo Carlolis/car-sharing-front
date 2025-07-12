@@ -10,11 +10,7 @@ export const loader = Remix.loader(
     const user = yield* cookieSession.getUserName()
 
     return { user }
-  }).pipe(T.catchAll(error =>
-    // Only for 404 if you want to do something with it
-
-    T.succeed(error)
-  ))
+  }).pipe(T.catchAll(error => T.succeed(error)))
 )
 
 export default function Index({ loaderData: { user } }: Route.ComponentProps) {
@@ -40,7 +36,7 @@ export default function Index({ loaderData: { user } }: Route.ComponentProps) {
             {!user && (
               <Link
                 to="/login"
-                className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
               >
                 Connexion
               </Link>

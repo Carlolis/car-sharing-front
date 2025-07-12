@@ -1,5 +1,6 @@
 import type { LinksFunction } from 'react-router'
 import {
+  Form,
   href,
   Links,
   Meta,
@@ -28,6 +29,35 @@ import { CookieSessionStorage } from './runtime/CookieSessionStorage'
 interface NavigationPros {
   isAuthenticated: boolean
 }
+
+export const loader = Remix.loader(
+  T.gen(function* () {
+    const cookieSession = yield* CookieSessionStorage
+
+    const request = yield* HttpServerRequest.HttpServerRequest
+    const url = yield* HttpServerRequest.toURL(request)
+
+    const isAuthenticated = yield* pipe(
+      cookieSession.getUserToken(),
+      T.map(_ => true),
+      T.catchAll(_ => T.succeed(false))
+    )
+    return { isAuthenticated, url }
+  })
+)
+
+export const action = Remix.action(
+  T.gen(function* () {
+    const cookieSession = yield* CookieSessionStorage
+
+    const user = yield* cookieSession.getUserName()
+
+    yield* T.logInfo(`User ${user} logging out`)
+    const result = yield* cookieSession.logout()
+    yield* T.logInfo(`Logout result ${result}`)
+    return result
+  })
+)
 
 const Navigation = ({ isAuthenticated }: NavigationPros) => (
   <nav className="bg-gray-800">
@@ -62,39 +92,23 @@ const Navigation = ({ isAuthenticated }: NavigationPros) => (
             IA
           </NavLink>
         </div>
+
         <div className="flex items-center">
-          {isAuthenticated ?
-            (
-              <NavLink to={href('/')}>
+          {isAuthenticated
+            && (
+              <Form method="post">
                 <button
-                  type="submit"
                   className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                  type="submit"
                 >
                   Déconnexion
                 </button>
-              </NavLink>
-            ) :
-            null}
+              </Form>
+            )}
         </div>
       </div>
     </div>
   </nav>
-)
-
-export const loader = Remix.loader(
-  T.gen(function* () {
-    const cookieSession = yield* CookieSessionStorage
-
-    const request = yield* HttpServerRequest.HttpServerRequest
-    const url = yield* HttpServerRequest.toURL(request)
-
-    const isAuthenticated = yield* pipe(
-      cookieSession.getUserToken(),
-      T.map(_ => true),
-      T.catchAll(_ => T.succeed(false))
-    )
-    return { isAuthenticated, url }
-  })
 )
 
 export default function App() {

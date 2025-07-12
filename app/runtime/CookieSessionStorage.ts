@@ -5,7 +5,7 @@ import { Context, Effect as T, pipe, Schema as Sc } from 'effect'
 import * as O from 'effect/Option'
 import { redirect } from 'react-router'
 import { commitSession, getSession } from '~/session'
-import { NotAuthenticated } from './NotAuthenticatedError'
+import { NotAuthenticated } from './errors/NotAuthenticatedError'
 import { ServerResponse } from './ServerResponse'
 
 const UserInfo = Sc.Struct({
@@ -99,10 +99,22 @@ export class CookieSessionStorage
             T.catchAll(() => T.succeed(undefined))
           )
         })
+
+      // Correction de la fonction logout pour gérer correctement la suppression de la session utilisateur
+      const logout = () =>
+        T.gen(function* (_) {
+          const cookies = yield* _(optionalCookies, T.catchAll(() => T.succeed(undefined)))
+          const session = yield* _(T.promise(() => getSession(cookies)))
+          session.unset('user_info')
+          const cookie = yield* _(T.promise(() => commitSession(session)))
+          return redirect('/', { headers: { 'Set-Cookie': cookie } })
+        })
+
       return {
         getUserToken,
         getUserName,
-        commitUserInfo
+        commitUserInfo,
+        logout
       }
     })
   }) {}
