@@ -1,6 +1,7 @@
 import { DateTime, identity, pipe, Schema as Sc } from 'effect'
 import { ensure } from 'effect/Array'
 import { formatIsoDateUtc } from 'effect/DateTime'
+import { Drivers } from '~/lib/models/Drivers'
 
 export interface Trip {
   id: string
@@ -49,10 +50,10 @@ const LocalDate = Sc.transform(
 )
 
 const ArrayEnsure = Sc.transform(
-  Sc.Union(Sc.String, Sc.Array(Sc.String)),
-  Sc.Array(Sc.String),
+  Sc.Union(Sc.String, Drivers),
+  Drivers,
   {
-    strict: true,
+    strict: false,
     decode: ensure,
     encode: identity
   }

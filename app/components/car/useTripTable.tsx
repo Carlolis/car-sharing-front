@@ -1,9 +1,16 @@
 import { type ColumnDef, createColumnHelper, getCoreRowModel,
   useReactTable } from '@tanstack/react-table'
+import { pipe } from 'effect'
+import * as A from 'effect/Array'
+import * as O from 'effect/Option'
+import * as R from 'effect/Record'
 import { useEffect, useMemo, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import { useSubmit } from 'react-router'
+import type { Driver, Drivers } from '~/lib/models/Drivers'
 import type { TripUpdate } from '~/types/api'
+import { Checkbox } from '../ui/checkbox'
+import { Label } from '../ui/label'
 
 const columnHelper = createColumnHelper<TripUpdate>()
 
@@ -98,24 +105,61 @@ export function useTripTable(loaderTrips: TripUpdate[]) {
             header: () => <span>Personnes</span>,
             footer: props => props.column.id,
             cell: ({ getValue, row: { index }, column: { id }, table }) => {
-              const initialValue = getValue<TripUpdate['drivers']>().join(', ')
+              const initialValues = getValue<TripUpdate['drivers']>()
+             
               // eslint-disable-next-line react-hooks/rules-of-hooks
-              const [value, setValue] = useState(initialValue)
-              const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-                setValue(e.target.value)
-                table.options.meta?.updateData(index, id, e.target.value.split(', '))
+              const [value, setValue] = useState<Drivers>([...initialValues])
+              const onChange = (e: Drivers) => {
+                console.log(e)
+                setValue(e)
+
+                table.options.meta?.updateData(index, id, e)
               }
               // eslint-disable-next-line react-hooks/rules-of-hooks
               useEffect(() => {
-                setValue(initialValue)
-              }, [initialValue])
+                setValue([...initialValues])
+              }, [initialValues])
+
+              const personnes = [
+                { id: 'maé' as const, name: 'Maé' },
+                { id: 'charles' as const, name: 'Charles' },
+                { id: 'brigitte' as const, name: 'Brigitte' }
+              ]
 
               return (
-                <select value={value} onChange={onChange} className="w-full">
-                  <option value="maé">maé</option>
-                  <option value="charles">charles</option>
-                  <option value="brigitte">brigitte</option>
-                </select>
+                <div className="flex flex-col gap-2">
+                  {personnes.map(personne => (
+                    <div key={personne.id} className="flex items-center gap-3">
+                      <Checkbox
+                      checked={A.contains(personne.id)(value)}
+                        
+                        onCheckedChange={checked => {
+                         
+                          if (A.contains(personne.id)(value) && !checked) {
+                            
+                            const personneIndex = pipe(
+                              value,
+                              A.findFirstIndex(v =>
+                                v === personne.id
+                              ),
+                              O.getOrElse(() => -1)
+                            )
+                            const newDrivers = A.remove(personneIndex)(value)
+                             
+                            onChange(newDrivers)
+                            return
+                          }
+                          if (!A.contains(personne.id)(value) && checked) {
+                            
+                            const newDrivers = A.append(personne.id)(value)
+                            onChange(newDrivers)
+                          }
+                        }}
+                      />
+                      <Label htmlFor="toggle">{personne.name}</Label>
+                    </div>
+                  ))}
+                </div>
               )
             }
           })
