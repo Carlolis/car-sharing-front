@@ -68,6 +68,12 @@ export const TripCreate = Sc.Struct({
 
 export type TripCreate = Sc.Schema.Type<typeof TripCreate>
 
+export const Username = Sc.Struct({
+  username: Sc.String
+})
+
+export type Username = Sc.Schema.Type<typeof Username>
+
 export const TripUpdate = Sc.Struct({
   id: Sc.String,
   name: Sc.String,
@@ -78,18 +84,11 @@ export const TripUpdate = Sc.Struct({
 
 export type TripUpdate = Sc.Schema.Type<typeof TripUpdate>
 
-export interface TripStats {
-  trips: {
-    id: string
-    distance: number
-    date: string
-    name: string
-    drivers: {
-      name: string
-    }[]
-  }[]
-  totalKilometers: number
-}
+export const TripStats = Sc.Struct({
+  totalKilometers: Sc.Int
+})
+
+export type TripStats = Sc.Schema.Type<typeof TripStats>
 
 export interface ErrorResponse {
   message: string

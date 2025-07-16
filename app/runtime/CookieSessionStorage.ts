@@ -81,22 +81,21 @@ export class CookieSessionStorage
         })
       const getUserName = () =>
         T.gen(function* (_) {
-          const cookies = yield* _(
+          const session = yield* _(
             optionalCookies,
-            T.catchAll(() => T.succeed(undefined))
-          )
-
-          const session = yield* _(T.promise(() =>
-            getSession(
-              cookies
+            T.flatMap(cookies =>
+              T.promise(() =>
+                getSession(
+                  cookies
+                )
+              )
             )
-          ))
+          )
 
           return yield* _(
             session.get('user_info'),
             Sc.decodeUnknown(UserInfo),
-            T.map(({ username }) => username),
-            T.catchAll(() => T.succeed(undefined))
+            T.map(({ username }) => username)
           )
         })
 

@@ -24,6 +24,7 @@ export const links: LinksFunction = () => [
 import { HttpServerRequest } from '@effect/platform'
 import { pipe } from 'effect'
 import * as T from 'effect/Effect'
+import { Unexpected } from 'effect/ParseResult'
 import { useEffect } from 'react'
 import { CookieSessionStorage } from './runtime/CookieSessionStorage'
 interface NavigationPros {
@@ -56,7 +57,7 @@ export const action = Remix.action(
     const result = yield* cookieSession.logout()
     yield* T.logInfo(`Logout result ${result}`)
     return result
-  })
+  }).pipe(T.catchAll(error => T.fail(new Unexpected(error))))
 )
 
 const Navigation = ({ isAuthenticated }: NavigationPros) => (

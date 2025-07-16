@@ -1,21 +1,24 @@
-import { type ColumnDef, createColumnHelper, getCoreRowModel,
-  useReactTable } from '@tanstack/react-table'
+import {
+  type ColumnDef,
+  createColumnHelper,
+  getCoreRowModel,
+  useReactTable
+} from '@tanstack/react-table'
 import { pipe } from 'effect'
 import * as A from 'effect/Array'
 import * as O from 'effect/Option'
-import * as R from 'effect/Record'
 import { useEffect, useMemo, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import { useSubmit } from 'react-router'
-import type { Driver, Drivers } from '~/lib/models/Drivers'
+import type { Drivers } from '~/lib/models/Drivers'
 import type { TripUpdate } from '~/types/api'
 import { Checkbox } from '../ui/checkbox'
 import { Label } from '../ui/label'
 
 const columnHelper = createColumnHelper<TripUpdate>()
 
-export function useTripTable(loaderTrips: TripUpdate[]) {
-  const [trips, setTrips] = useState<TripUpdate[]>([])
+export function useTripTable(loaderTrips: readonly TripUpdate[]) {
+  const [trips, setTrips] = useState<readonly TripUpdate[]>([])
   useEffect(() => {
     setTrips(loaderTrips)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -165,7 +168,7 @@ export function useTripTable(loaderTrips: TripUpdate[]) {
   )
 
   const table = useReactTable({
-    data: trips,
+    data: [...trips],
     columns,
     getCoreRowModel: getCoreRowModel(),
     meta: {

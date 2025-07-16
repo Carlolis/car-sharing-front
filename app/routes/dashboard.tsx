@@ -33,14 +33,15 @@ export const loader = Remix.loader(
     const user = yield* cookieSession.getUserName()
     const api = yield* ApiService
 
-    const totalStats = yield* api.getTotalStats()
+    const userStats = yield* api.getTripStatsByUser(user)
 
     const trips = yield* api.getAllTrips()
+
     yield* T.logInfo(
-      `Trips and stats fetched: ${stringify(trips.trips.length), stringify(totalStats)}`
+      `Trips and stats fetched: ${stringify(trips)}, stringify(userStats)}`
     )
 
-    return { totalStats, user, trips }
+    return { user, trips, userStats }
   }).pipe(T.catchAll(error => T.fail(new NotFound({ message: stringify(error) }))))
 )
 
@@ -67,9 +68,9 @@ export const action = Remix.action(
 )
 
 export default function Dashboard(
-  { loaderData: { totalStats, user, trips } }: Route.ComponentProps
+  { loaderData: { user, trips, userStats } }: Route.ComponentProps
 ) {
-  const table = useTripTable(trips.trips)
+  const table = useTripTable(trips)
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -92,13 +93,13 @@ export default function Dashboard(
         )}
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <StatsCard
-            title="Distance totale (km)"
-            value={Math.round(totalStats.totalKilometers)}
+            title="Ta distance totale (km)"
+            value={userStats.totalKilometers}
           />
         </div>
         <div className="mt-8 ">
           <div className="bg-white shadow-md rounded-lg overflow-hidden dark:bg-gray-700">
-            {trips.trips.length > 0 && (
+            {trips.length > 0 && (
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50 dark:bg-gray-700">
                   {table.getHeaderGroups().map(headerGroup => (

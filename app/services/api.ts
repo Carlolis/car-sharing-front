@@ -4,7 +4,7 @@ import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import * as O from 'effect/Option'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
-import { type Trip, type TripStats, TripUpdate } from '../types/api'
+import { type Trip, TripStats, TripUpdate, Username } from '../types/api'
 import { TripCreate } from '../types/api'
 
 class ApiError extends Error {
@@ -67,7 +67,6 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         const body = yield* HttpBody.jsonSchema(TripCreate)({ ...trip, drivers: ['maé'] })
         const createTrip = pipe(
           loginUrl,
-          HttpClientRequest.setHeader('Content-Type', 'application/json'),
           HttpClientRequest.setHeader('Authorization', `Bearer ${token}`),
           HttpClientRequest.setBody(body)
         )
@@ -98,7 +97,6 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         const body = yield* HttpBody.jsonSchema(TripUpdate)(trip)
         const updateTrip = pipe(
           loginUrl,
-          HttpClientRequest.setHeader('Content-Type', 'application/json'),
           HttpClientRequest.setHeader('Authorization', `Bearer ${token}`),
           HttpClientRequest.setBody(body)
         )
@@ -118,14 +116,25 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         T.annotateLogs('Api', 'updateTrip')
       )
 
-    const getTotalStats = () =>
+    const getTripStatsByUser = (username: string) =>
       T.gen(function* () {
-        yield* T.logInfo(`Getting trips....`)
-        const httpClient = HttpClientRequest.get(`${API_URL}/trips/total`)
+        yield* T.logInfo(`Getting stats for user.... ${username}`)
+
+        const httpClient = pipe(
+          `${API_URL}/trips/total`,
+          HttpClientRequest.get,
+          HttpClientRequest.setUrlParam('username', username)
+        )
 
         const response = yield* defaultClient.execute(httpClient)
-        const responseJson = yield* response.json
-        return responseJson as TripStats
+
+        const responseJson = yield* pipe(
+          response.json,
+          T.flatMap(Sc.decodeUnknown(TripStats)),
+          T.tapError(T.logError),
+          T.catchAll(() => T.succeed(TripStats.make({ totalKilometers: 10 })))
+        )
+        return responseJson
       })
 
     const getAllTrips = () =>
@@ -142,9 +151,16 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         )
         const response = yield* defaultClient.execute(getAllTripsRequest)
 
-        const responseJson = yield* response.json
+        const responseJson = yield* pipe(
+          response.json,
+          T.flatMap(Sc.decodeUnknown(Sc.Array(TripUpdate))),
+          T.tapError(T.logError),
+          T.catchAll(() => T.succeed<readonly TripUpdate[]>([]))
+        )
 
-        return responseJson as { trips: TripUpdate[]; totalKilometers: number }
+        yield* T.logInfo(`Found trips.... ${stringify(responseJson)}`)
+
+        return responseJson
       })
 
     pipe(O.some('token'), O.map(toke => O.some(toke + '1')))
@@ -184,7 +200,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
       updateTrip,
       login,
       createTrip,
-      getTotalStats,
+      getTripStatsByUser,
       getAllTrips,
       createChat,
       addMessageToChat

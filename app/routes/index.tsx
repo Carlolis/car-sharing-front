@@ -1,4 +1,5 @@
 import * as T from 'effect/Effect'
+import { Unexpected } from 'effect/ParseResult'
 import { Link } from 'react-router'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import { Remix } from '~/runtime/Remix'
@@ -10,7 +11,7 @@ export const loader = Remix.loader(
     const user = yield* cookieSession.getUserName()
 
     return { user }
-  }).pipe(T.catchAll(error => T.succeed(error)))
+  }).pipe(T.catchAll(error => T.fail(new Unexpected(error))))
 )
 
 export default function Index({ loaderData: { user } }: Route.ComponentProps) {
