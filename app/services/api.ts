@@ -1,11 +1,10 @@
 import { HttpBody, HttpClient, HttpClientRequest } from '@effect/platform'
-import { Config, Context, pipe, Schema as Sc } from 'effect'
+import { Config, pipe, Schema as Sc } from 'effect'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import * as O from 'effect/Option'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
-import { type Trip, TripStats, TripUpdate, Username } from '../types/api'
-import { TripCreate } from '../types/api'
+import { type Trip, TripCreate, TripStats, TripUpdate } from '../types/api'
 
 class ApiError extends Error {
   constructor(public statusCode: number, message: string) {

@@ -114,7 +114,7 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
               const [value, setValue] = useState<Drivers>([...initialValues])
               const onChange = (e: Drivers) => {
                 setValue(e)
-                console.log('ONCHAGE', e)
+
                 table.options.meta?.updateData(index, id, e)
               }
               // eslint-disable-next-line react-hooks/rules-of-hooks
