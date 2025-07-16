@@ -22,7 +22,9 @@ export class CookieSessionStorage
         HttpServerRequest.schemaHeaders(Sc.Struct({ cookie: Sc.String })),
         T.mapError(e => NotAuthenticated.of(e.message)),
         T.map(headers => O.some(headers.cookie)),
-        T.tapError(e => T.logError(`CookieSessionStorage - get cookies for service`, e.message)),
+        T.tapError(e =>
+          T.logError(`CookieSessionStorage - get cookies for service not found`, e.message)
+        ),
         T.catchAll(() => T.succeed(O.none()))
       )
 
@@ -49,6 +51,8 @@ export class CookieSessionStorage
 
       const getUserToken = () =>
         T.gen(function* (_) {
+          yield* T.logInfo('Getting user token')
+
           const cookies = yield* _(
             optionalCookies,
             T.catchAll(() =>
@@ -57,7 +61,7 @@ export class CookieSessionStorage
               })
             )
           )
-
+          yield* T.logInfo('Getting user cookies')
           const session = yield* _(T.promise(() =>
             getSession(
               cookies
@@ -81,6 +85,8 @@ export class CookieSessionStorage
         })
       const getUserName = () =>
         T.gen(function* (_) {
+          yield* T.logInfo('Getting user name')
+
           const session = yield* _(
             optionalCookies,
             T.flatMap(cookies =>
