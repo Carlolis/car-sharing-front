@@ -44,6 +44,7 @@ export default function CreateTrip() {
     )
     match(actionData)
   }, [actionData])
+  console.log('toto')
 
   return (
     <div className="max-w-md mx-auto mt-10 px-4">

@@ -4,7 +4,7 @@ import { Response } from '@effect/platform-node/Undici'
 import type * as FileSystem from '@effect/platform/FileSystem'
 import { fromWeb } from '@effect/platform/HttpServerRequest'
 import type { Scope } from 'effect'
-import { Cause, Context, Exit, Layer, ManagedRuntime, Match } from 'effect'
+import { Cause, Context, Exit, Layer, ManagedRuntime, Match, pipe } from 'effect'
 import type { NoSuchElementException } from 'effect/Cause'
 import * as T from 'effect/Effect'
 import type { ParseError, Unexpected } from 'effect/ParseResult'
@@ -13,7 +13,7 @@ import { data, redirect } from 'react-router'
 import type { CookieSessionStorage } from './CookieSessionStorage'
 import { CookieSessionStorageLayer } from './CookieSessionStorage'
 import { ResponseHeaders } from './ResponseHeaders'
-import { AppLayer } from './Runtime'
+import { AppLayer, DevToolsLive } from './Runtime'
 import type { FormError, NotFound, Redirect } from './ServerResponse'
 type Serializable =
   | undefined
@@ -85,8 +85,7 @@ const makeRequestContext = (
   return context
 }
 
-const runtime = ManagedRuntime.make(AppLayer)
-
+const runtime = pipe(AppLayer, ManagedRuntime.make)
 const loader = <A extends Serializable, R extends AppEnv | RequestEnv,>(
   effect: RemixLoaderHandler<A, R>
 ) => ((args: LoaderFunctionArgs) => {
@@ -110,6 +109,7 @@ const loader = <A extends Serializable, R extends AppEnv | RequestEnv,>(
     T.scoped,
     T.provide(CookieSessionStorageLayer),
     T.provide(makeRequestContext(args)),
+    // T.provide(DevToolsLive),
     T.exit
   )
 
@@ -155,6 +155,7 @@ const action = <A extends Serializable, R extends AppEnv | RequestEnv,>(
     T.scoped,
     T.provide(CookieSessionStorageLayer),
     T.provide(makeRequestContext(args)),
+    // T.provide(DevToolsLive),
     T.exit
   )
 

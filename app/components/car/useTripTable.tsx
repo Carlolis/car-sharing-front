@@ -18,11 +18,10 @@ import { Label } from '../ui/label'
 const columnHelper = createColumnHelper<TripUpdate>()
 
 export function useTripTable(loaderTrips: readonly TripUpdate[]) {
-  const [trips, setTrips] = useState<readonly TripUpdate[]>([])
+  const [trips, setTrips] = useState<TripUpdate[]>([])
   useEffect(() => {
-    setTrips(loaderTrips)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    setTrips([...loaderTrips])
+  }, [loaderTrips])
 
   const submit = useSubmit()
 
@@ -32,9 +31,8 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
         header: 'Trip Infos',
         footer: props => props.column.id,
         columns: [
-          columnHelper.accessor('id', { header: () => <span>Id</span> }),
           columnHelper.accessor('name', {
-            header: () => <span>Nom</span>,
+            header: () => <span>Info du trajet</span>,
             footer: props => props.column.id,
             cell: ({ getValue, row: { index }, column: { id }, table }) => {
               const initialValue = getValue()
@@ -133,6 +131,7 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
                   {personnes.map(personne => (
                     <div key={personne.id} className="flex items-center gap-3">
                       <Checkbox
+                        disabled={value.length === 1 && personnes[0].id == personne.id}
                         checked={A.contains(personne.id)(value)}
                         onCheckedChange={checked => {
                           if (A.contains(personne.id)(value) && !checked) {
@@ -168,7 +167,7 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
   )
 
   const table = useReactTable({
-    data: [...trips],
+    data: trips,
     columns,
     getCoreRowModel: getCoreRowModel(),
     meta: {
@@ -184,8 +183,7 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
           encType: 'application/json'
         })
       }
-    },
-    debugTable: true
+    }
   })
 
   return table
