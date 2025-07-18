@@ -129,9 +129,10 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
 
         const responseJson = yield* pipe(
           response.json,
+          T.tap(T.logInfo),
           T.flatMap(Sc.decodeUnknown(TripStats)),
           T.tapError(T.logError),
-          T.catchAll(() => T.succeed(TripStats.make({ totalKilometers: 10 })))
+          T.catchAll(() => T.succeed(TripStats.make({ totalKilometers: 0 })))
         )
         return responseJson
       })
@@ -139,9 +140,9 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
     const getAllTrips = () =>
       T.gen(function* () {
         const cookieSession = yield* CookieSessionStorage
-        yield* T.logInfo(`Getting token....`)
+        yield* T.logDebug(`Getting token....`)
         const token = yield* cookieSession.getUserToken()
-        yield* T.logInfo(`Found token....`, token)
+        yield* T.logDebug(`Found token....`, token)
         const httpClient = HttpClientRequest.get(`${API_URL}/trips`)
         const getAllTripsRequest = pipe(
           httpClient,
@@ -157,7 +158,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
           T.catchAll(() => T.succeed<readonly TripUpdate[]>([]))
         )
 
-        yield* T.logInfo(`Found trips.... ${stringify(responseJson)}`)
+        yield* T.logDebug(`Found trips.... ${stringify(responseJson)}`)
 
         return responseJson
       })

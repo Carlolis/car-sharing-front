@@ -109,7 +109,7 @@ const loader = <A extends Serializable, R extends AppEnv | RequestEnv,>(
     T.scoped,
     T.provide(CookieSessionStorageLayer),
     T.provide(makeRequestContext(args)),
-    T.provide(DevToolsLive),
+    // T.provide(DevToolsLive),
     T.exit
   )
 
@@ -155,7 +155,7 @@ const action = <A extends Serializable, R extends AppEnv | RequestEnv,>(
     T.scoped,
     T.provide(CookieSessionStorageLayer),
     T.provide(makeRequestContext(args)),
-    T.provide(DevToolsLive),
+    // T.provide(DevToolsLive),
     T.exit
   )
 

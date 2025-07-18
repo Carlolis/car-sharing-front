@@ -40,7 +40,7 @@ export class CookieSessionStorage
                 )
             )
           ))
-          yield* T.logInfo(`CookieSessionStorage - commitUserInfo`, userInfo, session)
+          yield* T.logDebug(`CookieSessionStorage - commitUserInfo`, userInfo, session)
 
           session.set('user_info', userInfo)
 
@@ -51,7 +51,7 @@ export class CookieSessionStorage
 
       const getUserToken = () =>
         T.gen(function* (_) {
-          yield* T.logInfo('Getting user token')
+          yield* T.logDebug('Getting user token')
 
           const cookies = yield* _(
             optionalCookies,
@@ -61,7 +61,7 @@ export class CookieSessionStorage
               })
             )
           )
-          yield* T.logInfo('Getting user cookies')
+          yield* T.logDebug('Getting user cookies')
           const session = yield* _(T.promise(() =>
             getSession(
               cookies
@@ -85,7 +85,7 @@ export class CookieSessionStorage
         })
       const getUserName = () =>
         T.gen(function* (_) {
-          yield* T.logInfo('Getting user name')
+          yield* T.logDebug('Getting user name')
 
           const session = yield* _(
             optionalCookies,

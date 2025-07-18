@@ -109,7 +109,7 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
               const initialValues = getValue<TripUpdate['drivers']>()
 
               // eslint-disable-next-line react-hooks/rules-of-hooks
-              const [value, setValue] = useState<Drivers>([...initialValues])
+              const [drivers, setValue] = useState<Drivers>([...initialValues])
               const onChange = (e: Drivers) => {
                 setValue(e)
 
@@ -131,24 +131,24 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
                   {personnes.map(personne => (
                     <div key={personne.id} className="flex items-center gap-3">
                       <Checkbox
-                        disabled={value.length === 1 && personnes[0].id == personne.id}
-                        checked={A.contains(personne.id)(value)}
+                        disabled={drivers.length === 1 && drivers[0] == personne.id}
+                        checked={A.contains(personne.id)(drivers)}
                         onCheckedChange={checked => {
-                          if (A.contains(personne.id)(value) && !checked) {
+                          if (A.contains(personne.id)(drivers) && !checked) {
                             const personneIndex = pipe(
-                              value,
+                              drivers,
                               A.findFirstIndex(v =>
                                 v === personne.id
                               ),
                               O.getOrElse(() => -1)
                             )
-                            const newDrivers = A.remove(personneIndex)(value)
+                            const newDrivers = A.remove(personneIndex)(drivers)
 
                             onChange(newDrivers)
                             return
                           }
-                          if (!A.contains(personne.id)(value) && checked) {
-                            const newDrivers = A.append(personne.id)(value)
+                          if (!A.contains(personne.id)(drivers) && checked) {
+                            const newDrivers = A.append(personne.id)(drivers)
                             onChange(newDrivers)
                           }
                         }}

@@ -37,7 +37,7 @@ export const loader = Remix.loader(
 
     const trips = yield* api.getAllTrips()
 
-    yield* T.logInfo(
+    yield* T.logDebug(
       `Trips and stats fetched: ${stringify(trips)}, stringify(userStats)}`
     )
 
@@ -48,7 +48,8 @@ export const loader = Remix.loader(
 export const action = Remix.action(
   T.gen(function* () {
     yield* T.logInfo(`Updating Trip....`)
-
+    const cookieSession = yield* CookieSessionStorage
+    const user = yield* cookieSession.getUserName()
     const api = yield* ApiService
 
     const tripUpdate = yield* HttpServerRequest.schemaBodyJson(
@@ -59,8 +60,8 @@ export const action = Remix.action(
     const tripId = yield* api.updateTrip(tripUpdate)
 
     yield* T.logInfo(`Trip updated .... ${stringify(tripId)}`)
-
-    return { tripId }
+    const userStats = yield* api.getTripStatsByUser(user)
+    return { tripId, userStats }
   }).pipe(
     T.tapError(T.logError),
     T.catchAll(() => new Redirect({ location: '/dashboard' }))
@@ -68,10 +69,13 @@ export const action = Remix.action(
 )
 
 export default function Dashboard(
-  { loaderData: { user, trips, userStats } }: Route.ComponentProps
+  { loaderData: { user, trips, userStats }, actionData }: Route.ComponentProps
 ) {
   const table = useTripTable(trips)
 
+  const totalKilometers = actionData?.userStats ?
+    actionData?.userStats.totalKilometers :
+    userStats.totalKilometers
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="py-8">
@@ -94,7 +98,7 @@ export default function Dashboard(
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <StatsCard
             title="Ta distance totale (km)"
-            value={userStats.totalKilometers}
+            value={totalKilometers}
           />
         </div>
         <div className="mt-8 ">

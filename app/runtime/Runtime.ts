@@ -13,7 +13,7 @@ export const DevToolsLive = DevTools.layerWebSocket().pipe(
 export const AppLayer = pipe(
   NodeFileSystem.layer,
   L.provideMerge(Path.layer),
-  Layer.provide(Logger.minimumLogLevel(LogLevel.All)),
+  Layer.provide(Logger.minimumLogLevel(LogLevel.Info)),
   L.provideMerge(NodeContext.layer),
   L.provideMerge(IaServiceLayer),
   Layer.provideMerge(ApiLayer),
