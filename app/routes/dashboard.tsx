@@ -29,7 +29,11 @@ declare module '@tanstack/react-table' {
 
 export const loader = Remix.loader(
   T.gen(function* () {
+    yield* T.logDebug(`Loading Dashboard...`)
     const cookieSession = yield* CookieSessionStorage
+
+    yield* T.logDebug(`CookieSessionStorage - loader`)
+
     const user = yield* cookieSession.getUserName()
     const api = yield* ApiService
 

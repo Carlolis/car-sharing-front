@@ -29,7 +29,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
     const API_URL = yield* pipe(Config, T.flatMap(c => c.getConfig), T.map(c => c.API_URL))
     const login = (login: string) =>
       T.gen(function* () {
-        yield* T.logInfo(`login url : ${API_URL}/login`)
+        yield* T.logInfo(`ApiService login url : ${API_URL}/login`)
         const loginUrl = HttpClientRequest.post(`${API_URL}/login`)
 
         const body = yield* HttpBody.json({ name: login })
@@ -40,11 +40,11 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         )
 
         const response = yield* defaultClient.execute(loginRequest)
-        yield* T.logInfo('login http response :', response)
+        yield* T.logInfo('ApiService login http response :', response)
         const responseJson = yield* response.json
-
-        if (response.status === 401) {
-          yield* T.logInfo(response.status === 401)
+        yield* T.logInfo('ApiService login json response :', response)
+        if (response.status !== 200) {
+          yield* T.logError('ApiService login response status is', response.status)
           return yield* T.fail(stringify(responseJson))
         }
 

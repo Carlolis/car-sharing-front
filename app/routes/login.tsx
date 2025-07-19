@@ -24,34 +24,13 @@ export const action = Remix.action(
       })
     )
 
-    yield* T.logInfo(`Login.... ${username}`)
+    yield* T.logInfo(`Remix Action Login Page Login.... ${username}`)
     const { token } = yield* api.login(username)
-    yield* T.logInfo(`Token.... ${stringify(token)}`)
+    yield* T.logInfo(`Remix Action Login Page  Token.... ${stringify(token)}`)
     return yield* cookieSession.commitUserInfo({ username, token })
-
-    // yield* T.fail(cookie)
   }).pipe(
     T.catchAll(error => Sc.decode(UserNotFound)({ message: error.toString(), _tag: 'NotFound' }))
-    // T.flatMap(cookie => {
-    //   const match = Match.type<typeof cookie>().pipe(
-    //     Match.tag(
-    //       'NotFound',
-    //       error => Sc.decode(UserNotFound)({ message: error.toString(), _tag: 'NotFound' })
-    //     ),
-    //     Match.orElse(cookie =>
-    //       new Redirect({ location: '/dashboard', headers: { 'Set-Cookie': cookie } })
-    //     )
-    //     // Match.when({ token: Match.string }, ({ token, username }) => {
-    //     //   setAuth({ token, username })
-    //     //   navigate('/dashboard')
-    //     // }),
-    //   )
-    //   const toto = match(cookie)
-    // })
   )
-  // .pipe(
-  //
-  // )
 )
 
 export default function Login() {
@@ -67,10 +46,6 @@ export default function Login() {
         setIsNotFound(true)
         setErrorMessage(message)
       })
-      // Match.when({ token: Match.string }, ({ token, username }) => {
-      //   setAuth({ token, username })
-      //   navigate('/dashboard')
-      // }),
     )
     match(actionData)
   }, [actionData])

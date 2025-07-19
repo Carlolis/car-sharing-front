@@ -2,6 +2,7 @@ import { HttpServerRequest } from '@effect/platform'
 
 // import { json, TypedResponse } from 'react-router';
 import { Context, Effect as T, pipe, Schema as Sc } from 'effect'
+import { stringify } from 'effect/FastCheck'
 import * as O from 'effect/Option'
 import { redirect } from 'react-router'
 import { commitSession, getSession } from '~/session'
@@ -30,6 +31,11 @@ export class CookieSessionStorage
 
       const commitUserInfo = (userInfo: UserInfo) =>
         T.gen(function* (_) {
+          yield* T.logDebug(
+            `CookieSessionStorage - commitUserInfo about to commit user info:`,
+            stringify(userInfo),
+            stringify(optionalCookies)
+          )
           const session = yield* _(T.promise(() =>
             pipe(
               optionalCookies,

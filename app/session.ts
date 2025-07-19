@@ -3,7 +3,6 @@ import { createCookieSessionStorage } from 'react-router'
 // export the whole sessionStorage object
 export const sessionStorage = createCookieSessionStorage({
   cookie: {
-    // FIXME : change this in prod
     maxAge: 60 * 60 * 24 * 365, // 1 year
     name: '_session', // use any name you want here
     sameSite: 'lax', // this helps with CSRF
@@ -12,9 +11,9 @@ export const sessionStorage = createCookieSessionStorage({
     // FIXME: secure:// replace this with an actual secret
     secrets: ['s3cr3t'],
     // FIXME: // enable this in prod only
-    secure: false,
+    secure: true,
     /// FIXME change this in prod
-    domain: 'localhost'
+    domain: 'share.ilieff.fr'
   }
 })
 

@@ -5,6 +5,7 @@ import {
 } from 'effect'
 import type { ConfigError } from 'effect/ConfigError'
 import * as T from 'effect/Effect'
+import { stringify } from 'effect/FastCheck'
 import * as L from 'effect/Layer'
 import { Info, type LogLevel } from 'effect/LogLevel'
 // Declaring a tag for the Config service
@@ -24,7 +25,10 @@ export class Config extends Context.Tag('Config')<
 
 export const ConfigLive = L.succeed(Config, {
   getConfig: T.gen(function* () {
-    const logLevel = yield* pipe(EConfig.logLevel('LOG_LEVEL'), EConfig.withDefault(Info))
+    const logLevel = yield* pipe(
+      EConfig.logLevel('LOG_LEVEL'),
+      EConfig.withDefault(Info)
+    )
     const API_URL = yield* pipe(
       EConfig.string('API_URL'),
       EConfig.withDefault('http://localhost:8081/api')
