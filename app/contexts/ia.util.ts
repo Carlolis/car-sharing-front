@@ -3,6 +3,7 @@ import { FetchHttpClient } from '@effect/platform'
 import { Deferred, pipe, type Scope } from 'effect'
 import * as T from 'effect/Effect'
 import type { ChatResponse } from 'ollama'
+import { ConfigLive } from '~/runtime/Config'
 import { ApiService } from '~/services/api'
 import { transformIterable } from './transformIterable'
 
@@ -104,6 +105,7 @@ export class IaService extends T.Service<IaService>()('IaService', {
           transformIterable(iterable, next, chatUuid, question, firstChunkContent),
           T.provide(ApiService.Default),
           T.provide(FetchHttpClient.layer),
+          T.provide(ConfigLive),
           T.runPromise
         )
         // ;(async () => {

@@ -1,8 +1,9 @@
 import { HttpBody, HttpClient, HttpClientRequest } from '@effect/platform'
-import { Config, pipe, Schema as Sc } from 'effect'
+import { pipe, Schema as Sc } from 'effect'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import * as O from 'effect/Option'
+import { Config } from '~/runtime/Config'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import { type Trip, TripCreate, TripStats, TripUpdate } from '../types/api'
 
@@ -25,10 +26,7 @@ async function handleResponse<T,>(response: Response): Promise<T> {
 export class ApiService extends T.Service<ApiService>()('ApiService', {
   effect: T.gen(function* () {
     const defaultClient = yield* HttpClient.HttpClient
-    const API_URL = yield* pipe(
-      Config.string('API_URL'),
-      Config.withDefault('http://localhost:8081/api')
-    )
+    const API_URL = yield* pipe(Config, T.flatMap(c => c.getConfig), T.map(c => c.API_URL))
     const login = (login: string) =>
       T.gen(function* () {
         yield* T.logInfo(`login url : ${API_URL}/login`)
@@ -117,7 +115,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
 
     const getTripStatsByUser = (username: string) =>
       T.gen(function* () {
-        yield* T.logInfo(`Getting stats for user.... ${username}`)
+        yield* T.logDebug(`Getting stats for user.... ${username}`)
 
         const httpClient = pipe(
           `${API_URL}/trips/total`,
@@ -129,7 +127,6 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
 
         const responseJson = yield* pipe(
           response.json,
-          T.tap(T.logInfo),
           T.flatMap(Sc.decodeUnknown(TripStats)),
           T.tapError(T.logError),
           T.catchAll(() => T.succeed(TripStats.make({ totalKilometers: 0 })))
@@ -209,69 +206,3 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
 }) {}
 
 export const ApiLayer = ApiService.Default
-
-const API_URL = 'TO DELETE'
-
-export const api = {
-  login(login: string) {
-    return T.gen(function* () {
-      const defaultClient = yield* HttpClient.HttpClient
-      const toto = HttpClientRequest.get(`${API_URL}/login`)
-
-      const body = yield* HttpBody.json({ name: login })
-      const loginRequest = pipe(
-        toto,
-        HttpClientRequest.setHeader('Content-Type', 'application/json'),
-        HttpClientRequest.setBody(body),
-        HttpClientRequest.setMethod('POST')
-      )
-
-      const response = yield* defaultClient.execute(loginRequest)
-      yield* T.logInfo(response)
-      const responseJson = yield* response.json
-
-      if (response.status === 401) {
-        yield* T.logInfo(response.status === 401)
-        return yield* T.fail(stringify(responseJson))
-      }
-
-      return responseJson as { token: string }
-    }).pipe(
-      T.scoped
-    )
-  },
-
-  async createTrip(trip: TripCreate, token: string): Promise<Trip> {
-    const response = await fetch(`${API_URL}/trips`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(trip)
-    })
-    return handleResponse<Trip>(response)
-  },
-
-  async getUserStats(token: string): Promise<TripStats> {
-    const response = await fetch(`${API_URL}/trips/user`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-    return handleResponse<TripStats>(response)
-  },
-
-  getTotalStats() {
-    return T.gen(function* () {
-      const defaultClient = yield* HttpClient.HttpClient
-      const toto = HttpClientRequest.get(`${API_URL}/trips/total`)
-
-      const response = yield* defaultClient.execute(toto)
-      const responseJson = yield* response.json
-      return responseJson as TripStats
-    }).pipe(
-      T.scoped
-    )
-  }
-}

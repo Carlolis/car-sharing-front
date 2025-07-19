@@ -33,17 +33,20 @@ export default function Index({ loaderData: { user } }: Route.ComponentProps) {
             Partagez la voiture simplement
           </h1>
           <div className="mt-10 flex items-center justify-center gap-x-6">
-            {!user && (
-              <Link
-                to="/login"
-                className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
-              >
-                Connexion
-              </Link>
-            )}
-            <Link to="/dashboard" className="text-2xl font-bold leading-8 text-blue-700">
-              Voir le tableau de bord <span aria-hidden="true">→</span>
-            </Link>
+            {!user ?
+              (
+                <Link
+                  to="/login"
+                  className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
+                >
+                  Connexion
+                </Link>
+              ) :
+              (
+                <Link to="/dashboard" className="text-2xl font-bold leading-8 text-blue-700">
+                  Voir le tableau de bord <span aria-hidden="true">→</span>
+                </Link>
+              )}
           </div>
         </div>
       </div>

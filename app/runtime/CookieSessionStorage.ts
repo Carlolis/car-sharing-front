@@ -61,15 +61,17 @@ export class CookieSessionStorage
               })
             )
           )
-          yield* T.logDebug('Getting user cookies')
+          yield* T.logInfo('Getting user session from cookies', cookies)
           const session = yield* _(T.promise(() =>
             getSession(
               cookies
             )
           ))
+          yield* T.logInfo('Getting user session sessions', session)
 
           const token = yield* _(
             session.get('user_info'),
+            // T.tap(infos => T.logInfo('CookieSessionStorage - getUserToken', infos)),
             Sc.decodeUnknown(UserInfo),
             T.map(({ token }) => token),
             T.mapError(e => NotAuthenticated.of(e.message)),
