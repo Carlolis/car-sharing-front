@@ -109,15 +109,15 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
               const initialValues = getValue<TripUpdate['drivers']>()
 
               // eslint-disable-next-line react-hooks/rules-of-hooks
-              const [drivers, setValue] = useState<Drivers>([...initialValues])
+              const [drivers, setDrivers] = useState<Drivers>([...initialValues])
               const onChange = (e: Drivers) => {
-                setValue(e)
+                setDrivers(e)
 
                 table.options.meta?.updateData(index, id, e)
               }
               // eslint-disable-next-line react-hooks/rules-of-hooks
               useEffect(() => {
-                setValue([...initialValues])
+                setDrivers([...initialValues])
               }, [initialValues])
 
               const personnes = [

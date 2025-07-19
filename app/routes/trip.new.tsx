@@ -1,9 +1,14 @@
 import { HttpServerRequest } from '@effect/platform'
-import { Match } from 'effect'
+import { Match, pipe } from 'effect'
+import * as A from 'effect/Array'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
+import * as O from 'effect/Option'
 import { useEffect, useState } from 'react'
 import { Form, useActionData } from 'react-router'
+import { Checkbox } from '~/components/ui/checkbox'
+import { Label } from '~/components/ui/label'
+import type { Drivers } from '~/lib/models/Drivers'
 import { Remix } from '~/runtime/Remix'
 import { Redirect } from '~/runtime/ServerResponse'
 import { ApiService } from '~/services/api'
@@ -33,30 +38,41 @@ export default function CreateTrip() {
   const actionData = useActionData<typeof action>()
 
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
-  const [userName, setUserName] = useState<string | undefined>(undefined)
+  const [tripInfos, setTripInfos] = useState<string | undefined>(undefined)
 
   useEffect(() => {
     const match = Match.type<typeof actionData>().pipe(
-      Match.when(undefined, () => setErrorMessage('Bienvenue')),
+      Match.when(
+        undefined,
+        () => setErrorMessage('Une erreur est survenue lors de la création du trajet')
+      ),
       Match.orElse(({ tripId }) => {
-        setUserName(tripId)
+        setTripInfos(tripId)
       })
     )
     match(actionData)
   }, [actionData])
 
+  const personnes = [
+    { id: 'maé' as const, name: 'Maé' },
+    { id: 'charles' as const, name: 'Charles' },
+    { id: 'brigitte' as const, name: 'Brigitte' }
+  ]
+
   return (
     <div className="max-w-md mx-auto mt-10 px-4">
       <h2 className="text-2xl font-bold mb-6">Créer un nouveau trajet</h2>
 
-      {errorMessage && (
-        <div className="mb-4 p-4 text-green-700 bg-green-100 rounded">
+      {
+        /* {errorMessage && (
+        <div className="mb-4 p-4 text-red-700 bg-red-100 rounded">
           {errorMessage}
         </div>
-      )}
-      {userName && (
+      )} */
+      }
+      {tripInfos && (
         <div className="mb-4 p-4 text-green-700 bg-green-100 rounded">
-          {userName}
+          {tripInfos}
         </div>
       )}
 
@@ -108,16 +124,17 @@ export default function CreateTrip() {
         <div>
           <label className="block text-sm font-medium text-gray-700">
             Qui ?
-            <select
-              name="drivers"
-              required
-              multiple
-              className="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100"
-            >
-              <option value="maé">Maé</option>
-              <option value="charles">Charles</option>
-              <option value="brigitte">Brigitte</option>
-            </select>
+            <div className="flex flex-col gap-2">
+              {personnes.map(personne => (
+                <div key={personne.id} className="flex items-center gap-3">
+                  <Checkbox
+                    name="drivers"
+                    value={personne.id}
+                  />
+                  <Label htmlFor="toggle">{personne.name}</Label>
+                </div>
+              ))}
+            </div>
           </label>
         </div>
 
