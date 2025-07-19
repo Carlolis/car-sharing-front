@@ -10,6 +10,8 @@ import * as T from 'effect/Effect'
 import type { ParseError, Unexpected } from 'effect/ParseResult'
 import type { ActionFunctionArgs, LoaderFunctionArgs, Params as RemixParams } from 'react-router'
 import { data, redirect } from 'react-router'
+import { SessionStorage } from '~/session'
+import { ConfigLive } from './Config'
 import type { CookieSessionStorage } from './CookieSessionStorage'
 import { CookieSessionStorageLayer } from './CookieSessionStorage'
 import { ResponseHeaders } from './ResponseHeaders'
@@ -50,6 +52,7 @@ type RequestEnv =
   | Path.Path
   | ResponseHeaders
   | CookieSessionStorage
+  | SessionStorage
 
 type ActionError = Redirect | Unexpected | FormError | ParseError | NotFound
 
@@ -108,6 +111,8 @@ const loader = <A extends Serializable, R extends AppEnv | RequestEnv,>(
     ),
     T.scoped,
     T.provide(CookieSessionStorageLayer),
+    T.provide(SessionStorage.Default),
+    T.provide(ConfigLive),
     T.provide(makeRequestContext(args)),
     // T.provide(DevToolsLive),
     T.exit
@@ -154,6 +159,8 @@ const action = <A extends Serializable, R extends AppEnv | RequestEnv,>(
     // TODO: map FormError to ErrorResponse
     T.scoped,
     T.provide(CookieSessionStorageLayer),
+    T.provide(SessionStorage.Default),
+    T.provide(ConfigLive),
     T.provide(makeRequestContext(args)),
     // T.provide(DevToolsLive),
     T.exit
