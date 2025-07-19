@@ -13,7 +13,7 @@ export const sessionStorage = createCookieSessionStorage({
     // FIXME: // enable this in prod only
     secure: true,
     /// FIXME change this in prod
-    domain: 'share.ilieff.fr'
+    domain: 'localhost'
   }
 })
 

@@ -27,12 +27,12 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
   effect: T.gen(function* () {
     const defaultClient = yield* HttpClient.HttpClient
     const API_URL = yield* pipe(Config, T.flatMap(c => c.getConfig), T.map(c => c.API_URL))
-    const login = (login: string) =>
+    const login = (username: string) =>
       T.gen(function* () {
         yield* T.logInfo(`ApiService login url : ${API_URL}/login`)
         const loginUrl = HttpClientRequest.post(`${API_URL}/login`)
 
-        const body = yield* HttpBody.json({ name: login })
+        const body = yield* HttpBody.json({ name: username })
         const loginRequest = pipe(
           loginUrl,
           HttpClientRequest.setHeader('Content-Type', 'application/json'),
@@ -50,7 +50,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
 
         return responseJson as { token: string }
       }).pipe(
-        T.annotateLogs('Api', 'login')
+        T.annotateLogs(ApiService.name, login.name)
       )
 
     const createTrip = (trip: TripCreate) =>
@@ -80,7 +80,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
 
         return Sc.decodeUnknownSync(Sc.String)(responseJson)
       }).pipe(
-        T.annotateLogs('Api', 'createTrip')
+        T.annotateLogs(ApiService.name, createTrip.name)
       )
 
     const updateTrip = (trip: TripUpdate) =>
@@ -110,7 +110,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
 
         return Sc.decodeUnknownSync(Sc.String)(responseJson)
       }).pipe(
-        T.annotateLogs('Api', 'updateTrip')
+        T.annotateLogs(ApiService.name, updateTrip.name)
       )
 
     const getTripStatsByUser = (username: string) =>
@@ -132,7 +132,9 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
           T.catchAll(() => T.succeed(TripStats.make({ totalKilometers: 0 })))
         )
         return responseJson
-      })
+      }).pipe(
+        T.annotateLogs('Api', getTripStatsByUser.name)
+      )
 
     const getAllTrips = () =>
       T.gen(function* () {
@@ -155,10 +157,12 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
           T.catchAll(() => T.succeed<readonly TripUpdate[]>([]))
         )
 
-        yield* T.logDebug(`Found trips.... ${stringify(responseJson)}`)
+        yield* T.logDebug(`Found ${stringify(responseJson.length)} trips`)
 
         return responseJson
-      })
+      }).pipe(
+        T.annotateLogs(ApiService.name, getAllTrips.name)
+      )
 
     pipe(O.some('token'), O.map(toke => O.some(toke + '1')))
 

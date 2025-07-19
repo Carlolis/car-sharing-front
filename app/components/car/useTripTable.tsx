@@ -82,7 +82,7 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
             header: () => <span>Distance (km)</span>,
             footer: props => props.column.id,
             cell: ({ getValue, row: { index }, column: { id }, table }) => {
-              const initialValue = getValue()
+              const initialValue = getValue<number>()
               // eslint-disable-next-line react-hooks/rules-of-hooks
               const [value, setValue] = useState(initialValue)
               const onBlur = () => {
@@ -95,8 +95,8 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
 
               return (
                 <input
-                  value={value as string}
-                  onChange={e => setValue(e.target.value)}
+                  value={value}
+                  onChange={e => setValue(+e.target.value)}
                   onBlur={onBlur}
                 />
               )

@@ -21,7 +21,7 @@ export default function Index({ loaderData: { user } }: Route.ComponentProps) {
           className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
           role="alert"
         >
-          <strong className="font-bold">Connecté !</strong>
+          <strong className="font-bold">Bravo !</strong>
           <span className="block sm:inline">
             {' '}Vous êtes connecté en tant que {user}.
           </span>
