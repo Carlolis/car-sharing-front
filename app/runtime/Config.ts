@@ -6,7 +6,7 @@ import {
 import type { ConfigError } from 'effect/ConfigError'
 import * as T from 'effect/Effect'
 import * as L from 'effect/Layer'
-import type { LogLevel } from 'effect/LogLevel'
+import { Info, type LogLevel } from 'effect/LogLevel'
 // Declaring a tag for the Config service
 
 export class Config extends Context.Tag('Config')<
@@ -24,7 +24,7 @@ export class Config extends Context.Tag('Config')<
 
 export const ConfigLive = L.succeed(Config, {
   getConfig: T.gen(function* () {
-    const logLevel = yield* EConfig.logLevel('LOG_LEVEL')
+    const logLevel = yield* pipe(EConfig.logLevel('LOG_LEVEL'), EConfig.withDefault(Info))
     const API_URL = yield* pipe(
       EConfig.string('API_URL'),
       EConfig.withDefault('http://localhost:8081/api')
