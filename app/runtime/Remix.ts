@@ -114,7 +114,7 @@ const loader = <A extends Serializable, R extends AppEnv | RequestEnv,>(
     T.provide(SessionStorage.Default),
     T.provide(ConfigLive),
     T.provide(makeRequestContext(args)),
-    // T.provide(DevToolsLive),
+    T.provide(DevToolsLive),
     T.exit
   )
 
@@ -162,7 +162,7 @@ const action = <A extends Serializable, R extends AppEnv | RequestEnv,>(
     T.provide(SessionStorage.Default),
     T.provide(ConfigLive),
     T.provide(makeRequestContext(args)),
-    // T.provide(DevToolsLive),
+    T.provide(DevToolsLive),
     T.exit
   )
 

@@ -186,6 +186,7 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
         ]
       }
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
 

@@ -3,7 +3,6 @@ import { HttpServerRequest } from '@effect/platform'
 // import { json, TypedResponse } from 'react-router';
 import { Context, Effect as T, pipe, Schema as Sc } from 'effect'
 import { stringify } from 'effect/FastCheck'
-import * as L from 'effect/Layer'
 import * as O from 'effect/Option'
 import { redirect } from 'react-router'
 import { SessionStorage } from '~/session'
