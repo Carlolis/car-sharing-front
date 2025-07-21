@@ -1,32 +1,31 @@
 import { HttpBody, HttpClient, HttpClientRequest } from '@effect/platform'
 import { pipe, Schema as Sc } from 'effect'
+
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import * as O from 'effect/Option'
 import { Config } from '~/runtime/Config'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
-import { type Trip, TripCreate, TripStats, TripUpdate } from '../types/api'
-
-class ApiError extends Error {
-  constructor(public statusCode: number, message: string) {
-    super(message)
-  }
-}
-
-async function handleResponse<T,>(response: Response): Promise<T> {
-  if (!response.ok) {
-    const error = await response.clone().json()
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-    throw new ApiError(response.status, error.message)
-  }
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return response.clone().json()
-}
+import { TripCreate, TripStats, TripUpdate } from '../types/api'
 
 export class ApiService extends T.Service<ApiService>()('ApiService', {
   effect: T.gen(function* () {
     const defaultClient = yield* HttpClient.HttpClient
     const API_URL = yield* pipe(Config, T.flatMap(c => c.getConfig), T.map(c => c.API_URL))
+
+    const deleteTrip = (tripId: string) =>
+      T.gen(function* () {
+        const deleteUrl = HttpClientRequest.del(`${API_URL}/trips/${tripId}/delete`)
+        const response = yield* defaultClient.execute(deleteUrl)
+        yield* T.logInfo('ApiService deleteTrip response :', response)
+        if (response.status !== 200) {
+          yield* T.logError('ApiService deleteTrip response status is', response.status)
+          return yield* T.fail('Failed to delete trip')
+        }
+        return response.status
+      }).pipe(
+        T.annotateLogs(ApiService.name, deleteTrip.name)
+      )
     const login = (username: string) =>
       T.gen(function* () {
         yield* T.logInfo(`ApiService login url : ${API_URL}/login`)
@@ -204,7 +203,8 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
       getTripStatsByUser,
       getAllTrips,
       createChat,
-      addMessageToChat
+      addMessageToChat,
+      deleteTrip
     })
   })
 }) {}

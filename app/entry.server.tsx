@@ -41,7 +41,7 @@ export default function handleRequest(
               status: didError ? 500 : responseStatusCode
             })
           )
-
+          // @effect-diagnostics-next-line unnecessaryPipe:off this is not an Effect pipe it is for Remix
           pipe(body)
         },
         onShellError(error: unknown) {

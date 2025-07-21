@@ -9,9 +9,10 @@
     "lint": "eslint",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc",
-    "check": "pnpm run typecheck && pnpm run lint",
+    "check": "pnpm run typecheck && pnpm run lint && pnpm run effectLint",
     "knip": "knip",
-    "prepare": "husky"
+    "prepare": "husky",
+    "effectLint": "effect-language-service check"
   },
   "dependencies": {
     "@effect/eslint-plugin": "^0.3.2",

@@ -14,6 +14,7 @@ import type { Drivers } from '~/lib/models/Drivers'
 import type { TripUpdate } from '~/types/api'
 import { Checkbox } from '../ui/checkbox'
 import { Label } from '../ui/label'
+import { DashboardArguments, TaggedDeleteTrip, TaggedUpdateTrip } from './DashboardArguments'
 
 const columnHelper = createColumnHelper<TripUpdate>()
 
@@ -159,6 +160,28 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
                 </div>
               )
             }
+          }),
+          columnHelper.display({
+            id: 'actions',
+            header: () => <span>Actions</span>,
+            cell: ({ row }) => (
+              <button
+                onClick={() => {
+                  const taggedDeletedTrip = TaggedDeleteTrip.make({
+                    tripId: row.original.id
+                  })
+
+                  submit(taggedDeletedTrip, {
+                    action: '/dashboard',
+                    method: 'post',
+                    encType: 'application/json'
+                  })
+                }}
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Supprimer
+              </button>
+            )
           })
         ]
       }
@@ -175,9 +198,11 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
         const updatedTrip = { ...trips[rowIndex], [columnId]: value }
 
         setTrips(old => old.map((row, index) => (index === rowIndex ? updatedTrip : row)))
-
+        const taggedUpdatedTrip = TaggedUpdateTrip.make({
+          tripUpdate: updatedTrip
+        })
         // @ts-expect-error date is a string
-        submit(updatedTrip, {
+        submit(taggedUpdatedTrip, {
           action: '/dashboard',
           method: 'post',
           encType: 'application/json'

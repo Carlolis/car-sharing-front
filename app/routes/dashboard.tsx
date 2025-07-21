@@ -17,6 +17,8 @@ import {
 
 import { HttpServerRequest } from '@effect/platform'
 import 'react-datepicker/dist/react-datepicker.css'
+import * as Match from 'effect/Match'
+import { DashboardArguments } from '~/components/car/DashboardArguments'
 import { StatsCard } from '~/components/car/StatsCard'
 import { useTripTable } from '~/components/car/useTripTable'
 import type { Route } from './+types/dashboard'
@@ -54,18 +56,35 @@ export const action = Remix.action(
     yield* T.logInfo(`Updating Trip....`)
     const cookieSession = yield* CookieSessionStorage
     const user = yield* cookieSession.getUserName()
+
     const api = yield* ApiService
+    const request = yield* HttpServerRequest.schemaBodyJson(DashboardArguments)
 
-    const tripUpdate = yield* HttpServerRequest.schemaBodyJson(
-      TripUpdate
+    const match = Match.type<DashboardArguments>().pipe(
+      Match.tag('delete', ({ tripId }) =>
+        T.gen(function* () {
+          yield* T.logInfo('Deleting trip...')
+          yield* api.deleteTrip(tripId)
+
+          yield* T.logInfo(`Trip deleted: ${stringify(tripId)}`)
+
+          const userStats = yield* api.getTripStatsByUser(user)
+          return { tripId, userStats }
+        })),
+      Match.tag('update', ({ tripUpdate }) =>
+        T.gen(function* () {
+          yield* T.logInfo(`Trip updating remix action .... ${stringify(tripUpdate)}`)
+
+          const tripId = yield* api.updateTrip(tripUpdate)
+
+          yield* T.logInfo(`Trip updated .... ${stringify(tripId)}`)
+          const userStats = yield* api.getTripStatsByUser(user)
+          return { tripId, userStats }
+        })),
+      Match.exhaustive
     )
-    yield* T.logInfo(`Trip updating remix action .... ${stringify(tripUpdate)}`)
 
-    const tripId = yield* api.updateTrip(tripUpdate)
-
-    yield* T.logInfo(`Trip updated .... ${stringify(tripId)}`)
-    const userStats = yield* api.getTripStatsByUser(user)
-    return { tripId, userStats }
+    return yield* match(request)
   }).pipe(
     T.tapError(T.logError),
     T.catchAll(() => new Redirect({ location: '/dashboard' }))

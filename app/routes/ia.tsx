@@ -53,21 +53,19 @@ export const action = Remix.action(
       Match.tag('wakeUp', () =>
         T.gen(function* () {
           yield* T.logInfo('Waking up Ollama...')
-          yield* pipe(
-            T.tryPromise(
-              {
-                try: () =>
-                  fetch(`http://192.168.1.101:3333`, {
-                    method: 'POST',
-                    body: 'ertttyujivovpvlghl'
-                  }),
-                catch: error => {
-                  // eslint-disable-next-line no-console
-                  console.error(error)
-                  return T.fail(error)
-                }
+          yield* T.tryPromise(
+            {
+              try: () =>
+                fetch(`http://192.168.1.101:3333`, {
+                  method: 'POST',
+                  body: 'ertttyujivovpvlghl'
+                }),
+              catch: error => {
+                // eslint-disable-next-line no-console
+                console.error(error)
+                return T.fail(error)
               }
-            )
+            }
           )
 
           const ollamaHost = yield* pipe(

@@ -2,7 +2,6 @@ import { DateTime, identity, pipe, Schema as Sc } from 'effect'
 import { ensure } from 'effect/Array'
 import { formatIsoDateUtc } from 'effect/DateTime'
 import { Drivers } from '~/lib/models/Drivers'
-
 export interface Trip {
   id: string
   userId: string

@@ -9,9 +9,14 @@
     ".react-router/types/**/*"
   ],
   "compilerOptions": {
+    "declaration": true,
+    "emitDeclarationOnly": true,
     "plugins": [
       {
-        "name": "@effect/language-service"
+        "name": "@effect/language-service",
+        "namespaceImportPackages": [
+          "effect"
+        ],
       }
     ],
     "verbatimModuleSyntax": true,
