@@ -92,6 +92,7 @@ export class IaService extends T.Service<IaService>()('IaService', {
           yield* T.log('DONE')
           yield* T.log(content)
           yield* api.addMessageToChat(chatUuid, { question, answer: content })
+          // @effect-diagnostics-next-line returnEffectInGen:off
           return T.succeed({ type: 'done' as const })
         }
         firstChunkContent = firstChunk.value.message.content ?? ''
@@ -134,6 +135,7 @@ export class IaService extends T.Service<IaService>()('IaService', {
         //   }
         // })()
 
+        // @effect-diagnostics-next-line returnEffectInGen:off
         return T.succeed({
           type: 'text' as const,
           content: firstChunkContent,
