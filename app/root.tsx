@@ -24,6 +24,7 @@ export const links: LinksFunction = () => [
 import { HttpServerRequest } from '@effect/platform'
 import { pipe } from 'effect'
 import * as T from 'effect/Effect'
+import { stringify } from 'effect/FastCheck'
 import { Unexpected } from 'effect/ParseResult'
 import { useEffect } from 'react'
 import { CookieSessionStorage } from './runtime/CookieSessionStorage'
@@ -55,7 +56,7 @@ export const action = Remix.action(
 
     yield* T.logInfo(`User ${user} logging out`)
     const result = yield* cookieSession.logout()
-    yield* T.logInfo(`Logout result ${result}`)
+    yield* T.logInfo(`Logout result ${stringify(result)}`)
     return result
   }).pipe(T.catchAll(error => T.fail(new Unexpected(error))))
 )
@@ -99,7 +100,7 @@ const Navigation = ({ isAuthenticated }: NavigationPros) => (
             && (
               <Form method="post">
                 <button
-                  className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium hover:cursor-pointer"
                   type="submit"
                 >
                   Déconnexion

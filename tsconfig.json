@@ -14,8 +14,11 @@
     "plugins": [
       {
         "name": "@effect/language-service",
+        "barrelImportPackages": [
+          "effect/FastCheck"
+        ],
         "namespaceImportPackages": [
-          "effect"
+          "effect/Stream"
         ],
       }
     ],
