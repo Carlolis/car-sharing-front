@@ -8,16 +8,14 @@ import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import { stringify } from 'effect/FastCheck'
 import { NotFound, Redirect } from '~/runtime/ServerResponse'
 
-import { TripUpdate } from '~/types/api'
-
 import {
   flexRender,
   type RowData
 } from '@tanstack/react-table'
 
 import { HttpServerRequest } from '@effect/platform'
-import 'react-datepicker/dist/react-datepicker.css'
 import * as Match from 'effect/Match'
+import 'react-datepicker/dist/react-datepicker.css'
 import { DashboardArguments } from '~/components/car/DashboardArguments'
 import { StatsCard } from '~/components/car/StatsCard'
 import { useTripTable } from '~/components/car/useTripTable'

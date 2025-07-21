@@ -14,7 +14,7 @@ import type { Drivers } from '~/lib/models/Drivers'
 import type { TripUpdate } from '~/types/api'
 import { Checkbox } from '../ui/checkbox'
 import { Label } from '../ui/label'
-import { DashboardArguments, TaggedDeleteTrip, TaggedUpdateTrip } from './DashboardArguments'
+import { TaggedDeleteTrip, TaggedUpdateTrip } from './DashboardArguments'
 
 const columnHelper = createColumnHelper<TripUpdate>()
 
