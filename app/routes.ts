@@ -7,6 +7,7 @@ export default [
   route('/login', './routes/login.tsx'),
   route('/trip/new', './routes/trip.new.tsx'),
   route('/ia', './routes/ia.tsx'),
-  route('/health', './routes/health.tsx')
+  route('/health', './routes/health.tsx'),
+  route('/calendar', './routes/calendar.tsx')
   // pattern ^           ^ module file
 ] as RouteConfig
