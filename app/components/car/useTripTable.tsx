@@ -26,6 +26,7 @@ import {
 } from '../ui/dialog'
 import { Label } from '../ui/label'
 import { TaggedDeleteTrip, TaggedUpdateTrip } from './DashboardArguments'
+import { DeleteButton } from './DeleteButton'
 
 const columnHelper = createColumnHelper<TripUpdate>()
 
@@ -226,7 +227,6 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
         ]
       }
     ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
 
@@ -253,38 +253,4 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
   })
 
   return table
-
-  function DeleteButton(
-    props: {
-      row?: Row<{
-        readonly id: string
-        readonly name: string
-        readonly startDate: Date
-        readonly endDate: Date
-        readonly distance: number
-        readonly drivers: readonly ('maé' | 'charles' | 'brigitte')[]
-      }>
-    }
-  ) {
-    return (
-      <button
-        onClick={() => {
-          if (props.row) {
-            const taggedDeletedTrip = TaggedDeleteTrip.make({
-              tripId: props.row.original.id
-            })
-
-            submit(taggedDeletedTrip, {
-              action: '/dashboard',
-              method: 'post',
-              encType: 'application/json'
-            })
-          }
-        }}
-        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded hover:cursor-pointer"
-      >
-        Supprimer
-      </button>
-    )
-  }
 }
