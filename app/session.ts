@@ -7,7 +7,6 @@ export class SessionStorage extends T.Service<SessionStorage>()('SessionStorage'
   effect: T.gen(function* () {
     yield* T.logDebug('SessionStorage initialized')
     const { SECRET, DOMAIN } = yield* pipe(Config, T.flatMap(c => c.getConfig))
-    yield* T.logDebug(`SessionStorage - Loaded configuration: SECRET=${SECRET}, DOMAIN=${DOMAIN}`)
 
     const sessionStorage = createCookieSessionStorage({
       cookie: {

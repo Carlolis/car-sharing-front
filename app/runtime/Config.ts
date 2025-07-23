@@ -46,7 +46,7 @@ export const ConfigLive = L.succeed(Config, {
     )
     yield* T.logInfo(
       `ConfigLive - Loaded configuration: logLevel=${
-        stringify(logLevel)
+        stringify(logLevel.label)
       }, API_URL=${API_URL}, SECRET=${SECRET}, DOMAIN=${DOMAIN}`
     )
 
