@@ -92,7 +92,6 @@ export const action = Remix.action(
 export default function Dashboard(
   { loaderData: { user, trips, userStats }, actionData }: Route.ComponentProps
 ) {
-  console.log('Dashboard loaded with data:', { user, trips })
   const table = useTripTable(trips)
 
   const totalKilometers = actionData?.userStats ?

@@ -3,7 +3,6 @@ import {
   type ColumnDef,
   createColumnHelper,
   getCoreRowModel,
-  type Row,
   useReactTable
 } from '@tanstack/react-table'
 import { pipe } from 'effect'
@@ -18,14 +17,13 @@ import { Checkbox } from '../ui/checkbox'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger
 } from '../ui/dialog'
 import { Label } from '../ui/label'
-import { TaggedDeleteTrip, TaggedUpdateTrip } from './DashboardArguments'
+import { TaggedUpdateTrip } from './DashboardArguments'
 import { DeleteButton } from './DeleteButton'
 
 const columnHelper = createColumnHelper<TripUpdate>()

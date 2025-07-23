@@ -7,6 +7,7 @@ import type { Scope } from 'effect'
 import { Cause, Context, Exit, Layer, ManagedRuntime, Match, pipe } from 'effect'
 import type { NoSuchElementException } from 'effect/Cause'
 import * as T from 'effect/Effect'
+import * as L from 'effect/Layer'
 import type { ParseError, Unexpected } from 'effect/ParseResult'
 import type { ActionFunctionArgs, LoaderFunctionArgs, Params as RemixParams } from 'react-router'
 import { data, redirect } from 'react-router'
@@ -89,6 +90,22 @@ const makeRequestContext = (
 }
 
 const runtime = pipe(AppLayer, ManagedRuntime.make)
+
+const makeLayerContext = (
+  args: LoaderArgs | ActionArgs
+) =>
+  pipe(
+    CookieSessionStorageLayer,
+    L.provideMerge(
+      SessionStorage.Default
+    ),
+    L.provide(ConfigLive),
+    L.provide(DevToolsLive),
+    L.provideMerge(
+      makeRequestContext(args)
+    )
+  )
+
 const loader = <A extends Serializable, R extends AppEnv | RequestEnv,>(
   effect: RemixLoaderHandler<A, R>
 ) => ((args: LoaderFunctionArgs) => {
@@ -110,11 +127,7 @@ const loader = <A extends Serializable, R extends AppEnv | RequestEnv,>(
       )
     ),
     T.scoped,
-    T.provide(CookieSessionStorageLayer),
-    T.provide(SessionStorage.Default),
-    T.provide(ConfigLive),
-    T.provide(makeRequestContext(args)),
-    T.provide(DevToolsLive),
+    T.provide(makeLayerContext(args)),
     T.exit
   )
 
@@ -158,11 +171,7 @@ const action = <A extends Serializable, R extends AppEnv | RequestEnv,>(
     // T.catchTag('FormError', e => T.succeed(e.toJSON())),
     // TODO: map FormError to ErrorResponse
     T.scoped,
-    T.provide(CookieSessionStorageLayer),
-    T.provide(SessionStorage.Default),
-    T.provide(ConfigLive),
-    T.provide(makeRequestContext(args)),
-    T.provide(DevToolsLive),
+    T.provide(makeLayerContext(args)),
     T.exit
   )
 

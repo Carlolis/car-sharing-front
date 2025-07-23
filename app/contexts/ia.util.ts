@@ -2,6 +2,7 @@ import type { HttpClient } from '@effect/platform'
 import { FetchHttpClient } from '@effect/platform'
 import { Deferred, pipe, type Scope } from 'effect'
 import * as T from 'effect/Effect'
+import * as L from 'effect/Layer'
 import type { ChatResponse } from 'ollama'
 import { ConfigLive } from '~/runtime/Config'
 import { ApiService } from '~/services/api'
@@ -101,12 +102,16 @@ export class IaService extends T.Service<IaService>()('IaService', {
 
         const next = yield* Deferred.make<ChatChunk>()
         const firstPromise = T.runPromise(Deferred.await(next))
-
+        const layers = pipe(
+          ApiService.Default,
+          L.provide(
+            FetchHttpClient.layer
+          ),
+          L.provide(ConfigLive)
+        )
         pipe(
           transformIterable(iterable, next, chatUuid, question, firstChunkContent),
-          T.provide(ApiService.Default),
-          T.provide(FetchHttpClient.layer),
-          T.provide(ConfigLive),
+          T.provide(layers),
           T.runPromise
         )
         // ;(async () => {
