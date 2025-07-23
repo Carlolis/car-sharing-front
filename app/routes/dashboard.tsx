@@ -92,6 +92,7 @@ export const action = Remix.action(
 export default function Dashboard(
   { loaderData: { user, trips, userStats }, actionData }: Route.ComponentProps
 ) {
+  console.log('Dashboard loaded with data:', { user, trips })
   const table = useTripTable(trips)
 
   const totalKilometers = actionData?.userStats ?
@@ -123,10 +124,10 @@ export default function Dashboard(
           />
         </div>
         <div className="mt-8 ">
-          <div className="bg-white shadow-md rounded-lg overflow-hidden dark:bg-gray-700">
+          <div className="bg-white shadow-md rounded-lg overflow-hidden ">
             {trips.length > 0 && (
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50 dark:bg-gray-700">
+                <thead className="bg-gray-50 ">
                   {table.getHeaderGroups().map(headerGroup => (
                     <tr key={headerGroup.id}>
                       {headerGroup.headers.map(header => (

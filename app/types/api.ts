@@ -2,15 +2,6 @@ import { DateTime, identity, pipe, Schema as Sc } from 'effect'
 import { ensure } from 'effect/Array'
 import { formatIsoDateUtc } from 'effect/DateTime'
 import { Drivers } from '~/lib/models/Drivers'
-export interface Trip {
-  id: string
-  userId: string
-  startLocation: string
-  endLocation: string
-  date: string
-  distance: number
-  passengers: number
-}
 
 const LocalDate = Sc.transform(
   // Source schema: "on" or "off"
@@ -60,7 +51,8 @@ const ArrayEnsure = Sc.transform(
 
 export const TripCreate = Sc.Struct({
   name: Sc.String,
-  date: LocalDate,
+  startDate: LocalDate,
+  endDate: LocalDate,
   distance: Sc.NumberFromString,
   drivers: ArrayEnsure
 })
@@ -76,7 +68,8 @@ export type Username = Sc.Schema.Type<typeof Username>
 export const TripUpdate = Sc.Struct({
   id: Sc.String,
   name: Sc.String,
-  date: LocalDate,
+  startDate: LocalDate,
+  endDate: LocalDate,
   distance: Sc.Number,
   drivers: ArrayEnsure
 })

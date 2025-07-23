@@ -18,11 +18,11 @@ export const ModelSelect = ({ setSelectedModel }: ModelSSelectProps) => (
           <SelectTrigger
             id="model"
             name="model"
-            className="dark:bg-gray-800 dark:text-white bg-white"
+            className=" bg-white"
           >
             <SelectValue placeholder="Choisi un modèle" />
           </SelectTrigger>
-          <SelectContent className="dark:bg-gray-800 dark:text-white">
+          <SelectContent>
             <SelectItem value="codestral:latest">
               <FaCircle className="inline-block mr-1 text-green-600" />
               🇫🇷 Mistral Codestral Latest

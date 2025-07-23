@@ -1,6 +1,5 @@
 import { pipe } from 'effect'
 import * as T from 'effect/Effect'
-import { stringify } from 'effect/FastCheck'
 import { createCookieSessionStorage } from 'react-router'
 import { Config } from './runtime/Config'
 

@@ -1,7 +1,7 @@
 import * as T from 'effect/Effect'
 import { DateTime } from 'luxon'
 
-import { Calendar, luxonLocalizer } from 'react-big-calendar'
+import { Calendar, type Event, luxonLocalizer } from 'react-big-calendar'
 
 import '../components/calendar/calendar.css'
 
@@ -19,7 +19,6 @@ export const loader = Remix.loader(
 )
 
 export default function Index({ loaderData: { user } }: Route.ComponentProps) {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const localizer = luxonLocalizer(DateTime, { firstDayOfWeek: 7 })
 
   const { views } = useMemo(() => ({
@@ -30,9 +29,8 @@ export default function Index({ loaderData: { user } }: Route.ComponentProps) {
     }
   }), [])
 
-  const { defaultDate, messages } = useMemo(
+  const { messages } = useMemo(
     () => ({
-      defaultDate: new Date(2015, 3, 1),
       messages: {
         week: 'La semaine',
         work_week: 'Semaine de travail',
@@ -49,34 +47,36 @@ export default function Index({ loaderData: { user } }: Route.ComponentProps) {
     []
   )
 
+  // export interface Event {
+  //     allDay?: boolean | undefined;
+  //     title?: React.ReactNode | undefined;
+  //     start?: Date | undefined;
+  //     end?: Date | undefined;
+  //     resource?: any;
+  // }
+
+  const events: Event[] = [{
+    title: 'maé',
+    start: new Date(2025, 6, 1),
+    end: new Date(2025, 6, 30)
+  }]
+
   return (
-    <div className=" px-6 pt-14 lg:px-8">
-      {user && (
-        <div
-          className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
-          role="alert"
-        >
-          <strong className="font-bold">Bravo !</strong>
-          <span className="block sm:inline">
-            {' '}Vous êtes connecté en tant que {user}.
-          </span>
-        </div>
-      )}
-      <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
+    <div className=" px-6 pt-14 lg:px-4">
+      <div className="mx-auto max-w-2xl py-4 sm:py-6 lg:py-7">
         <div className="text-center">
-          <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-            Calendrier de réservations
-          </h1>
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 ">
+            Calendrier des réservations
+          </h2>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto ">
         <Calendar
           culture="fr"
-          defaultDate={defaultDate}
           messages={messages}
           views={views}
           localizer={localizer}
-          events={[]}
+          events={events}
           startAccessor="start"
           endAccessor="end"
           style={{ height: 500, margin: '50px' }}

@@ -7,6 +7,7 @@ import {
   pipe
 } from 'effect'
 import * as T from 'effect/Effect'
+import { stringify } from 'effect/FastCheck'
 import * as L from 'effect/Layer'
 import { IaServiceLayer } from '~/contexts/ia.util'
 import { ApiLayer } from '~/services/api'
@@ -19,6 +20,7 @@ export const DevToolsLive = DevTools.layerWebSocket().pipe(
 const LogLevel = T.gen(function* () {
   const config = yield* Config
   const logLEvel = yield* pipe(config.getConfig, T.map(c => c.logLevel))
+  yield* T.logInfo(`Setting log level to: ${stringify(logLEvel)}`)
   return Logger.minimumLogLevel(logLEvel)
 }).pipe(L.unwrapEffect)
 

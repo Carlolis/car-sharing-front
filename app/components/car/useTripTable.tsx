@@ -1,18 +1,29 @@
+import { DialogClose } from '@radix-ui/react-dialog'
 import {
   type ColumnDef,
   createColumnHelper,
   getCoreRowModel,
+  type Row,
   useReactTable
 } from '@tanstack/react-table'
 import { pipe } from 'effect'
 import * as A from 'effect/Array'
 import * as O from 'effect/Option'
-import { useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import { useSubmit } from 'react-router'
 import type { Drivers } from '~/lib/models/Drivers'
 import type { TripUpdate } from '~/types/api'
 import { Checkbox } from '../ui/checkbox'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '../ui/dialog'
 import { Label } from '../ui/label'
 import { TaggedDeleteTrip, TaggedUpdateTrip } from './DashboardArguments'
 
@@ -49,6 +60,7 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
 
               return (
                 <input
+                  className=" p-2 w-full"
                   value={value as string}
                   onChange={e => setValue(e.target.value)}
                   onBlur={onBlur}
@@ -56,8 +68,8 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
               )
             }
           }),
-          columnHelper.accessor('date', {
-            header: () => <span>Date</span>,
+          columnHelper.accessor('startDate', {
+            header: () => <span>Date de début</span>,
             footer: props => props.column.id,
             cell: ({ getValue, row: { index }, column: { id }, table }) => {
               const initialValue = getValue<Date>()
@@ -70,6 +82,32 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
               }, [initialValue])
               return (
                 <DatePicker
+                  className=" p-2 w-full"
+                  selected={startDate}
+                  onChange={date => {
+                    setStartDate(date)
+                    table.options.meta?.updateData(index, id, date)
+                  }}
+                />
+              )
+            }
+          }),
+          columnHelper.accessor('endDate', {
+            header: () => <span>Date de fin</span>,
+            footer: props => props.column.id,
+            cell: ({ getValue, row: { index }, column: { id }, table }) => {
+              const initialValue = getValue<Date>()
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              const [startDate, setStartDate] = useState<null | Date>(initialValue)
+
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              useEffect(() => {
+                setStartDate(initialValue)
+              }, [initialValue])
+              return (
+                <DatePicker
+                  className=" p-2 w-full"
+                  locale={'fr'}
                   selected={startDate}
                   onChange={date => {
                     setStartDate(date)
@@ -96,6 +134,7 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
 
               return (
                 <input
+                  className=" p-2 w-full"
                   value={value}
                   onChange={e => setValue(+e.target.value)}
                   onBlur={onBlur}
@@ -128,7 +167,7 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
               ]
 
               return (
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 p-2 w-full">
                   {personnes.map(personne => (
                     <div key={personne.id} className="flex items-center gap-3">
                       <Checkbox
@@ -165,22 +204,23 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
             id: 'actions',
             header: () => <span>Actions</span>,
             cell: ({ row }) => (
-              <button
-                onClick={() => {
-                  const taggedDeletedTrip = TaggedDeleteTrip.make({
-                    tripId: row.original.id
-                  })
-
-                  submit(taggedDeletedTrip, {
-                    action: '/dashboard',
-                    method: 'post',
-                    encType: 'application/json'
-                  })
-                }}
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded hover:cursor-pointer"
-              >
-                Supprimer
-              </button>
+              <Fragment>
+                <Dialog>
+                  <DialogTrigger>
+                    <DeleteButton />
+                  </DialogTrigger>
+                  <DialogContent className="bg-white shadow-lg">
+                    <DialogHeader>
+                      <DialogTitle className="py-2">Êtes vous sûr ?</DialogTitle>
+                      <DeleteButton row={row} />
+                    </DialogHeader>
+                  </DialogContent>{' '}
+                  <DialogFooter className="sm:justify-start">
+                    <DialogClose asChild>
+                    </DialogClose>
+                  </DialogFooter>
+                </Dialog>
+              </Fragment>
             )
           })
         ]
@@ -213,4 +253,38 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
   })
 
   return table
+
+  function DeleteButton(
+    props: {
+      row?: Row<{
+        readonly id: string
+        readonly name: string
+        readonly startDate: Date
+        readonly endDate: Date
+        readonly distance: number
+        readonly drivers: readonly ('maé' | 'charles' | 'brigitte')[]
+      }>
+    }
+  ) {
+    return (
+      <button
+        onClick={() => {
+          if (props.row) {
+            const taggedDeletedTrip = TaggedDeleteTrip.make({
+              tripId: props.row.original.id
+            })
+
+            submit(taggedDeletedTrip, {
+              action: '/dashboard',
+              method: 'post',
+              encType: 'application/json'
+            })
+          }
+        }}
+        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded hover:cursor-pointer"
+      >
+        Supprimer
+      </button>
+    )
+  }
 }

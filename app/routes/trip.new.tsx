@@ -84,21 +84,35 @@ export default function CreateTrip() {
               type="text"
               name="name"
               required
-              className="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+              className="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-100 text-gray-900  "
             />
           </label>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Quand
+            Début
 
             <input
               type="date"
-              name="date"
+              name="startDate"
               required
               defaultValue={new Date().toISOString().split('T')[0]}
-              className="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+              className="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-100 text-gray-900  "
+            />
+          </label>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Fin
+
+            <input
+              type="date"
+              name="endDate"
+              required
+              defaultValue={new Date().toISOString().split('T')[0]}
+              className="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-100 text-gray-900  "
             />
           </label>
         </div>
@@ -113,7 +127,7 @@ export default function CreateTrip() {
               required
               min="0"
               step="0.1"
-              className="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+              className="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-100 text-gray-900  "
             />
           </label>
         </div>

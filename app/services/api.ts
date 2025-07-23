@@ -123,7 +123,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         )
 
         const response = yield* defaultClient.execute(httpClient)
-
+        yield* T.logDebug(`Stats for user.... ${response.status}`)
         const responseJson = yield* pipe(
           response.json,
           T.flatMap(Sc.decodeUnknown(TripStats)),

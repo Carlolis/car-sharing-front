@@ -80,6 +80,12 @@ const Navigation = ({ isAuthenticated }: NavigationPros) => (
                 Tableau de bord
               </NavLink>
               <NavLink
+                to={href('/calendar')}
+                className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+              >
+                Calendrier
+              </NavLink>
+              <NavLink
                 to={href('/trip/new')}
                 className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
               >

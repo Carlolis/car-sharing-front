@@ -56,7 +56,9 @@ export class CookieSessionStorage
           const cookie = yield* _(T.promise(() => commitSession(session)))
 
           return redirect('/dashboard', { headers: { 'Set-Cookie': cookie } })
-        })
+        }).pipe(
+          T.annotateLogs('Cookie Session', commitUserInfo.name)
+        )
 
       const getUserToken = () =>
         T.gen(function* (_) {
@@ -76,7 +78,7 @@ export class CookieSessionStorage
               cookies
             )
           ))
-          yield* T.logInfo('Getting user session sessions', session)
+          yield* T.logInfo('Getting user session', session)
 
           const token = yield* _(
             session.get('user_info'),
@@ -93,7 +95,9 @@ export class CookieSessionStorage
           )
 
           return token
-        })
+        }).pipe(
+          T.annotateLogs('Cookie Session', getUserToken.name)
+        )
       const getUserName = () =>
         T.gen(function* (_) {
           yield* T.logDebug('Getting user name')
@@ -114,7 +118,9 @@ export class CookieSessionStorage
             Sc.decodeUnknown(UserInfo),
             T.map(({ username }) => username)
           )
-        })
+        }).pipe(
+          T.annotateLogs('Cookie Session', getUserName.name)
+        )
 
       // Correction de la fonction logout pour gérer correctement la suppression de la session utilisateur
       const logout = () =>
@@ -124,7 +130,9 @@ export class CookieSessionStorage
           session.unset('user_info')
           const cookie = yield* _(T.promise(() => commitSession(session)))
           return redirect('/', { headers: { 'Set-Cookie': cookie } })
-        })
+        }).pipe(
+          T.annotateLogs('Cookie Session', logout.name)
+        )
 
       return {
         getUserToken,
