@@ -199,7 +199,7 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
           }),
           columnHelper.display({
             id: 'actions',
-            header: () => <span>Actions</span>,
+            header: () => <span>Supprimer</span>,
             cell: ({ row }) => (
               <Fragment>
                 <Dialog>

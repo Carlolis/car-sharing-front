@@ -117,22 +117,24 @@ export default function Dashboard(
             </span>
           </div>
         )}
-        <CreateTrip />
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          <StatsCard
-            title="Ta distance totale (km)"
-            value={totalKilometers}
-          />
+        <div className="flex justify-between items-center mb-6">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <StatsCard
+              title="Ta distance totale (km)"
+              value={totalKilometers}
+            />
+          </div>
+          <CreateTrip />
         </div>
         <div className="mt-8 ">
           <div className="bg-white shadow-md rounded-lg overflow-hidden ">
             {trips.length > 0 && (
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50 ">
+                <thead className="bg-gray-50">
                   {table.getHeaderGroups().map(headerGroup => (
                     <tr key={headerGroup.id}>
                       {headerGroup.headers.map(header => (
-                        <th key={header.id} colSpan={header.colSpan}>
+                        <th className="py-2" key={header.id} colSpan={header.colSpan}>
                           {header.isPlaceholder ? null : (
                             <div>
                               {flexRender(

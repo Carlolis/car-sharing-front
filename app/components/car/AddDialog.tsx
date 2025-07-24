@@ -53,7 +53,15 @@ export default function CreateTrip() {
   return (
     <Dialog>
       <DialogTrigger>
-        <DeleteButton />
+        <div className="py-2">
+          <button
+            type="button"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded cursor-pointer transition-colors duration-150 shadow "
+            aria-label="Ajouter un trajet"
+          >
+            Ajouter un trajet
+          </button>
+        </div>
       </DialogTrigger>
       <DialogContent className="bg-white shadow-lg">
         <DialogHeader>
