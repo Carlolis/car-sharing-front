@@ -32,7 +32,6 @@ export const DeleteButton = ({ row, submit }: DeleteButtonProps): JSX.Element =>
       type="button"
       onClick={handleClick}
       className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded cursor-pointer transition-colors duration-150"
-      disabled={!row || !submit}
       aria-label="Supprimer le trajet"
     >
       Supprimer

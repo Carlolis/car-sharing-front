@@ -1,4 +1,3 @@
-import { DialogClose } from '@radix-ui/react-dialog'
 import {
   type ColumnDef,
   createColumnHelper,
@@ -17,7 +16,6 @@ import { Checkbox } from '../ui/checkbox'
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger
@@ -213,11 +211,7 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
                       <DialogTitle className="py-2">Êtes vous sûr ?</DialogTitle>
                       <DeleteButton row={row} />
                     </DialogHeader>
-                  </DialogContent>{' '}
-                  <DialogFooter className="sm:justify-start">
-                    <DialogClose asChild>
-                    </DialogClose>
-                  </DialogFooter>
+                  </DialogContent>
                 </Dialog>
               </Fragment>
             )
