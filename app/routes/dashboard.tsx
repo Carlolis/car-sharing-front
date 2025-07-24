@@ -16,6 +16,7 @@ import {
 import { HttpServerRequest } from '@effect/platform'
 import * as Match from 'effect/Match'
 import 'react-datepicker/dist/react-datepicker.css'
+import CreateTrip from '~/components/car/AddDialog'
 import { DashboardArguments } from '~/components/car/DashboardArguments'
 import { StatsCard } from '~/components/car/StatsCard'
 import { useTripTable } from '~/components/car/useTripTable'
@@ -116,6 +117,7 @@ export default function Dashboard(
             </span>
           </div>
         )}
+        <CreateTrip />
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <StatsCard
             title="Ta distance totale (km)"
