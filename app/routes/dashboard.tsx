@@ -20,6 +20,7 @@ import { CreateTrip } from '~/components/car/AddDialog'
 import { DashboardArguments } from '~/components/car/DashboardArguments'
 import { StatsCard } from '~/components/car/StatsCard'
 import { useTripTable } from '~/components/car/useTripTable'
+import { matchDashboardArgs } from '~/lib/utils'
 import type { Route } from './+types/dashboard'
 
 declare module '@tanstack/react-table' {
@@ -56,44 +57,8 @@ export const action = Remix.action(
     const cookieSession = yield* CookieSessionStorage
     const user = yield* cookieSession.getUserName()
 
-    const api = yield* ApiService
     const request = yield* HttpServerRequest.schemaBodyJson(DashboardArguments)
-
-    const match = Match.type<DashboardArguments>().pipe(
-      Match.tag('delete', ({ tripId }) =>
-        T.gen(function* () {
-          yield* T.logInfo('Deleting trip...')
-          yield* api.deleteTrip(tripId)
-
-          yield* T.logInfo(`Trip deleted: ${stringify(tripId)}`)
-
-          const userStats = yield* api.getTripStatsByUser(user)
-          return { tripId, userStats }
-        })),
-      Match.tag('update', ({ tripUpdate }) =>
-        T.gen(function* () {
-          yield* T.logInfo(`Trip updating trip action .... ${stringify(tripUpdate)}`)
-
-          const tripId = yield* api.updateTrip(tripUpdate)
-
-          yield* T.logInfo(`Trip updated .... ${stringify(tripId)}`)
-          const userStats = yield* api.getTripStatsByUser(user)
-          return { tripId, userStats }
-        })),
-      Match.tag('create', ({ tripCreate }) =>
-        T.gen(function* () {
-          yield* T.logInfo(`Trip creating trip action .... ${stringify(tripCreate)}`)
-
-          const tripId = yield* api.createTrip(tripCreate)
-
-          yield* T.logInfo(`Trip created .... ${stringify(tripId)}`)
-          const userStats = yield* api.getTripStatsByUser(user)
-          return { tripId, userStats }
-        })),
-      Match.exhaustive
-    )
-
-    return yield* match(request)
+    return yield* matchDashboardArgs(request, user)
   }).pipe(
     T.tapError(T.logError),
     T.catchAll(() => new Redirect({ location: '/dashboard' }))
@@ -101,13 +66,11 @@ export const action = Remix.action(
 )
 
 export default function Dashboard(
-  { loaderData: { user, trips, userStats }, actionData }: Route.ComponentProps
+  { loaderData: { user, trips, userStats } }: Route.ComponentProps
 ) {
   const table = useTripTable(trips)
 
-  const totalKilometers = actionData?.userStats ?
-    actionData?.userStats.totalKilometers :
-    userStats.totalKilometers
+  const totalKilometers = userStats.totalKilometers
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
