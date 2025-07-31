@@ -9,9 +9,9 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const matchDashboardArgs = (request: DashboardArguments, username: string) =>
+export const matchTripArgs = (request: DashboardArguments, username: string) =>
   T.gen(function* () {
-    yield* T.logDebug(`Dashboard action request: ${stringify(request)}`)
+    yield* T.logDebug(`Trip action request: ${stringify(request)}`)
     const api = yield* ApiService
     return yield* Match.type<DashboardArguments>().pipe(
       Match.tag('delete', ({ tripId }) =>

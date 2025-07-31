@@ -4,7 +4,7 @@ import { DateTime } from 'luxon'
 import { Calendar, type Event, luxonLocalizer } from 'react-big-calendar'
 
 import { HttpServerRequest } from '@effect/platform'
-import { Match, pipe } from 'effect'
+import { pipe } from 'effect'
 import * as A from 'effect/Array'
 import { stringify } from 'effect/FastCheck'
 import { useCallback, useMemo, useState } from 'react'
@@ -18,13 +18,12 @@ import {
   DialogHeader,
   DialogTitle
 } from '~/components/ui/dialog'
+import { matchTripArgs } from '~/lib/utils'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import { Remix } from '~/runtime/Remix'
 import { NotFound, Redirect } from '~/runtime/ServerResponse'
 import { ApiService } from '~/services/api'
 import '../components/calendar/calendar.css'
-import { matchDashboardArgs } from '~/lib/utils'
-import Route from '../routes'
 import type { Route as t } from './+types/calendar'
 
 export const loader = Remix.loader(
@@ -51,7 +50,7 @@ export const action = Remix.action(
     const user = yield* cookieSession.getUserName()
 
     const request = yield* HttpServerRequest.schemaBodyJson(DashboardArguments)
-    return yield* matchDashboardArgs(request, user)
+    return yield* matchTripArgs(request, user)
   }).pipe(
     T.tapError(T.logError),
     T.catchAll(() => new Redirect({ location: '/calendar' }))

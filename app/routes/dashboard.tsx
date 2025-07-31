@@ -14,13 +14,12 @@ import {
 } from '@tanstack/react-table'
 
 import { HttpServerRequest } from '@effect/platform'
-import * as Match from 'effect/Match'
 
 import { CreateTrip } from '~/components/car/AddDialog'
 import { DashboardArguments } from '~/components/car/DashboardArguments'
 import { StatsCard } from '~/components/car/StatsCard'
 import { useTripTable } from '~/components/car/useTripTable'
-import { matchDashboardArgs } from '~/lib/utils'
+import { matchTripArgs } from '~/lib/utils'
 import type { Route } from './+types/dashboard'
 
 declare module '@tanstack/react-table' {
@@ -58,7 +57,7 @@ export const action = Remix.action(
     const user = yield* cookieSession.getUserName()
 
     const request = yield* HttpServerRequest.schemaBodyJson(DashboardArguments)
-    return yield* matchDashboardArgs(request, user)
+    return yield* matchTripArgs(request, user)
   }).pipe(
     T.tapError(T.logError),
     T.catchAll(() => new Redirect({ location: '/dashboard' }))
