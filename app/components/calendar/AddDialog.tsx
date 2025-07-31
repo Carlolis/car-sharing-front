@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Form, useSubmit } from 'react-router'
 import { Checkbox } from '~/components/ui/checkbox'
 import { Label } from '~/components/ui/label'
+import { TaggedCreateTrip } from '../car/DashboardArguments'
 import {
   Dialog,
   DialogContent,
@@ -11,8 +12,12 @@ import {
   DialogTitle,
   DialogTrigger
 } from '../ui/dialog'
-import { TaggedCreateTrip } from './DashboardArguments'
-export const CreateTrip = (): JSX.Element => {
+type TripDialogProps = {
+  isOpen: boolean
+  setIsOpen: (open: boolean) => void
+}
+
+export const TripDialog = ({ isOpen, setIsOpen }: TripDialogProps): JSX.Element => {
   const [isTripUpdated, setIsTripUpdated] = useState<boolean>(false)
   const submit = useSubmit()
 
@@ -23,19 +28,11 @@ export const CreateTrip = (): JSX.Element => {
   ]
 
   return (
-    <Dialog>
-      <DialogTrigger>
-        <div className="py-2">
-          <button
-            type="submit"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded cursor-pointer transition-colors duration-150 shadow "
-            aria-label="Ajouter un trajet"
-          >
-            Ajouter un trajet
-          </button>
-        </div>
-      </DialogTrigger>
-      <DialogContent className="bg-white shadow-lg">
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogContent
+        className="bg-white shadow-lg"
+        onPointerDownOutside={event => event.preventDefault()}
+      >
         <DialogTitle className="text-2xl font-bold mb-6 px-4 ">
           Créer un nouveau trajet
         </DialogTitle>

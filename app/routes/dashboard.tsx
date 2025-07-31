@@ -16,7 +16,7 @@ import {
 import { HttpServerRequest } from '@effect/platform'
 import * as Match from 'effect/Match'
 
-import CreateTrip from '~/components/car/AddDialog'
+import { CreateTrip } from '~/components/car/AddDialog'
 import { DashboardArguments } from '~/components/car/DashboardArguments'
 import { StatsCard } from '~/components/car/StatsCard'
 import { useTripTable } from '~/components/car/useTripTable'
