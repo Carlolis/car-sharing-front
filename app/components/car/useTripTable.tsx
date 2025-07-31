@@ -1,3 +1,5 @@
+import DatePicker from 'react-datepicker'
+
 import {
   type ColumnDef,
   createColumnHelper,
@@ -8,7 +10,7 @@ import { pipe } from 'effect'
 import * as A from 'effect/Array'
 import * as O from 'effect/Option'
 import { Fragment, useEffect, useMemo, useState } from 'react'
-import DatePicker from 'react-datepicker'
+
 import { useSubmit } from 'react-router'
 import type { Drivers } from '~/lib/models/Drivers'
 import type { TripUpdate } from '~/types/api'
@@ -103,7 +105,6 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
               }, [initialValue])
               return (
                 <DatePicker
-                  className=" p-2 w-full"
                   locale={'fr'}
                   selected={startDate}
                   onChange={date => {

@@ -100,7 +100,7 @@ const makeLayerContext = (
       SessionStorage.Default
     ),
     L.provide(ConfigLive),
-    // L.provide(DevToolsLive),
+    L.provide(DevToolsLive),
     L.provideMerge(
       makeRequestContext(args)
     )

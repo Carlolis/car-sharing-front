@@ -55,9 +55,9 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
     const createTrip = (trip: TripCreate) =>
       T.gen(function* () {
         const cookieSession = yield* CookieSessionStorage
-        yield* T.logInfo(`Getting token....`)
+        yield* T.logDebug(`Getting token....`)
         const token = yield* cookieSession.getUserToken()
-        yield* T.logInfo(`Token ?.... ${stringify(token)}`)
+        yield* T.logDebug(`Token ?.... ${stringify(token)}`)
         const loginUrl = HttpClientRequest.post(`${API_URL}/trips`)
 
         const body = yield* HttpBody.jsonSchema(TripCreate)({ ...trip, drivers: ['maé'] })
@@ -71,8 +71,8 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
 
         if (response.status === 401 || response.status === 400) {
           const error = yield* response.text
-          yield* T.logInfo('Unauthorized Error', error)
-          yield* T.logInfo('Error status :', response.status)
+          yield* T.logDebug('Unauthorized Error', error)
+          yield* T.logDebug('Error status :', response.status)
         }
 
         const responseJson = yield* response.json
@@ -114,16 +114,16 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
 
     const getTripStatsByUser = (username: string) =>
       T.gen(function* () {
-        yield* T.logDebug(`Getting stats for user.... ${username}`)
+        yield* T.logInfo(`Getting stats for user.... ${username}`)
 
         const httpClient = pipe(
           `${API_URL}/trips/total`,
           HttpClientRequest.get,
-          HttpClientRequest.setUrlParam('username', username)
+          HttpClientRequest.setUrlParam('username', 'charles')
         )
 
         const response = yield* defaultClient.execute(httpClient)
-        yield* T.logDebug(`Stats for user.... ${response.status}`)
+        yield* T.logInfo(`Stats for user....`)
         const responseJson = yield* pipe(
           response.json,
           T.flatMap(Sc.decodeUnknown(TripStats)),

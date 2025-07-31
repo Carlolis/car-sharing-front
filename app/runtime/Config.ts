@@ -32,7 +32,7 @@ export const ConfigLive = L.succeed(Config, {
     )
     const API_URL = yield* pipe(
       EConfig.string('API_URL'),
-      EConfig.withDefault('http://localhost:8081/api')
+      EConfig.withDefault('http://localhost:8093/api')
     )
 
     const SECRET = yield* pipe(

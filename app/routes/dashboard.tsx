@@ -15,7 +15,7 @@ import {
 
 import { HttpServerRequest } from '@effect/platform'
 import * as Match from 'effect/Match'
-import 'react-datepicker/dist/react-datepicker.css'
+
 import CreateTrip from '~/components/car/AddDialog'
 import { DashboardArguments } from '~/components/car/DashboardArguments'
 import { StatsCard } from '~/components/car/StatsCard'
@@ -30,7 +30,7 @@ declare module '@tanstack/react-table' {
 
 export const loader = Remix.loader(
   T.gen(function* () {
-    yield* T.logDebug(`Loading Dashboard...`)
+    yield* T.logInfo(`Loading Dashboard...`)
     const cookieSession = yield* CookieSessionStorage
 
     yield* T.logDebug(`CookieSessionStorage - loader`)
@@ -72,7 +72,7 @@ export const action = Remix.action(
         })),
       Match.tag('update', ({ tripUpdate }) =>
         T.gen(function* () {
-          yield* T.logInfo(`Trip updating remix action .... ${stringify(tripUpdate)}`)
+          yield* T.logInfo(`Trip updating trip action .... ${stringify(tripUpdate)}`)
 
           const tripId = yield* api.updateTrip(tripUpdate)
 
@@ -82,7 +82,7 @@ export const action = Remix.action(
         })),
       Match.tag('create', ({ tripCreate }) =>
         T.gen(function* () {
-          yield* T.logInfo(`Trip creating remix action .... ${stringify(tripCreate)}`)
+          yield* T.logInfo(`Trip creating trip action .... ${stringify(tripCreate)}`)
 
           const tripId = yield* api.createTrip(tripCreate)
 
@@ -108,6 +108,7 @@ export default function Dashboard(
   const totalKilometers = actionData?.userStats ?
     actionData?.userStats.totalKilometers :
     userStats.totalKilometers
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="py-8">

@@ -1,3 +1,4 @@
+import styles from 'react-datepicker/dist/react-datepicker.css?url'
 import type { LinksFunction } from 'react-router'
 import {
   Form,
@@ -12,13 +13,13 @@ import {
   useNavigate,
   useRouteError
 } from 'react-router'
-
 import { Remix } from './runtime/Remix'
 import stylesheet from './tailwind.css?url'
 
 export const links: LinksFunction = () => [
   //  { rel: "preconnect", href: "https://fonts.googleapis.com" },
-  { rel: 'stylesheet', href: stylesheet }
+  { rel: 'stylesheet', href: stylesheet },
+  { rel: 'stylesheet', href: styles }
 ]
 
 import { HttpServerRequest } from '@effect/platform'
@@ -44,6 +45,8 @@ export const loader = Remix.loader(
       T.map(_ => true),
       T.catchAll(_ => T.succeed(false))
     )
+
+    yield* T.logInfo(`Loader - isAuthenticated: ${isAuthenticated}`, url)
     return { isAuthenticated, url }
   })
 )
