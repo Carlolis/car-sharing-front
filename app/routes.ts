@@ -1,13 +1,16 @@
 import { route, type RouteConfig } from '@react-router/dev/routes'
 
+const routeDefs = [
+  ['', './routes/index.tsx'],
+  ['/dashboard', './routes/dashboard.tsx'],
+  ['/login', './routes/login.tsx'],
+  ['/trip/new', './routes/trip.new.tsx'],
+  ['/ia', './routes/ia.tsx'],
+  ['/health', './routes/health.tsx'],
+  ['/calendar', './routes/calendar.tsx']
+] as const
+
+export type RoutePaths = typeof routeDefs[number][0]
+
 // export default flatRoutes() satisfies RouteConfig;
-export default [
-  route('', './routes/index.tsx'),
-  route('/dashboard', './routes/dashboard.tsx'),
-  route('/login', './routes/login.tsx'),
-  route('/trip/new', './routes/trip.new.tsx'),
-  route('/ia', './routes/ia.tsx'),
-  route('/health', './routes/health.tsx'),
-  route('/calendar', './routes/calendar.tsx')
-  // pattern ^           ^ module file
-] as RouteConfig
+export default routeDefs.map(([path, mod]) => route(path, mod)) as RouteConfig

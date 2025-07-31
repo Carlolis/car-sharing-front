@@ -3,17 +3,30 @@ import { DateTime } from 'luxon'
 
 import { Calendar, type Event, luxonLocalizer } from 'react-big-calendar'
 
-import '../components/calendar/calendar.css'
-import { pipe } from 'effect'
+import { HttpServerRequest } from '@effect/platform'
+import { Match, pipe } from 'effect'
 import * as A from 'effect/Array'
 import { stringify } from 'effect/FastCheck'
 import { useCallback, useMemo, useState } from 'react'
+import { useSubmit } from 'react-router'
 import { TripDialog } from '~/components/calendar/AddDialog'
+import { DashboardArguments } from '~/components/car/DashboardArguments'
+import { DeleteButton } from '~/components/car/DeleteButton'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle
+} from '~/components/ui/dialog'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import { Remix } from '~/runtime/Remix'
-import { NotFound } from '~/runtime/ServerResponse'
+import { NotFound, Redirect } from '~/runtime/ServerResponse'
 import { ApiService } from '~/services/api'
-import type { Route } from './+types/calendar'
+import '../components/calendar/calendar.css'
+import { matchDashboardArgs } from '~/lib/utils'
+import Route from '../routes'
+import type { Route as t } from './+types/calendar'
+
 export const loader = Remix.loader(
   T.gen(function* () {
     const cookieSession = yield* CookieSessionStorage
@@ -31,8 +44,33 @@ export const loader = Remix.loader(
   )
 )
 
-export default function Calendar2({ loaderData: { trips } }: Route.ComponentProps) {
+export const action = Remix.action(
+  T.gen(function* () {
+    yield* T.logInfo(`Dashboard action trigged....`)
+    const cookieSession = yield* CookieSessionStorage
+    const user = yield* cookieSession.getUserName()
+
+    const request = yield* HttpServerRequest.schemaBodyJson(DashboardArguments)
+    return yield* matchDashboardArgs(request, user)
+  }).pipe(
+    T.tapError(T.logError),
+    T.catchAll(() => new Redirect({ location: '/calendar' }))
+  )
+)
+
+export default function Calendar2({ loaderData: { trips } }: t.ComponentProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const [startDate, setStartDate] = useState(new Date())
+  const [tripIdToDelete, setTripIdToDelete] = useState<string | undefined>(undefined)
+  const myEvents = pipe(
+    trips,
+    A.map(trip => ({
+      title: trip.name,
+      start: new Date(trip.startDate),
+      end: new Date(trip.endDate),
+      resource: trip
+    }))
+  )
 
   const localizer = luxonLocalizer(DateTime, { firstDayOfWeek: 7 })
 
@@ -62,35 +100,26 @@ export default function Calendar2({ loaderData: { trips } }: Route.ComponentProp
     []
   )
 
-  // export interface Event {
-  //     allDay?: boolean | undefined;
-  //     title?: React.ReactNode | undefined;
-  //     start?: Date | undefined;
-  //     end?: Date | undefined;
-  //     resource?: any;
-  // }
-
-  const events: Event[] = pipe(
-    trips,
-    A.map(trip => ({
-      title: trip.name,
-      start: trip.startDate,
-      end: trip.endDate,
-      resource: trip
-    }))
-  )
-  const [myEvents, setEvents] = useState(events)
   const handleSelectSlot = useCallback(
     ({ start, end }: Event) => {
+      if (start) setStartDate(start)
+
       setIsOpen(true)
     },
     []
   )
 
   const handleSelectEvent = useCallback(
-    (event: Event) => window.alert(event.title),
+    (event: Event) => {
+      console.log({ event })
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+      setTripIdToDelete(event.resource.id)
+      setIsOpen(true)
+    },
     []
   )
+
+  const submit = useSubmit()
 
   return (
     <div className=" px-6 pt-14 lg:px-4">
@@ -116,7 +145,19 @@ export default function Calendar2({ loaderData: { trips } }: Route.ComponentProp
           onSelectEvent={handleSelectEvent}
         />
       </div>
-      <TripDialog isOpen={isOpen} setIsOpen={setIsOpen} />
+      <TripDialog
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        startDate={startDate}
+      />
+      <Dialog open={!!tripIdToDelete} onOpenChange={() => setTripIdToDelete(undefined)}>
+        <DialogContent className="bg-white shadow-lg">
+          <DialogHeader>
+            <DialogTitle className="py-2">Êtes vous sûr ?</DialogTitle>
+            <DeleteButton tripId={tripIdToDelete} submit={submit} route={'/calendar'} />
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

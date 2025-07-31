@@ -131,10 +131,15 @@
 }
 
 .rbc-day-bg {
+  cursor: pointer;
+  padding: 1rem;
   flex: 1 0 0%;
   background-color: hsl(var(--background));
   border-right: 1px solid hsl(var(--border));
   border-left: 1px solid hsl(var(--border));
+}
+.rbc-day-bg:hover {
+  background-color: lightblue;
 }
 
 .rbc-event:hover {

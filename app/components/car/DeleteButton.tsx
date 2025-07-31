@@ -1,28 +1,23 @@
-import type { Row } from '@tanstack/react-table'
 import type { SubmitFunction } from 'react-router'
+
+import type { RoutePaths } from '../../routes'
 import { TaggedDeleteTrip } from './DashboardArguments'
 
 type DeleteButtonProps = {
-  row?: Row<{
-    readonly id: string
-    readonly name: string
-    readonly startDate: Date
-    readonly endDate: Date
-    readonly distance: number
-    readonly drivers: readonly ('maé' | 'charles' | 'brigitte')[]
-  }>
+  tripId?: string
   submit?: SubmitFunction
+  route?: RoutePaths
 }
 
-export const DeleteButton = ({ row, submit }: DeleteButtonProps): JSX.Element => {
+export const DeleteButton = ({ tripId, submit, route }: DeleteButtonProps): JSX.Element => {
   const handleClick = () => {
-    if (!row || !submit) return
+    if (!tripId || !submit) return
     const taggedDeletedTrip = TaggedDeleteTrip.make({
-      tripId: row.original.id
+      tripId
     })
 
     submit(taggedDeletedTrip, {
-      action: '/dashboard',
+      action: route,
       method: 'post',
       encType: 'application/json'
     })
