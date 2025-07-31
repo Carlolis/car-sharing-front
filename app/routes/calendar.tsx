@@ -79,7 +79,7 @@ export default function Index({ loaderData: { user } }: Route.ComponentProps) {
           events={events}
           startAccessor="start"
           endAccessor="end"
-          style={{ height: 500, margin: '50px' }}
+          style={{ height: '50rem', margin: '20px' }}
         />
       </div>
     </div>
