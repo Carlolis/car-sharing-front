@@ -52,7 +52,7 @@ export const loader = Remix.loader(
 
 export const action = Remix.action(
   T.gen(function* () {
-    yield* T.logInfo(`Updating Trip....`)
+    yield* T.logInfo(`Dashboard action trigged....`)
     const cookieSession = yield* CookieSessionStorage
     const user = yield* cookieSession.getUserName()
 
@@ -77,6 +77,16 @@ export const action = Remix.action(
           const tripId = yield* api.updateTrip(tripUpdate)
 
           yield* T.logInfo(`Trip updated .... ${stringify(tripId)}`)
+          const userStats = yield* api.getTripStatsByUser(user)
+          return { tripId, userStats }
+        })),
+      Match.tag('create', ({ tripCreate }) =>
+        T.gen(function* () {
+          yield* T.logInfo(`Trip creating remix action .... ${stringify(tripCreate)}`)
+
+          const tripId = yield* api.createTrip(tripCreate)
+
+          yield* T.logInfo(`Trip created .... ${stringify(tripId)}`)
           const userStats = yield* api.getTripStatsByUser(user)
           return { tripId, userStats }
         })),

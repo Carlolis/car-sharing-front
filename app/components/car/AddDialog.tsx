@@ -1,8 +1,11 @@
+import { pipe, Schema as Sc } from 'effect'
 import { useState } from 'react'
-import { Form } from 'react-router'
+import { Form, useSubmit } from 'react-router'
 import { Checkbox } from '~/components/ui/checkbox'
 import { Label } from '~/components/ui/label'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTrigger } from '../ui/dialog'
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle,
+  DialogTrigger } from '../ui/dialog'
+import { TaggedCreateTrip } from './DashboardArguments'
 import { DeleteButton } from './DeleteButton'
 
 // export const action = Remix.action(
@@ -28,9 +31,8 @@ import { DeleteButton } from './DeleteButton'
 export default function CreateTrip() {
   // const actionData = useActionData<typeof action>()
 
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
-  const [tripInfos, setTripInfos] = useState<string | undefined>(undefined)
-
+  const [isTripUpdated, setIsTripUpdated] = useState<boolean>(false)
+  const submit = useSubmit()
   // useEffect(() => {
   //   const match = Match.type<typeof actionData>().pipe(
   //     Match.when(
@@ -55,7 +57,7 @@ export default function CreateTrip() {
       <DialogTrigger>
         <div className="py-2">
           <button
-            type="button"
+            type="submit"
             className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded cursor-pointer transition-colors duration-150 shadow "
             aria-label="Ajouter un trajet"
           >
@@ -64,10 +66,11 @@ export default function CreateTrip() {
         </div>
       </DialogTrigger>
       <DialogContent className="bg-white shadow-lg">
+        <DialogTitle className="text-2xl font-bold mb-6 px-4 ">
+          Créer un nouveau trajet
+        </DialogTitle>
         <DialogHeader>
-          <div className="max-w-md mx-auto mt-10 px-4">
-            <h2 className="text-2xl font-bold mb-6">Créer un nouveau trajet</h2>
-
+          <div className="max-w-md px-4">
             {
               /* {errorMessage && (
         <div className="mb-4 p-4 text-red-700 bg-red-100 rounded">
@@ -75,15 +78,32 @@ export default function CreateTrip() {
         </div>
       )} */
             }
-            {tripInfos && (
+            {isTripUpdated && (
               <div className="mb-4 p-4 text-green-700 bg-green-100 rounded">
-                {tripInfos}
+                {isTripUpdated}
               </div>
             )}
 
             <Form
+              action="/dashboard"
               method="post"
               className="space-y-6"
+              onSubmit={event => {
+                event.preventDefault()
+                const formData = new FormData(event.target as HTMLFormElement)
+
+                const tripCreate = pipe(formData.entries(), Object.fromEntries, trip =>
+                  Sc.decodeUnknownSync(TaggedCreateTrip)({
+                    _tag: 'create',
+                    tripCreate: trip
+                  }), Sc.encodeSync(TaggedCreateTrip))
+
+                submit(tripCreate, {
+                  action: '/dashboard',
+                  method: 'post',
+                  encType: 'application/json'
+                })
+              }}
             >
               <div>
                 <label className="block text-sm font-medium text-gray-700">

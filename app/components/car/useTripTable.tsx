@@ -209,7 +209,7 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
                   <DialogContent className="bg-white shadow-lg">
                     <DialogHeader>
                       <DialogTitle className="py-2">Êtes vous sûr ?</DialogTitle>
-                      <DeleteButton row={row} />
+                      <DeleteButton row={row} submit={submit} />
                     </DialogHeader>
                   </DialogContent>
                 </Dialog>

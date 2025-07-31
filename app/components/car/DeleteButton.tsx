@@ -20,6 +20,7 @@ export const DeleteButton = ({ row, submit }: DeleteButtonProps): JSX.Element =>
     const taggedDeletedTrip = TaggedDeleteTrip.make({
       tripId: row.original.id
     })
+
     submit(taggedDeletedTrip, {
       action: '/dashboard',
       method: 'post',

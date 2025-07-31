@@ -1,10 +1,13 @@
 import { Schema as Sc } from 'effect'
-import { TripUpdate } from '~/types/api'
+import { TripCreate, TripUpdate } from '~/types/api'
 
 export const TaggedUpdateTrip = Sc.TaggedStruct('update', {
   tripUpdate: TripUpdate
 })
 
+export const TaggedCreateTrip = Sc.TaggedStruct('create', {
+  tripCreate: TripCreate
+})
 export type TaggedUpdateTrip = Sc.Schema.Type<typeof TaggedUpdateTrip>
 
 export const TaggedDeleteTrip = Sc.TaggedStruct('delete', {
@@ -14,7 +17,8 @@ export type TaggedDeleteTrip = Sc.Schema.Type<typeof TaggedDeleteTrip>
 
 export const DashboardArguments = Sc.Union(
   TaggedDeleteTrip,
-  TaggedUpdateTrip
+  TaggedUpdateTrip,
+  TaggedCreateTrip
 )
 
 export type DashboardArguments = typeof DashboardArguments.Type
