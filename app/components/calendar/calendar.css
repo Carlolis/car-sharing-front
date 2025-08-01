@@ -48,6 +48,7 @@
 .rbc-event,
 .rbc-slot-selection {
   background-color: green;
+  z-index: 9999;
   color: white;
   padding: 3px;
   border-radius: 4px;
@@ -56,6 +57,7 @@
 
 .rbc-event.rbc-selected {
   background-color: blue;
+  z-index: 9999;
 }
 
 .rbc-row {

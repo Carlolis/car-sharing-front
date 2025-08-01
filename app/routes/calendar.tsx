@@ -57,7 +57,7 @@ export const action = Remix.action(
   )
 )
 
-export default function Calendar2({ loaderData: { trips } }: t.ComponentProps) {
+export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [startDate, setStartDate] = useState(new Date())
   const [tripIdToDelete, setTripIdToDelete] = useState<string | undefined>(undefined)
@@ -100,8 +100,8 @@ export default function Calendar2({ loaderData: { trips } }: t.ComponentProps) {
   )
 
   const handleSelectSlot = useCallback(
-    ({ start, end }: Event) => {
-      if (start) setStartDate(start)
+    (event: Event) => {
+      if (event.start) setStartDate(event.start)
 
       setIsOpen(true)
     },
@@ -110,10 +110,11 @@ export default function Calendar2({ loaderData: { trips } }: t.ComponentProps) {
 
   const handleSelectEvent = useCallback(
     (event: Event) => {
-      console.log({ event })
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-      setTripIdToDelete(event.resource.id)
-      setIsOpen(true)
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      if (event.resource && event.resource.id) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+        setTripIdToDelete(event.resource.id)
+      }
     },
     []
   )
@@ -140,7 +141,7 @@ export default function Calendar2({ loaderData: { trips } }: t.ComponentProps) {
           endAccessor="end"
           style={{ height: '50rem', margin: '20px' }}
           onSelectSlot={handleSelectSlot}
-          selectable
+          selectable="ignoreEvents"
           onSelectEvent={handleSelectEvent}
         />
       </div>

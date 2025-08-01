@@ -77,7 +77,7 @@ export const CreateTrip = (): JSX.Element => {
             >
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Quoi ?
+                  Quoi ? *
                   <input
                     type="text"
                     name="name"
@@ -89,8 +89,7 @@ export const CreateTrip = (): JSX.Element => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Début
-
+                  Début *
                   <input
                     type="date"
                     name="startDate"
@@ -103,8 +102,7 @@ export const CreateTrip = (): JSX.Element => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Fin
-
+                  Fin *
                   <input
                     type="date"
                     name="endDate"
@@ -118,11 +116,9 @@ export const CreateTrip = (): JSX.Element => {
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Distance (km)
-
                   <input
                     type="number"
                     name="distance"
-                    required
                     min="0"
                     step="0.1"
                     className="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-100 text-gray-900  "
@@ -132,7 +128,7 @@ export const CreateTrip = (): JSX.Element => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Qui ?
+                  Qui ? *
                   <div className="flex flex-col gap-2">
                     {personnes.map(personne => (
                       <div key={personne.id} className="flex items-center gap-3">
