@@ -81,7 +81,9 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
               }, [initialValue])
               return (
                 <DatePicker
-                  className=" p-2 w-full"
+                  locale={'fr'}
+                  dateFormat={'dd/MM/yyyy'}
+                  className="p-2 w-full"
                   selected={startDate}
                   onChange={date => {
                     setStartDate(date)
@@ -106,6 +108,7 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
               return (
                 <DatePicker
                   locale={'fr'}
+                  dateFormat={'dd/MM/yyyy'}
                   selected={startDate}
                   onChange={date => {
                     setStartDate(date)

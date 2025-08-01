@@ -119,11 +119,11 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         const httpClient = pipe(
           `${API_URL}/trips/total`,
           HttpClientRequest.get,
-          HttpClientRequest.setUrlParam('username', 'charles')
+          HttpClientRequest.setUrlParam('username', username)
         )
 
         const response = yield* defaultClient.execute(httpClient)
-        yield* T.logInfo(`Stats for user....`)
+        yield* T.logInfo(`Stats for user.... ${username}`)
         const responseJson = yield* pipe(
           response.json,
           T.flatMap(Sc.decodeUnknown(TripStats)),
