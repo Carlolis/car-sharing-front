@@ -8,20 +8,21 @@
 
 /* Week header */
 .rbc-header {
-  background-color: orange;
+  background: #f3f4f6;
+  color: #22223b;
   overflow: hidden;
-  -webkit-flex: 1 0 0%;
-  -ms-flex: 1 0 0%;
   flex: 1 0 0%;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding: 3px 3px;
+  padding: 8px 0;
   text-align: center;
   vertical-align: middle;
-  font-weight: bold;
+  font-weight: 700;
+  font-size: 1rem;
   min-height: 0;
-  border-bottom: 1px solid hsl(var(--border));
-  border-right: 1px solid hsl(var(--border));
+  border-bottom: 1px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
+  letter-spacing: 0.5px;
 }
 
 .rbc-row-content {
@@ -116,32 +117,39 @@
 }
 
 .rbc-toolbar button {
-  background-color: grey;
+  background: #3b82f6;
+  color: #fff;
   border: none;
-  height: 40px;
-  padding: 8px 16px;
-  border-radius: var(--radius);
+  height: 38px;
+  padding: 4px 20px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: none;
-  margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.rbc-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .rbc-toolbar button:hover {
-  background-color: yellow;
-  color: violet;
+  background: #2563eb;
+  color: #fff;
 }
 
 .rbc-day-bg {
   cursor: pointer;
   padding: 1rem;
   flex: 1 0 0%;
-  background-color: hsl(var(--background));
-  border-right: 1px solid hsl(var(--border));
-  border-left: 1px solid hsl(var(--border));
+  background: #f8fafc;
+  border-right: 1px solid #e2e8f0;
+  border-left: 1px solid #e2e8f0;
+  transition: background 0.2s;
 }
 .rbc-day-bg:hover {
-  background-color: lightblue;
+  background: #bae6fd;
 }
 
 .rbc-event:hover {
