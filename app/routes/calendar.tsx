@@ -1,13 +1,12 @@
 import * as T from 'effect/Effect'
 import { DateTime } from 'luxon'
 
-import { Calendar, type Event, luxonLocalizer } from 'react-big-calendar'
-
 import { HttpServerRequest } from '@effect/platform'
-import { pipe } from 'effect'
+import { pipe, Schema as Sc } from 'effect'
 import * as A from 'effect/Array'
 import { stringify } from 'effect/FastCheck'
 import { useCallback, useMemo, useState } from 'react'
+import { Calendar, type Event, luxonLocalizer } from 'react-big-calendar'
 import { useSubmit } from 'react-router'
 import { TripDialog } from '~/components/calendar/AddDialog'
 import { DashboardArguments } from '~/components/car/DashboardArguments'
@@ -23,8 +22,19 @@ import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import { Remix } from '~/runtime/Remix'
 import { NotFound, Redirect } from '~/runtime/ServerResponse'
 import { ApiService } from '~/services/api'
+import type { TripUpdate } from '~/types/api'
+import { DriversArrayEnsure } from '~/types/api'
 import '../components/calendar/calendar.css'
 import type { Route as t } from './+types/calendar'
+
+export const TripCalendar = Sc.Struct({
+  id: Sc.String,
+  name: Sc.String,
+  startDate: Sc.DateFromSelf,
+  endDate: Sc.DateFromSelf,
+  distance: Sc.Number,
+  drivers: DriversArrayEnsure
+})
 
 export const loader = Remix.loader(
   T.gen(function* () {
@@ -61,6 +71,7 @@ export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps
   const [isOpen, setIsOpen] = useState(false)
   const [startDate, setStartDate] = useState(new Date())
   const [tripIdToDelete, setTripIdToDelete] = useState<string | undefined>(undefined)
+  const [tripToUpdate, setTripToUpdate] = useState<TripUpdate | undefined>(undefined)
   const myEvents = pipe(
     trips,
     A.map(trip => ({
@@ -101,7 +112,11 @@ export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps
 
   const handleSelectSlot = useCallback(
     (event: Event) => {
-      if (event.start) setStartDate(event.start)
+      if (event.start) {
+        const startDate = event.start
+        startDate.setDate(startDate.getDate() + 1)
+        setStartDate(startDate)
+      }
 
       setIsOpen(true)
     },
@@ -110,11 +125,15 @@ export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps
 
   const handleSelectEvent = useCallback(
     (event: Event) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      if (event.resource && event.resource.id) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-        setTripIdToDelete(event.resource.id)
-      }
+      const resourceTrip = Sc.decodeUnknownSync(TripCalendar)(event.resource)
+      setTripToUpdate(resourceTrip)
+      setIsOpen(true)
+
+      // // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      // if (event.resource && event.resource.id) {
+      //   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+      //   setTripIdToDelete(event.resource.id)
+      // }
     },
     []
   )
@@ -149,6 +168,8 @@ export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         startDate={startDate}
+        updateTrip={tripToUpdate}
+        setTripUpdate={setTripToUpdate}
       />
       <Dialog open={!!tripIdToDelete} onOpenChange={() => setTripIdToDelete(undefined)}>
         <DialogContent className="bg-white shadow-lg">

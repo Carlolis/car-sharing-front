@@ -122,7 +122,7 @@ export default [{
             caughtErrorsIgnorePattern: "^_",
         }],
         "arrow-body-style": ["error", "as-needed"],
-        "no-console": ["warn"],
+        "no-console": ["error"],
         "@typescript-eslint/no-unsafe-member-access": "error",
         "@typescript-eslint/no-unsafe-return": "error",
 

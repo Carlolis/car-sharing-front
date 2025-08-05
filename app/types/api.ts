@@ -39,7 +39,7 @@ const LocalDate = Sc.transform(
   }
 )
 
-const ArrayEnsure = Sc.transform(
+export const DriversArrayEnsure = Sc.transform(
   Sc.Union(Sc.String, Drivers),
   Drivers,
   {
@@ -54,7 +54,7 @@ export const TripCreate = Sc.Struct({
   startDate: LocalDate,
   endDate: LocalDate,
   distance: Sc.NumberFromString,
-  drivers: ArrayEnsure
+  drivers: DriversArrayEnsure
 })
 
 export type TripCreate = Sc.Schema.Type<typeof TripCreate>
@@ -71,7 +71,7 @@ export const TripUpdate = Sc.Struct({
   startDate: LocalDate,
   endDate: LocalDate,
   distance: Sc.Number,
-  drivers: ArrayEnsure
+  drivers: DriversArrayEnsure
 })
 
 export type TripUpdate = Sc.Schema.Type<typeof TripUpdate>

@@ -12,18 +12,18 @@ import {
   DialogHeader,
   DialogTitle
 } from '../ui/dialog'
+
 type TripDialogProps = {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
-
+  setTripUpdate: (tripUpdate: TripUpdate | undefined) => void
   startDate: Date
+  updateTrip?: TripUpdate
 }
 
 export const TripDialog = (
-  { isOpen, setIsOpen, startDate }: TripDialogProps
+  { isOpen, setIsOpen, startDate, updateTrip, setTripUpdate }: TripDialogProps
 ): JSX.Element => {
-  console.log(startDate)
-  const [isTripUpdated, setIsTripUpdated] = useState<boolean>(false)
   const submit = useSubmit()
 
   const personnes = [
@@ -59,29 +59,22 @@ export const TripDialog = (
   )
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={isOpen => {
+        setIsOpen(isOpen)
+        if (!isOpen) setTripUpdate(undefined)
+      }}
+    >
       <DialogContent
         className="bg-white shadow-lg"
         onPointerDownOutside={event => event.preventDefault()}
       >
         <DialogTitle className="text-2xl font-bold mb-6 px-4 ">
-          Créer un nouveau trajet
+          {updateTrip ? 'Modifier le trajet' : 'Créer un nouveau trajet'}
         </DialogTitle>
         <DialogHeader>
           <div className="max-w-md px-4">
-            {
-              /* {errorMessage && (
-        <div className="mb-4 p-4 text-red-700 bg-red-100 rounded">
-          {errorMessage}
-        </div>
-      )} */
-            }
-            {isTripUpdated && (
-              <div className="mb-4 p-4 text-green-700 bg-green-100 rounded">
-                {isTripUpdated}
-              </div>
-            )}
-
             <Form
               action="/dashboard"
               method="post"
@@ -96,6 +89,7 @@ export const TripDialog = (
                     name="name"
                     required
                     className="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-100 text-gray-900  "
+                    defaultValue={updateTrip?.name}
                   />
                 </label>
               </div>
@@ -108,8 +102,8 @@ export const TripDialog = (
                     name="startDate"
                     required
                     defaultValue={(() => {
-                      const d = new Date(startDate)
-                      d.setDate(d.getDate() + 1)
+                      const d = updateTrip?.startDate ? updateTrip.startDate : startDate
+                      // d.setDate(d.getDate() + 1)
                       return d.toISOString().split('T')[0]
                     })()}
                     className="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-100 text-gray-900  "
@@ -123,8 +117,10 @@ export const TripDialog = (
                   <input
                     type="date"
                     name="endDate"
+                    defaultValue={updateTrip?.endDate ?
+                      updateTrip.endDate.toISOString().split('T')[0] :
+                      undefined}
                     required
-                    defaultValue={undefined}
                     className="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-100 text-gray-900  "
                   />
                 </label>
@@ -138,6 +134,7 @@ export const TripDialog = (
                     name="distance"
                     min="0"
                     step="0.1"
+                    defaultValue={updateTrip?.distance ? updateTrip.distance : undefined}
                     className="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-100 text-gray-900  "
                   />
                 </label>
@@ -152,6 +149,7 @@ export const TripDialog = (
                         <Checkbox
                           name="drivers"
                           value={personne.id}
+                          defaultChecked={updateTrip?.drivers.includes(personne.id)}
                         />
                         <Label htmlFor="toggle">{personne.name}</Label>
                       </div>
@@ -164,12 +162,11 @@ export const TripDialog = (
                 type="submit"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 hover:cursor-pointer"
               >
-                Créer le trajet
+                {updateTrip ? 'Modifier le trajet' : 'Créer le trajet'}
               </button>
             </Form>
           </div>
         </DialogHeader>
-        <DialogFooter></DialogFooter>
       </DialogContent>
     </Dialog>
   )
