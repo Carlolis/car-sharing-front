@@ -11,7 +11,8 @@ type DeleteButtonProps = {
 
 export const DeleteButton = ({ tripId, submit, route }: DeleteButtonProps): JSX.Element => {
   const handleClick = () => {
-    if (!tripId || !submit) return
+    if (!tripId || !submit || !route) return
+
     const taggedDeletedTrip = TaggedDeleteTrip.make({
       tripId
     })

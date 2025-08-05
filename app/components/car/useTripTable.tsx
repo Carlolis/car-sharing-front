@@ -201,10 +201,10 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
               )
             }
           }),
-          columnHelper.display({
+          columnHelper.accessor('id', {
             id: 'actions',
             header: () => <span>Supprimer</span>,
-            cell: ({ row }) => (
+            cell: ({ getValue }) => (
               <Fragment>
                 <Dialog>
                   <DialogTrigger>
@@ -213,7 +213,9 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
                   <DialogContent className="bg-white shadow-lg">
                     <DialogHeader>
                       <DialogTitle className="py-2">Êtes vous sûr ?</DialogTitle>
-                      <DeleteButton tripId={row.id} submit={submit} />
+                      <DialogTrigger>
+                        <DeleteButton tripId={getValue()} submit={submit} route={'/dashboard'} />
+                      </DialogTrigger>
                     </DialogHeader>
                   </DialogContent>
                 </Dialog>

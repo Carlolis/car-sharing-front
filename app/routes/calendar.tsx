@@ -70,7 +70,7 @@ export const action = Remix.action(
 export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [startDate, setStartDate] = useState(new Date())
-  const [tripIdToDelete, setTripIdToDelete] = useState<string | undefined>(undefined)
+
   const [tripToUpdate, setTripToUpdate] = useState<TripUpdate | undefined>(undefined)
   const myEvents = pipe(
     trips,
@@ -138,8 +138,6 @@ export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps
     []
   )
 
-  const submit = useSubmit()
-
   return (
     <div className=" px-6 pt-14 lg:px-4">
       <div className="mx-auto max-w-2xl py-4 sm:py-6 lg:py-7">
@@ -171,14 +169,6 @@ export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps
         updateTrip={tripToUpdate}
         setTripUpdate={setTripToUpdate}
       />
-      <Dialog open={!!tripIdToDelete} onOpenChange={() => setTripIdToDelete(undefined)}>
-        <DialogContent className="bg-white shadow-lg">
-          <DialogHeader>
-            <DialogTitle className="py-2">Êtes vous sûr ?</DialogTitle>
-            <DeleteButton tripId={tripIdToDelete} submit={submit} route={'/calendar'} />
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

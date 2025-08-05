@@ -1,14 +1,15 @@
 import { pipe, Schema as Sc } from 'effect'
+import { Trash } from 'lucide-react'
 import { useCallback, useState } from 'react'
-import { Form, useSubmit } from 'react-router'
+import { Form, type SubmitFunction, useSubmit } from 'react-router'
 import { Checkbox } from '~/components/ui/checkbox'
 import { Label } from '~/components/ui/label'
 import type { TripUpdate } from '~/types/api'
 import { TaggedCreateTrip } from '../car/DashboardArguments'
+import { DeleteButton } from '../car/DeleteButton'
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle
 } from '../ui/dialog'
@@ -25,7 +26,7 @@ export const TripDialog = (
   { isOpen, setIsOpen, startDate, updateTrip, setTripUpdate }: TripDialogProps
 ): JSX.Element => {
   const submit = useSubmit()
-
+  const [tripIdToDelete, setTripIdToDelete] = useState<string | undefined>(undefined)
   const personnes = [
     { id: 'maé' as const, name: 'Maé' },
     { id: 'charles' as const, name: 'Charles' },
@@ -55,7 +56,18 @@ export const TripDialog = (
       })
       setIsOpen(false)
     },
-    [submit]
+    [setIsOpen, submit]
+  )
+
+  const handleDeleteSubmit: SubmitFunction = useCallback(
+    (event, route) =>
+      submit(event, route).then(() => {
+        setIsOpen(false)
+
+        setTripIdToDelete(undefined)
+        setTripUpdate(undefined)
+      }),
+    [setIsOpen, setTripUpdate, submit]
   )
 
   return (
@@ -70,8 +82,17 @@ export const TripDialog = (
         className="bg-white shadow-lg"
         onPointerDownOutside={event => event.preventDefault()}
       >
-        <DialogTitle className="text-2xl font-bold mb-6 px-4 ">
+        <DialogTitle className="text-2xl font-bold mb-6 px-4 flex justify-between">
           {updateTrip ? 'Modifier le trajet' : 'Créer un nouveau trajet'}
+          {updateTrip && (
+            <Trash
+              color="red"
+              className="w-5 h-5 mx-4 cursor-pointer"
+              onClick={() => {
+                setTripIdToDelete(updateTrip?.id)
+              }}
+            />
+          )}
         </DialogTitle>
         <DialogHeader>
           <div className="max-w-md px-4">
@@ -168,6 +189,18 @@ export const TripDialog = (
           </div>
         </DialogHeader>
       </DialogContent>
+      <Dialog open={!!tripIdToDelete} onOpenChange={() => setTripIdToDelete(undefined)}>
+        <DialogContent className="bg-white shadow-lg">
+          <DialogHeader>
+            <DialogTitle className="py-2">Êtes vous sûr ?</DialogTitle>
+            <DeleteButton
+              tripId={tripIdToDelete}
+              submit={handleDeleteSubmit}
+              route={'/calendar'}
+            />
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   )
 }
