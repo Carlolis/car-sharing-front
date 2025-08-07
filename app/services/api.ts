@@ -1,16 +1,17 @@
-import { HttpBody, HttpClient, HttpClientRequest } from '@effect/platform'
-import { pipe, Schema as Sc } from 'effect'
+import { HttpBody, HttpClient, HttpClientRequest, HttpClientResponse } from '@effect/platform'
+import { Console, pipe, Schema as Sc } from 'effect'
 
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import * as O from 'effect/Option'
 import { Config } from '~/runtime/Config'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
+import { InvoiceCreate } from '~/types/InvoiceCreate'
 import { TripCreate, TripStats, TripUpdate } from '../types/api'
 
 export class ApiService extends T.Service<ApiService>()('ApiService', {
   effect: T.gen(function* () {
-    const defaultClient = yield* HttpClient.HttpClient
+    const defaultClient = (yield* HttpClient.HttpClient).pipe(HttpClient.filterStatusOk)
     const API_URL = yield* pipe(Config, T.flatMap(c => c.getConfig), T.map(c => c.API_URL))
 
     const deleteTrip = (tripId: string) =>
@@ -60,7 +61,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         yield* T.logDebug(`Token ?.... ${stringify(token)}`)
         const loginUrl = HttpClientRequest.post(`${API_URL}/trips`)
 
-        const body = yield* HttpBody.jsonSchema(TripCreate)({ ...trip, drivers: ['maé'] })
+        const body = yield* HttpBody.jsonSchema(TripCreate)({ ...trip })
         const createTrip = pipe(
           loginUrl,
           HttpClientRequest.setHeader('Authorization', `Bearer ${token}`),
@@ -124,14 +125,16 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
 
         const response = yield* defaultClient.execute(httpClient)
         yield* T.logInfo(`Stats for user.... ${username}`)
+
         const responseJson = yield* pipe(
-          response.json,
-          T.flatMap(Sc.decodeUnknown(TripStats)),
+          response,
+          HttpClientResponse.schemaBodyJson(TripStats),
           T.tapError(T.logError),
           T.catchAll(() => T.succeed(TripStats.make({ totalKilometers: 0 })))
         )
         return responseJson
       }).pipe(
+        T.andThen(Console.log),
         T.annotateLogs('Api', getTripStatsByUser.name)
       )
 
@@ -196,6 +199,28 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         return responseJson as string
       })
 
+    const createInvoice = (invoice: InvoiceCreate) =>
+      T.gen(function* () {
+        const cookieSession = yield* CookieSessionStorage
+        yield* T.logDebug(`Getting token....`)
+        const token = yield* cookieSession.getUserToken()
+        yield* T.logDebug(`Token ?.... ${stringify(token)}`)
+        const invoiceUrl = HttpClientRequest.post(`${API_URL}/trips`)
+
+        const body = yield* HttpBody.jsonSchema(InvoiceCreate)({ ...invoice })
+        const createInvoice = pipe(
+          invoiceUrl,
+          HttpClientRequest.setHeader('Authorization', `Bearer ${token}`),
+          HttpClientRequest.setBody(body)
+        )
+
+        const response = yield* defaultClient.execute(createInvoice).pipe(T.tapError(T.logError))
+
+        return yield* HttpClientResponse.schemaBodyJson(Sc.String)(response)
+      }).pipe(
+        T.annotateLogs(ApiService.name, createInvoice.name)
+      )
+
     return ({
       updateTrip,
       login,
@@ -204,7 +229,8 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
       getAllTrips,
       createChat,
       addMessageToChat,
-      deleteTrip
+      deleteTrip,
+      createInvoice
     })
   })
 }) {}

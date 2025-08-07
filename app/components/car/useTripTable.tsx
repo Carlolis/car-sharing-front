@@ -225,7 +225,7 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
         ]
       }
     ],
-    []
+    [submit]
   )
 
   const table = useReactTable({

@@ -94,6 +94,12 @@ const Navigation = ({ isAuthenticated }: NavigationPros) => (
               >
                 Nouveau trajet
               </NavLink>
+              <NavLink
+                to={href('/invoice/new')}
+                className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+              >
+                Facture/Entretien
+              </NavLink>
             </div>
           )}
           <NavLink

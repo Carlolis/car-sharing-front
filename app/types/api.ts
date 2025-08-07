@@ -3,7 +3,7 @@ import { ensure } from 'effect/Array'
 import { formatIsoDateUtc } from 'effect/DateTime'
 import { Drivers } from '~/lib/models/Drivers'
 
-const LocalDate = Sc.transform(
+export const LocalDate = Sc.transform(
   // Source schema: "on" or "off"
 
   Sc.String,

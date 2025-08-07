@@ -69,7 +69,7 @@ export default function Dashboard(
 ) {
   const table = useTripTable(trips)
 
-  const totalKilometers = userStats.totalKilometers
+  const totalKilometers = 0
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
