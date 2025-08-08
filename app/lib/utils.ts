@@ -4,6 +4,7 @@ import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import { twMerge } from 'tailwind-merge'
 import type { DashboardArguments } from '~/components/car/DashboardArguments'
+import { SimpleTaggedError } from '~/routes/invoice.new'
 import { ApiService } from '~/services/api'
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -22,7 +23,7 @@ export const matchTripArgs = (request: DashboardArguments, username: string) =>
           yield* T.logInfo(`Trip deleted: ${stringify(tripId)}`)
 
           const userStats = yield* api.getTripStatsByUser(username)
-          return { tripId, userStats }
+          return { tripId, userStats, _tag: 'delete' }
         })),
       Match.tag('update', ({ tripUpdate }) =>
         T.gen(function* () {
@@ -32,7 +33,7 @@ export const matchTripArgs = (request: DashboardArguments, username: string) =>
 
           yield* T.logInfo(`Trip updated .... ${stringify(tripId)}`)
           const userStats = yield* api.getTripStatsByUser(username)
-          return { tripId, userStats }
+          return { tripId, userStats, _tag: 'update' }
         })),
       Match.tag('create', ({ tripCreate }) =>
         T.gen(function* () {
@@ -42,8 +43,11 @@ export const matchTripArgs = (request: DashboardArguments, username: string) =>
 
           yield* T.logInfo(`Trip created .... ${stringify(tripId)}`)
           const userStats = yield* api.getTripStatsByUser(username)
-          return { tripId, userStats }
+          return { tripId, userStats, _tag: 'create' }
         })),
       Match.exhaustive
     )(request)
-  })
+  }).pipe(
+    T.mapError(T.logError),
+    T.catchAll(error => T.succeed(SimpleTaggedError.of(error.toString())))
+  )

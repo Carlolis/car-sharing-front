@@ -7,16 +7,8 @@ import * as A from 'effect/Array'
 import { stringify } from 'effect/FastCheck'
 import { useCallback, useMemo, useState } from 'react'
 import { Calendar, type Event, luxonLocalizer } from 'react-big-calendar'
-import { useSubmit } from 'react-router'
 import { TripDialog } from '~/components/calendar/AddDialog'
 import { DashboardArguments } from '~/components/car/DashboardArguments'
-import { DeleteButton } from '~/components/car/DeleteButton'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle
-} from '~/components/ui/dialog'
 import { matchTripArgs } from '~/lib/utils'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import { Remix } from '~/runtime/Remix'

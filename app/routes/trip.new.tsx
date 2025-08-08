@@ -10,6 +10,7 @@ import { Remix } from '~/runtime/Remix'
 import { Redirect } from '~/runtime/ServerResponse'
 import { ApiService } from '~/services/api'
 import { TripCreate } from '~/types/api'
+import { SimpleTaggedError } from './invoice.new'
 
 export const action = Remix.action(
   T.gen(function* () {
@@ -22,9 +23,10 @@ export const action = Remix.action(
     )
 
     yield* T.logInfo(`Creating Trip.... ${stringify(tripCreate)}`)
-    const tripId = yield* api.createTrip(tripCreate)
-    yield* T.logInfo(`Trip created .... ${stringify(tripId)}`)
-    return { tripId }
+    return yield* api.createTrip(tripCreate).pipe(
+      T.map(tripId => ({ tripId, _tag: 'TripId' as const })),
+      T.catchAll(error => T.succeed(SimpleTaggedError.of(error.toString())))
+    )
   }).pipe(
     T.tapError(T.logError),
     T.catchAll(() => new Redirect({ location: '/trip/new' }))
@@ -43,9 +45,13 @@ export default function CreateTrip() {
         undefined,
         () => setErrorMessage('Une erreur est survenue lors de la création du trajet')
       ),
-      Match.orElse(({ tripId }) => {
+      Match.tag('TripId', ({ tripId }) => {
         setTripInfos(tripId)
-      })
+      }),
+      Match.tag('SimpleTaggedError', ({ message }) => {
+        setErrorMessage(message)
+      }),
+      Match.exhaustive
     )
     match(actionData)
   }, [actionData])
@@ -60,13 +66,12 @@ export default function CreateTrip() {
     <div className="max-w-md mx-auto mt-10 px-4">
       <h2 className="text-2xl font-bold mb-6">Créer un nouveau trajet</h2>
 
-      {
-        /* {errorMessage && (
+      {errorMessage && (
         <div className="mb-4 p-4 text-red-700 bg-red-100 rounded">
           {errorMessage}
         </div>
-      )} */
-      }
+      )}
+
       {tripInfos && (
         <div className="mb-4 p-4 text-green-700 bg-green-100 rounded">
           {tripInfos}

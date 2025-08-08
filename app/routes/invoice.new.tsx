@@ -1,5 +1,5 @@
 import { HttpServerRequest } from '@effect/platform'
-import { Match } from 'effect'
+import { Data, Match } from 'effect'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import { useEffect, useState } from 'react'
@@ -11,6 +11,10 @@ import { Redirect } from '~/runtime/ServerResponse'
 import { ApiService } from '~/services/api'
 
 import { InvoiceCreate } from '~/types/InvoiceCreate'
+
+export class SimpleTaggedError extends Data.TaggedError('SimpleTaggedError')<{ message: string }> {
+  static of = (message: string): SimpleTaggedError => new SimpleTaggedError({ message })
+}
 
 export const action = Remix.action(
   T.gen(function* () {
@@ -24,8 +28,8 @@ export const action = Remix.action(
 
     yield* T.logInfo(`Creating Invoice.... ${stringify(invoiceCreate)}`)
     const tripId = yield* api.createInvoice(invoiceCreate).pipe(
-      T.map(tripId => ({ tripId })),
-      T.catchAll(error => T.succeed({ error }))
+      T.map(tripId => ({ tripId, _tag: 'TripId' as const })),
+      T.catchAll(error => T.succeed(SimpleTaggedError.of(error.toString())))
     )
     yield* T.logInfo(`Invoice created .... ${stringify(tripId)}`)
     return tripId
@@ -46,14 +50,14 @@ export default function CreateInvoice() {
       Match.when(
         undefined,
         () => {
-          setErrorMessage('Une erreur est survenue lors de la création du trajet')
+          setErrorMessage('Une erreur inconnue est survenue lors de la création du trajet')
         }
       ),
-      Match.when({ error: Match.any }, error => {
-        setErrorMessage(error.error.toString())
+      Match.tag('TripId', ({ tripId }) => {
+        setTripInfos(tripId)
       }),
-      Match.when({ tripId: Match.string }, ({ tripId }) => {
-        setErrorMessage('Une erreur est survenue lors de la création du trajet')
+      Match.tag('SimpleTaggedError', ({ message }) => {
+        setErrorMessage(message)
       }),
       Match.orElse(() => {
         setTripInfos('A')
