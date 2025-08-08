@@ -38,9 +38,6 @@ export const action = Remix.action(
     // Reading the content of the same file where this code is written
 
     const content = yield* fs.readFile(file[0].path)
-    // .pipe(T.map(
-    //   buffer => Array.from(buffer)
-    // ))
 
     // yield* T.logInfo(`Creating Invoice.... ${stringify(invoiceCreate)}`)
     const tripId = yield* api.createInvoice({
@@ -56,8 +53,8 @@ export const action = Remix.action(
     T.catchTag('ResponseError', error =>
       T.gen(function* () {
         const text = yield* error.response.text
-        yield* T.logError('AAAAAAAAAAAAAAAAAAA TTT', text)
-        yield* T.logError('AAAAAAAAAAAAAAAAAAA TTT', error.description)
+        yield* T.logError('Error text : ', text)
+        yield* T.logError('Description :', error.description)
 
         return yield* T.succeed(SimpleTaggedError(stringify(text)))
       })),

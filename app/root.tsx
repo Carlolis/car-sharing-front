@@ -46,7 +46,7 @@ export const loader = Remix.loader(
       T.catchAll(_ => T.succeed(false))
     )
 
-    yield* T.logInfo(`Loader - isAuthenticated: ${isAuthenticated}`, url)
+    yield* T.logDebug(`Loader - isAuthenticated: ${isAuthenticated}`, url)
     return { isAuthenticated, url }
   })
 )
@@ -57,9 +57,9 @@ export const action = Remix.action(
 
     const user = yield* cookieSession.getUserName()
 
-    yield* T.logInfo(`User ${user} logging out`)
+    yield* T.logDebug(`User ${user} logging out`)
     const result = yield* cookieSession.logout()
-    yield* T.logInfo(`Logout result ${stringify(result)}`)
+    yield* T.logDebug(`Logout result ${stringify(result)}`)
     return result
   }).pipe(T.catchAll(error => T.fail(new Unexpected(error))))
 )

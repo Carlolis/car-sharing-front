@@ -72,13 +72,13 @@ export class CookieSessionStorage
               })
             )
           )
-          yield* T.logInfo('Getting user session from cookies', cookies)
+          yield* T.logDebug('Getting user session from cookies', cookies)
           const session = yield* _(T.promise(() =>
             getSession(
               cookies
             )
           ))
-          yield* T.logInfo('Getting user info', session.get('user_info'))
+          yield* T.logDebug('Getting user info', session.get('user_info'))
 
           const token = yield* _(
             session.get('user_info'),
@@ -92,7 +92,7 @@ export class CookieSessionStorage
               })
             )
           )
-          yield* T.logInfo('User token found', token)
+          yield* T.logDebug('User token found', token)
 
           return token
         }).pipe(

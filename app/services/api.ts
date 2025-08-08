@@ -78,7 +78,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
     const updateTrip = (trip: TripUpdate) =>
       T.gen(function* () {
         const cookieSession = yield* CookieSessionStorage
-        yield* T.logInfo(`Getting token....`)
+        yield* T.logDebug(`Getting token....`)
         const token = yield* cookieSession.getUserToken()
 
         const loginUrl = HttpClientRequest.put(`${API_URL}/trips`)
@@ -89,13 +89,13 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
           HttpClientRequest.setHeader('Authorization', `Bearer ${token}`),
           HttpClientRequest.setBody(body)
         )
-        yield* T.logInfo(`About to update a trip.... ${stringify(trip)}`)
+        yield* T.logDebug(`About to update a trip.... ${stringify(trip)}`)
         const response = yield* defaultClient.execute(updateTrip)
-        yield* T.logInfo(`Response status : ${response.status}`)
+        yield* T.logDebug(`Response status : ${response.status}`)
         if (response.status === 401 || response.status === 400) {
           const error = yield* response.text
-          yield* T.logInfo('Unauthorized Error', error)
-          yield* T.logInfo('Error status :', response.status)
+          yield* T.logError('Unauthorized Error', error)
+          yield* T.logError('Error status :', response.status)
         }
 
         return yield* HttpClientResponse.schemaBodyJson(Sc.String)(response)
@@ -107,7 +107,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
       username: string
     ) =>
       T.gen(function* () {
-        yield* T.logInfo(`Getting stats for user.... ${username}`)
+        yield* T.logDebug(`Getting stats for user.... ${username}`)
 
         const httpClient = pipe(
           `${API_URL}/trips/total`,
@@ -116,7 +116,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         )
 
         const response = yield* defaultClient.execute(httpClient)
-        yield* T.logInfo(`Stats for user.... ${username}`)
+        yield* T.logDebug(`Stats for user.... ${username}`)
 
         return yield* pipe(
           response,
@@ -197,14 +197,17 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         const cookieSession = yield* CookieSessionStorage
 
         const token = yield* cookieSession.getUserToken()
-
+        yield* T.logInfo(`About to save invoice...`, {
+          ...invoice,
+          fileBytes: invoice.fileBytes.length
+        })
         const invoiceUrl = HttpClientRequest.post(`${API_URL}/invoices`)
         const formData = new FormData()
         formData.append('name', invoice.name)
         formData.append('fileBytes', new Blob([invoice.fileBytes]), 'invoice.pdf')
         formData.append('date', invoice.date.toISOString().split('T')[0])
-        formData.append('distance', '3')
-        formData.append('drivers', JSON.stringify(['maé']))
+        formData.append('distance', JSON.stringify(invoice.distance))
+        invoice.drivers.forEach(driver => formData.append('drivers', driver))
 
         const createInvoiceRequest = pipe(
           invoiceUrl,
