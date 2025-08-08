@@ -6,11 +6,11 @@ import { useEffect, useState } from 'react'
 import { Form, useActionData } from 'react-router'
 import { Checkbox } from '~/components/ui/checkbox'
 import { Label } from '~/components/ui/label'
+import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
 import { Remix } from '~/runtime/Remix'
 import { Redirect } from '~/runtime/ServerResponse'
 import { ApiService } from '~/services/api'
 import { TripCreate } from '~/types/api'
-import { SimpleTaggedError } from './invoice.new'
 
 export const action = Remix.action(
   T.gen(function* () {

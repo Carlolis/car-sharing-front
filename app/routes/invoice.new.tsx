@@ -1,20 +1,17 @@
 import { HttpServerRequest } from '@effect/platform'
-import { Data, Match } from 'effect'
+import { Match } from 'effect'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import { useEffect, useState } from 'react'
 import { Form, useActionData } from 'react-router'
 import { Checkbox } from '~/components/ui/checkbox'
 import { Label } from '~/components/ui/label'
+import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
 import { Remix } from '~/runtime/Remix'
 import { Redirect } from '~/runtime/ServerResponse'
 import { ApiService } from '~/services/api'
 
 import { InvoiceCreate } from '~/types/InvoiceCreate'
-
-export class SimpleTaggedError extends Data.TaggedError('SimpleTaggedError')<{ message: string }> {
-  static of = (message: string): SimpleTaggedError => new SimpleTaggedError({ message })
-}
 
 export const action = Remix.action(
   T.gen(function* () {

@@ -4,7 +4,8 @@ import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import { twMerge } from 'tailwind-merge'
 import type { DashboardArguments } from '~/components/car/DashboardArguments'
-import { SimpleTaggedError } from '~/routes/invoice.new'
+import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
+
 import { ApiService } from '~/services/api'
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
