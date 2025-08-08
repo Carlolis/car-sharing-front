@@ -1,5 +1,5 @@
-import { HttpServerRequest } from '@effect/platform'
-import { Match } from 'effect'
+import { FileSystem, HttpServerRequest } from '@effect/platform'
+import { Match, Schema as Sc } from 'effect'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import { useEffect, useState } from 'react'
@@ -11,7 +11,16 @@ import { Remix } from '~/runtime/Remix'
 import { Redirect } from '~/runtime/ServerResponse'
 import { ApiService } from '~/services/api'
 
-import { InvoiceCreate } from '~/types/InvoiceCreate'
+import { FilesSchema } from '@effect/platform/Multipart'
+import { DriversArrayEnsure, LocalDate } from '~/types/api'
+
+const InvoiceCreateForm = Sc.Struct({
+  name: Sc.String,
+  date: LocalDate,
+  distance: Sc.NumberFromString,
+  drivers: DriversArrayEnsure,
+  fileBytes: FilesSchema
+})
 
 export const action = Remix.action(
   T.gen(function* () {
@@ -20,18 +29,41 @@ export const action = Remix.action(
     const api = yield* ApiService
 
     const invoiceCreate = yield* HttpServerRequest.schemaBodyForm(
-      InvoiceCreate
+      InvoiceCreateForm
     )
+    const file = invoiceCreate.fileBytes
 
-    yield* T.logInfo(`Creating Invoice.... ${stringify(invoiceCreate)}`)
-    const tripId = yield* api.createInvoice(invoiceCreate).pipe(
-      T.map(tripId => ({ tripId, _tag: 'TripId' as const })),
-      T.catchAll(error => T.succeed(SimpleTaggedError.of(error.toString())))
+    const fs = yield* FileSystem.FileSystem
+
+    // Reading the content of the same file where this code is written
+
+    const content = yield* fs.readFile(file[0].path)
+    // .pipe(T.map(
+    //   buffer => Array.from(buffer)
+    // ))
+
+    // yield* T.logInfo(`Creating Invoice.... ${stringify(invoiceCreate)}`)
+    const tripId = yield* api.createInvoice({
+      ...invoiceCreate,
+      fileBytes: content,
+      filePath: file[0].path
+    }).pipe(
+      T.map(tripId => ({ tripId, _tag: 'TripId' as const }))
     )
     yield* T.logInfo(`Invoice created .... ${stringify(tripId)}`)
     return tripId
   }).pipe(
-    T.tapError(T.logError),
+    T.catchTag('ResponseError', error =>
+      T.gen(function* () {
+        const text = yield* error.response.text
+        yield* T.logError('AAAAAAAAAAAAAAAAAAA TTT', text)
+        yield* T.logError('AAAAAAAAAAAAAAAAAAA TTT', error.description)
+
+        return yield* T.succeed(SimpleTaggedError(stringify(text)))
+      })),
+    // T.catchTags({
+    //   HttpBodyError: error => T.succeed(SimpleTaggedError(stringify(error)))
+    // }),
     T.catchAll(() => new Redirect({ location: '/invoice/new' }))
   )
 )
@@ -57,7 +89,7 @@ export default function CreateInvoice() {
         setErrorMessage(message)
       }),
       Match.orElse(() => {
-        setTripInfos('A')
+        setErrorMessage('Une erreur inconnue est survenue lors de la création du trajet')
       })
     )
 
@@ -89,6 +121,7 @@ export default function CreateInvoice() {
       <Form
         method="post"
         className="space-y-6"
+        encType="multipart/form-data"
       >
         <div>
           <label className="block text-sm font-medium text-gray-700">
@@ -145,6 +178,18 @@ export default function CreateInvoice() {
                 </div>
               ))}
             </div>
+          </label>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Un fichier pdf/image ?
+            <input
+              type="file"
+              accept=".pdf, .png, .jpg, .jpeg"
+              name="fileBytes"
+              className="mt-1 block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-100 text-gray-900  "
+            />
           </label>
         </div>
 

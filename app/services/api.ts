@@ -1,13 +1,15 @@
 import { HttpBody, HttpClient, HttpClientRequest, HttpClientResponse } from '@effect/platform'
-import { Console, pipe, Schema as Sc } from 'effect'
+import { pipe, Schema as Sc } from 'effect'
 
 import type { HttpClientError } from '@effect/platform/HttpClientError'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import * as O from 'effect/Option'
+import type { ParseError } from 'effect/ParseResult'
 import { Config } from '~/runtime/Config'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
-import { InvoiceCreate } from '~/types/InvoiceCreate'
+import type { Redirect } from '~/runtime/ServerResponse'
+import type { InvoiceCreate } from '~/types/InvoiceCreate'
 import { TripCreate, TripStats, TripUpdate } from '../types/api'
 
 export class ApiService extends T.Service<ApiService>()('ApiService', {
@@ -186,22 +188,33 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         return yield* HttpClientResponse.schemaBodyJson(Sc.String)(response)
       })
 
-    const createInvoice = (invoice: InvoiceCreate) =>
+    const createInvoice: (
+      invoice: InvoiceCreate
+    ) => T.Effect<string, HttpClientError | ParseError | Redirect, CookieSessionStorage> = (
+      invoice: InvoiceCreate
+    ) =>
       T.gen(function* () {
         const cookieSession = yield* CookieSessionStorage
-        yield* T.logDebug(`Getting token....`)
-        const token = yield* cookieSession.getUserToken()
-        yield* T.logDebug(`Token ?.... ${stringify(token)}`)
-        const invoiceUrl = HttpClientRequest.post(`${API_URL}/trips`)
 
-        const body = yield* HttpBody.jsonSchema(InvoiceCreate)({ ...invoice })
-        const createInvoice = pipe(
+        const token = yield* cookieSession.getUserToken()
+
+        const invoiceUrl = HttpClientRequest.post(`${API_URL}/invoices`)
+        const formData = new FormData()
+        formData.append('name', invoice.name)
+        formData.append('fileBytes', new Blob([invoice.fileBytes]), 'invoice.pdf')
+        formData.append('date', invoice.date.toISOString().split('T')[0])
+        formData.append('distance', '3')
+        formData.append('drivers', JSON.stringify(['maé']))
+
+        const createInvoiceRequest = pipe(
           invoiceUrl,
           HttpClientRequest.setHeader('Authorization', `Bearer ${token}`),
-          HttpClientRequest.setBody(body)
+          HttpClientRequest.bodyFormData(formData)
         )
 
-        const response = yield* defaultClient.execute(createInvoice).pipe(T.tapError(T.logError))
+        const response = yield* defaultClient.execute(createInvoiceRequest).pipe(
+          T.tapError(T.logError)
+        )
         return yield* HttpClientResponse.schemaBodyJson(Sc.String)(response)
       }).pipe(
         T.annotateLogs(ApiService.name, createInvoice.name)

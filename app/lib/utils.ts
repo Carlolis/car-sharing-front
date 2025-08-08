@@ -50,5 +50,5 @@ export const matchTripArgs = (request: DashboardArguments, username: string) =>
     )(request)
   }).pipe(
     T.mapError(T.logError),
-    T.catchAll(error => T.succeed(SimpleTaggedError.of(error.toString())))
+    T.catchAll(error => T.succeed(SimpleTaggedError(error.toString())))
   )

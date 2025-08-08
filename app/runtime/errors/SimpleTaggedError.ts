@@ -1,5 +1,4 @@
-import { Data } from 'effect'
-
-export class SimpleTaggedError extends Data.TaggedError('SimpleTaggedError')<{ message: string }> {
-  static of = (message: string): SimpleTaggedError => new SimpleTaggedError({ message })
-}
+export const SimpleTaggedError = (message: string) => ({
+  message,
+  _tag: 'SimpleTaggedError' as const
+})

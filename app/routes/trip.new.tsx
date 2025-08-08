@@ -25,7 +25,7 @@ export const action = Remix.action(
     yield* T.logInfo(`Creating Trip.... ${stringify(tripCreate)}`)
     return yield* api.createTrip(tripCreate).pipe(
       T.map(tripId => ({ tripId, _tag: 'TripId' as const })),
-      T.catchAll(error => T.succeed(SimpleTaggedError.of(error.toString())))
+      T.catchAll(error => T.succeed(SimpleTaggedError(error.toString())))
     )
   }).pipe(
     T.tapError(T.logError),

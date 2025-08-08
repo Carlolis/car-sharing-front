@@ -1,4 +1,5 @@
 import { Schema as Sc } from 'effect'
+import { Uint8Array } from 'effect/Schema'
 import { DriversArrayEnsure, LocalDate } from './api'
 
 export const InvoiceCreate = Sc.Struct({
@@ -6,7 +7,8 @@ export const InvoiceCreate = Sc.Struct({
   date: LocalDate,
   distance: Sc.NumberFromString,
   drivers: DriversArrayEnsure,
-  fileBytes: Sc.optional(Sc.String)
+  fileBytes: Uint8Array,
+  filePath: Sc.String
 })
 
 export type InvoiceCreate = Sc.Schema.Type<typeof InvoiceCreate>
