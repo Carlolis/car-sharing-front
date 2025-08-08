@@ -1,6 +1,7 @@
 import { HttpBody, HttpClient, HttpClientRequest, HttpClientResponse } from '@effect/platform'
 import { Console, pipe, Schema as Sc } from 'effect'
 
+import type { HttpClientError } from '@effect/platform/HttpClientError'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import * as O from 'effect/Option'
@@ -19,10 +20,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         const deleteUrl = HttpClientRequest.del(`${API_URL}/trips/${tripId}/delete`)
         const response = yield* defaultClient.execute(deleteUrl)
         yield* T.logInfo('ApiService deleteTrip response :', response)
-        if (response.status !== 200) {
-          yield* T.logError('ApiService deleteTrip response status is', response.status)
-          return yield* T.fail('Failed to delete trip')
-        }
+
         return response.status
       }).pipe(
         T.annotateLogs(ApiService.name, deleteTrip.name)
@@ -41,14 +39,8 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
 
         const response = yield* defaultClient.execute(loginRequest)
         yield* T.logInfo('ApiService login http response :', response)
-        const responseJson = yield* response.json
-        yield* T.logInfo('ApiService login json response :', response)
-        if (response.status !== 200) {
-          yield* T.logError('ApiService login response status is', response.status)
-          return yield* T.fail(stringify(responseJson))
-        }
 
-        return responseJson as { token: string }
+        return yield* HttpClientResponse.schemaBodyJson(Sc.Struct({ token: Sc.String }))(response)
       }).pipe(
         T.annotateLogs(ApiService.name, login.name)
       )
@@ -76,9 +68,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
           yield* T.logDebug('Error status :', response.status)
         }
 
-        const responseJson = yield* response.json
-
-        return Sc.decodeUnknownSync(Sc.String)(responseJson)
+        return yield* HttpClientResponse.schemaBodyJson(Sc.String)(response)
       }).pipe(
         T.annotateLogs(ApiService.name, createTrip.name)
       )
@@ -106,14 +96,14 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
           yield* T.logInfo('Error status :', response.status)
         }
 
-        const responseJson = yield* response.json
-
-        return Sc.decodeUnknownSync(Sc.String)(responseJson)
+        return yield* HttpClientResponse.schemaBodyJson(Sc.String)(response)
       }).pipe(
         T.annotateLogs(ApiService.name, updateTrip.name)
       )
 
-    const getTripStatsByUser = (username: string) =>
+    const getTripStatsByUser: (username: string) => T.Effect<TripStats, HttpClientError, never> = (
+      username: string
+    ) =>
       T.gen(function* () {
         yield* T.logInfo(`Getting stats for user.... ${username}`)
 
@@ -126,15 +116,13 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         const response = yield* defaultClient.execute(httpClient)
         yield* T.logInfo(`Stats for user.... ${username}`)
 
-        const responseJson = yield* pipe(
+        return yield* pipe(
           response,
           HttpClientResponse.schemaBodyJson(TripStats),
           T.tapError(T.logError),
           T.catchAll(() => T.succeed(TripStats.make({ totalKilometers: 0 })))
         )
-        return responseJson
       }).pipe(
-        T.andThen(Console.log),
         T.annotateLogs('Api', getTripStatsByUser.name)
       )
 
@@ -153,8 +141,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         const response = yield* defaultClient.execute(getAllTripsRequest)
 
         const responseJson = yield* pipe(
-          response.json,
-          T.flatMap(Sc.decodeUnknown(Sc.Array(TripUpdate))),
+          HttpClientResponse.schemaBodyJson(Sc.Array(TripUpdate))(response),
           T.tapError(T.logError),
           T.catchAll(() => T.succeed<readonly TripUpdate[]>([]))
         )
@@ -181,7 +168,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         const response = yield* defaultClient.execute(createChatRequest)
         const responseJson = yield* response.json
         yield* T.logInfo('responseJson', responseJson)
-        return responseJson as string
+        return yield* HttpClientResponse.schemaBodyJson(Sc.String)(response)
       })
 
     const addMessageToChat = (chatUuid: string, message: { question: string; answer: string }) =>
@@ -196,7 +183,7 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         const response = yield* defaultClient.execute(createChatRequest)
         const responseJson = yield* response.json
         yield* T.logInfo('responseJson', responseJson)
-        return responseJson as string
+        return yield* HttpClientResponse.schemaBodyJson(Sc.String)(response)
       })
 
     const createInvoice = (invoice: InvoiceCreate) =>
@@ -215,7 +202,6 @@ export class ApiService extends T.Service<ApiService>()('ApiService', {
         )
 
         const response = yield* defaultClient.execute(createInvoice).pipe(T.tapError(T.logError))
-
         return yield* HttpClientResponse.schemaBodyJson(Sc.String)(response)
       }).pipe(
         T.annotateLogs(ApiService.name, createInvoice.name)
