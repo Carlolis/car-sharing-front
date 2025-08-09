@@ -37,7 +37,7 @@ export default function CreateTrip() {
   const actionData = useActionData<typeof action>()
 
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
-  const [tripInfos, setTripInfos] = useState<string | undefined>(undefined)
+  const [tripUpdateSuccess, setTripUpdateSuccess] = useState<string | undefined>(undefined)
 
   useEffect(() => {
     const match = Match.type<typeof actionData>().pipe(
@@ -46,7 +46,7 @@ export default function CreateTrip() {
         identity
       ),
       Match.tag('TripName', ({ tripName }) => {
-        setTripInfos(`Le trajet ${tripName} a été créé avec succès`)
+        setTripUpdateSuccess(`Le trajet ${tripName} a été créé avec succès`)
       }),
       Match.tag('SimpleTaggedError', ({ message }) => {
         setErrorMessage(message)
@@ -68,7 +68,7 @@ export default function CreateTrip() {
     if (drivers.length === 0) {
       event.preventDefault()
       setErrorMessage('Veuillez sélectionner au moins un conducteur.')
-      setTripInfos(undefined)
+      setTripUpdateSuccess(undefined)
     } else {
       setErrorMessage(undefined)
     }
@@ -84,9 +84,9 @@ export default function CreateTrip() {
         </div>
       )}
 
-      {tripInfos && (
+      {tripUpdateSuccess && (
         <div className="mb-4 p-4 text-green-700 bg-green-100 rounded">
-          {tripInfos}
+          {tripUpdateSuccess}
         </div>
       )}
 

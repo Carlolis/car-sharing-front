@@ -7,8 +7,8 @@ export const InvoiceCreate = Sc.Struct({
   date: LocalDate,
   distance: Sc.NumberFromString,
   drivers: DriversArrayEnsure,
-  fileBytes: Uint8Array,
-  filePath: Sc.String
+  fileBytes: Sc.optional(Uint8Array),
+  filePath: Sc.optional(Sc.String)
 })
 
 export type InvoiceCreate = Sc.Schema.Type<typeof InvoiceCreate>

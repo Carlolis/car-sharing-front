@@ -24,12 +24,15 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
         const token = yield* cookieSession.getUserToken()
         yield* T.logInfo(`About to save invoice...`, {
           ...invoice,
-          fileBytes: invoice.fileBytes.length
+          fileBytes: invoice.fileBytes?.length
         })
         const invoiceUrl = pipe(postRequest, HttpClientRequest.appendUrl('/invoices'))
         const formData = new FormData()
         formData.append('name', invoice.name)
-        formData.append('fileBytes', new Blob([invoice.fileBytes]), 'invoice.pdf')
+        if (invoice.fileBytes) {
+          formData.append('fileBytes', new Blob([invoice.fileBytes]), 'invoice.pdf')
+        }
+
         formData.append('date', invoice.date.toISOString().split('T')[0])
         formData.append('distance', JSON.stringify(invoice.distance))
         invoice.drivers.forEach(driver => formData.append('drivers', driver))
