@@ -9,14 +9,14 @@ import { Label } from '~/components/ui/label'
 import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
 import { Remix } from '~/runtime/Remix'
 import { Redirect } from '~/runtime/ServerResponse'
-import { ApiService } from '~/services/api'
+import { TripService } from '~/services/trip'
 import { TripCreate } from '~/types/api'
 
 export const action = Remix.action(
   T.gen(function* () {
     yield* T.logInfo(`Creating Trip....`)
 
-    const api = yield* ApiService
+    const api = yield* TripService
 
     const tripCreate = yield* HttpServerRequest.schemaBodyForm(
       TripCreate

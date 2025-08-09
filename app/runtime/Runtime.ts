@@ -9,7 +9,12 @@ import {
 import * as T from 'effect/Effect'
 import * as L from 'effect/Layer'
 import { IaServiceLayer } from '~/contexts/ia.util'
-import { ApiLayer } from '~/services/api'
+import { AuthLayer } from '~/services/auth'
+import { HttpLayer } from '~/services/httpClient'
+import { IALayer } from '~/services/ia'
+import { InvoiceLayer } from '~/services/invoice'
+import { TripLayer } from '~/services/trip'
+
 import { Config, ConfigLive } from './Config'
 
 export const DevToolsLive = DevTools.layerWebSocket().pipe(
@@ -28,7 +33,11 @@ export const AppLayer = pipe(
   L.provide(LogLevel),
   L.provideMerge(NodeContext.layer),
   L.provideMerge(IaServiceLayer),
-  L.provideMerge(ApiLayer),
+  L.provideMerge(AuthLayer),
+  L.provideMerge(TripLayer),
+  L.provideMerge(InvoiceLayer),
+  L.provideMerge(IALayer),
+  L.provide(HttpLayer),
   L.provide(ConfigLive),
   L.provideMerge(FetchHttpClient.layer)
 )

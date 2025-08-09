@@ -6,7 +6,7 @@ import { twMerge } from 'tailwind-merge'
 import type { DashboardArguments } from '~/components/car/DashboardArguments'
 import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
 
-import { ApiService } from '~/services/api'
+import { TripService } from '~/services/trip'
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -14,7 +14,7 @@ export function cn(...inputs: ClassValue[]) {
 export const matchTripArgs = (request: DashboardArguments, username: string) =>
   T.gen(function* () {
     yield* T.logDebug(`Trip action request: ${stringify(request)}`)
-    const api = yield* ApiService
+    const api = yield* TripService
     return yield* Match.type<DashboardArguments>().pipe(
       Match.tag('delete', ({ tripId }) =>
         T.gen(function* () {

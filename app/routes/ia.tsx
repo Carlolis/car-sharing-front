@@ -18,7 +18,7 @@ import type { ChatChunk } from '~/contexts/ia.util'
 import { IaService } from '~/contexts/ia.util'
 import { IArguments } from '~/lib/models/IA'
 import { Remix } from '~/runtime/Remix'
-import { ApiService } from '~/services/api'
+import { IAService as HttpIAService } from '~/services/ia'
 
 export const loader = Remix.loader(
   T.gen(function* () {
@@ -130,7 +130,7 @@ export const action = Remix.action(
         })),
       Match.tag('newChat', ({ name }) =>
         T.gen(function* () {
-          const api = yield* ApiService
+          const api = yield* HttpIAService
           const chatUuid = yield* api.createChat('da57890c-ed4f-11ef-ade3-1f987dffad35', name)
 
           return chatUuid

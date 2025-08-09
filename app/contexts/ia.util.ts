@@ -5,7 +5,8 @@ import * as T from 'effect/Effect'
 import * as L from 'effect/Layer'
 import type { ChatResponse } from 'ollama'
 import { ConfigLive } from '~/runtime/Config'
-import { ApiService } from '~/services/api'
+import { HttpService } from '~/services/httpClient'
+import { IAService as HttpIAService } from '~/services/ia'
 import { transformIterable } from './transformIterable'
 
 export type ChatChunk =
@@ -73,12 +74,12 @@ export type ChatChunk =
 
 export class IaService extends T.Service<IaService>()('IaService', {
   effect: T.gen(function* () {
-    const api = yield* ApiService
+    const api = yield* HttpIAService
     const streamEffectResponse = (
       response: AsyncIterable<ChatResponse>,
       chatUuid: string,
       question: string
-    ): T.Effect<T.Effect<ChatChunk>, never, ApiService | HttpClient.HttpClient | Scope.Scope> =>
+    ): T.Effect<T.Effect<ChatChunk>, never, HttpIAService | HttpClient.HttpClient | Scope.Scope> =>
       T.gen(function* () {
         let content = ''
         let firstChunkContent = ''
@@ -103,7 +104,10 @@ export class IaService extends T.Service<IaService>()('IaService', {
         const next = yield* Deferred.make<ChatChunk>()
         const firstPromise = T.runPromise(Deferred.await(next))
         const layers = pipe(
-          ApiService.Default,
+          HttpIAService.Default,
+          L.provide(
+            HttpService.Default
+          ),
           L.provide(
             FetchHttpClient.layer
           ),
@@ -111,7 +115,9 @@ export class IaService extends T.Service<IaService>()('IaService', {
         )
         pipe(
           transformIterable(iterable, next, chatUuid, question, firstChunkContent),
+          x => x,
           T.provide(layers),
+          x => x,
           T.runPromise
         )
         // ;(async () => {

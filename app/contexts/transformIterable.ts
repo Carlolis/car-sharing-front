@@ -4,7 +4,7 @@ import * as Ref from 'effect/Ref'
 
 import { pipe } from 'effect'
 import type { ChatResponse } from 'ollama'
-import { ApiService } from '~/services/api'
+import { IAService as ApiService } from '~/services/ia'
 import type { ChatChunk } from './ia.util'
 
 export function transformIterable(

@@ -9,9 +9,9 @@ import { Label } from '~/components/ui/label'
 import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
 import { Remix } from '~/runtime/Remix'
 import { Redirect } from '~/runtime/ServerResponse'
-import { ApiService } from '~/services/api'
 
 import { FilesSchema } from '@effect/platform/Multipart'
+import { InvoiceService } from '~/services/invoice'
 import { DriversArrayEnsure, LocalDate } from '~/types/api'
 
 const InvoiceCreateForm = Sc.Struct({
@@ -26,7 +26,7 @@ export const action = Remix.action(
   T.gen(function* () {
     yield* T.logInfo(`Creating Invoice....`)
 
-    const api = yield* ApiService
+    const api = yield* InvoiceService
 
     const invoiceCreate = yield* HttpServerRequest.schemaBodyForm(
       InvoiceCreateForm

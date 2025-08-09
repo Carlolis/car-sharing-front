@@ -1,7 +1,7 @@
 import * as T from 'effect/Effect'
 
 import { Remix } from '~/runtime/Remix'
-import { ApiService } from '../services/api'
+import { TripService } from '../services/trip'
 
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 
@@ -36,7 +36,7 @@ export const loader = Remix.loader(
     yield* T.logDebug(`CookieSessionStorage - loader`)
 
     const user = yield* cookieSession.getUserName()
-    const api = yield* ApiService
+    const api = yield* TripService
 
     const userStats = yield* api.getTripStatsByUser(user)
 

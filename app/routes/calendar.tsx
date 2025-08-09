@@ -13,7 +13,7 @@ import { matchTripArgs } from '~/lib/utils'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import { Remix } from '~/runtime/Remix'
 import { NotFound, Redirect } from '~/runtime/ServerResponse'
-import { ApiService } from '~/services/api'
+import { TripService } from '~/services/trip'
 import type { TripUpdate } from '~/types/api'
 import { DriversArrayEnsure } from '~/types/api'
 import '../components/calendar/calendar.css'
@@ -32,7 +32,7 @@ export const loader = Remix.loader(
   T.gen(function* () {
     const cookieSession = yield* CookieSessionStorage
     const user = yield* cookieSession.getUserName()
-    const api = yield* ApiService
+    const api = yield* TripService
     const trips = yield* api.getAllTrips()
 
     yield* T.logDebug(
