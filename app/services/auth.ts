@@ -6,12 +6,12 @@ import { HttpService } from './httpClient'
 
 export class AuthService extends T.Service<AuthService>()('AuthService', {
   effect: T.gen(function* () {
-    const { defaultClient, deleteRequest } = yield* HttpService
+    const { defaultClient, postRequest } = yield* HttpService
 
     const login = (username: string) =>
       T.gen(function* () {
-        yield* T.logInfo(`AuthService login url : ${deleteRequest.url}/login`)
-        const loginUrl = pipe(deleteRequest, HttpClientRequest.appendUrl('/login'))
+        yield* T.logInfo(`AuthService login url : ${postRequest.url}/login`)
+        const loginUrl = pipe(postRequest, HttpClientRequest.appendUrl('/login'))
 
         const body = yield* HttpBody.json({ name: username })
         const loginRequest = pipe(
