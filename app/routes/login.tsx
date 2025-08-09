@@ -26,7 +26,7 @@ export const action = Remix.action(
 
     yield* T.logInfo(`Remix Action Login Page Login.... ${username}`)
     return yield* api.login(username).pipe(
-      T.map(({ token }) => cookieSession.commitUserInfo({ username, token })),
+      T.flatMap(({ token }) => cookieSession.commitUserInfo({ username, token })),
       T.catchTag('ResponseError', error => pipe(error.response.text, T.map(SimpleTaggedError)))
     )
   }).pipe(
