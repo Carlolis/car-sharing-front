@@ -25,6 +25,7 @@ export class AuthService extends T.Service<AuthService>()('AuthService', {
 
         return yield* HttpClientResponse.schemaBodyJson(Sc.Struct({ token: Sc.String }))(response)
       }).pipe(
+        T.tapError(T.logError),
         T.annotateLogs(AuthService.name, login.name)
       )
 

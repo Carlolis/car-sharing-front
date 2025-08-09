@@ -1,13 +1,13 @@
 import { HttpServerRequest } from '@effect/platform'
 
-import { Match, Schema as Sc } from 'effect'
+import { Match, pipe, Schema as Sc } from 'effect'
 import * as T from 'effect/Effect'
-import { stringify } from 'effect/FastCheck'
 import { useEffect, useState } from 'react'
 import { Form, useActionData } from 'react-router'
 import { Remix } from '~/runtime/Remix'
 
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
+import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
 import { AuthService } from '../services/auth'
 
 const UserNotFound = Sc.TaggedStruct('NotFound', {
@@ -25,9 +25,10 @@ export const action = Remix.action(
     )
 
     yield* T.logInfo(`Remix Action Login Page Login.... ${username}`)
-    const { token } = yield* api.login(username)
-    yield* T.logInfo(`Remix Action Login Page  Token.... ${stringify(token)}`)
-    return yield* cookieSession.commitUserInfo({ username, token })
+    return yield* api.login(username).pipe(
+      T.map(({ token }) => cookieSession.commitUserInfo({ username, token })),
+      T.catchTag('ResponseError', error => pipe(error.response.text, T.map(SimpleTaggedError)))
+    )
   }).pipe(
     T.catchAll(error => Sc.decode(UserNotFound)({ message: error.toString(), _tag: 'NotFound' }))
   )
@@ -42,10 +43,15 @@ export default function Login() {
   useEffect(() => {
     const match = Match.type<typeof actionData>().pipe(
       Match.when(undefined, () => setIsNotFound(false)),
-      Match.orElse(({ message }) => {
+      Match.tag('NotFound', ({ message }) => {
         setIsNotFound(true)
         setErrorMessage(message)
-      })
+      }),
+      Match.tag('SimpleTaggedError', ({ message }) => {
+        setIsNotFound(true)
+        setErrorMessage(message)
+      }),
+      Match.orElse(() => '')
     )
     match(actionData)
   }, [actionData])

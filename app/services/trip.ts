@@ -20,6 +20,7 @@ export class TripService extends T.Service<TripService>()('TripService', {
 
         return response.status
       }).pipe(
+        T.tapError(T.logError),
         T.annotateLogs(TripService.name, deleteTrip.name)
       )
 
@@ -48,6 +49,7 @@ export class TripService extends T.Service<TripService>()('TripService', {
 
         return yield* HttpClientResponse.schemaBodyJson(Sc.String)(response)
       }).pipe(
+        T.tapError(T.logError),
         T.annotateLogs(TripService.name, createTrip.name)
       )
 
@@ -75,6 +77,7 @@ export class TripService extends T.Service<TripService>()('TripService', {
 
         return yield* HttpClientResponse.schemaBodyJson(Sc.String)(response)
       }).pipe(
+        T.tapError(T.logError),
         T.annotateLogs(TripService.name, updateTrip.name)
       )
 
@@ -100,6 +103,7 @@ export class TripService extends T.Service<TripService>()('TripService', {
           T.catchAll(() => T.succeed(TripStats.make({ totalKilometers: 0 })))
         )
       }).pipe(
+        T.tapError(T.logError),
         T.annotateLogs('Trip', getTripStatsByUser.name)
       )
 
@@ -128,6 +132,7 @@ export class TripService extends T.Service<TripService>()('TripService', {
 
         return responseJson
       }).pipe(
+        T.tapError(T.logError),
         T.annotateLogs(TripService.name, getAllTrips.name)
       )
 

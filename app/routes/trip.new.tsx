@@ -1,8 +1,8 @@
 import { HttpServerRequest } from '@effect/platform'
-import { Match } from 'effect'
+import { identity, Match, pipe } from 'effect'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
-import { useEffect, useState } from 'react'
+import { type FormEvent, useEffect, useState } from 'react'
 import { Form, useActionData } from 'react-router'
 import { Checkbox } from '~/components/ui/checkbox'
 import { Label } from '~/components/ui/label'
@@ -24,8 +24,8 @@ export const action = Remix.action(
 
     yield* T.logInfo(`Creating Trip.... ${stringify(tripCreate)}`)
     return yield* api.createTrip(tripCreate).pipe(
-      T.map(tripId => ({ tripId, _tag: 'TripId' as const })),
-      T.catchAll(error => T.succeed(SimpleTaggedError(error.toString())))
+      T.map(() => ({ tripName: tripCreate.name, _tag: 'TripName' as const })),
+      T.catchTag('ResponseError', error => pipe(error.response.text, T.map(SimpleTaggedError)))
     )
   }).pipe(
     T.tapError(T.logError),
@@ -43,10 +43,10 @@ export default function CreateTrip() {
     const match = Match.type<typeof actionData>().pipe(
       Match.when(
         undefined,
-        () => setErrorMessage('Une erreur est survenue lors de la création du trajet')
+        identity
       ),
-      Match.tag('TripId', ({ tripId }) => {
-        setTripInfos(tripId)
+      Match.tag('TripName', ({ tripName }) => {
+        setTripInfos(`Le trajet ${tripName} a été créé avec succès`)
       }),
       Match.tag('SimpleTaggedError', ({ message }) => {
         setErrorMessage(message)
@@ -61,6 +61,18 @@ export default function CreateTrip() {
     { id: 'charles' as const, name: 'Charles' },
     { id: 'brigitte' as const, name: 'Brigitte' }
   ]
+
+  const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
+    const formData = new FormData(event.currentTarget)
+    const drivers = formData.getAll('drivers')
+    if (drivers.length === 0) {
+      event.preventDefault()
+      setErrorMessage('Veuillez sélectionner au moins un conducteur.')
+      setTripInfos(undefined)
+    } else {
+      setErrorMessage(undefined)
+    }
+  }
 
   return (
     <div className="max-w-md mx-auto mt-10 px-4">
@@ -81,6 +93,7 @@ export default function CreateTrip() {
       <Form
         method="post"
         className="space-y-6"
+        onSubmit={handleFormSubmit}
       >
         <div>
           <label className="block text-sm font-medium text-gray-700">
@@ -144,10 +157,11 @@ export default function CreateTrip() {
               {personnes.map(personne => (
                 <div key={personne.id} className="flex items-center gap-3">
                   <Checkbox
+                    id={personne.id}
                     name="drivers"
                     value={personne.id}
                   />
-                  <Label htmlFor="toggle">{personne.name}</Label>
+                  <Label htmlFor={personne.id}>{personne.name}</Label>
                 </div>
               ))}
             </div>

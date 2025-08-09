@@ -45,6 +45,7 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
         )
         return yield* HttpClientResponse.schemaBodyJson(Sc.String)(response)
       }).pipe(
+        T.tapError(T.logError),
         T.annotateLogs(InvoiceService.name, createInvoice.name)
       )
 
