@@ -5,7 +5,6 @@ import { GiBrain } from 'react-icons/gi'
 import { LuLoaderCircle } from 'react-icons/lu'
 import Markdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { materialDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 
 interface ChatProps {
   isLoading: boolean
@@ -26,10 +25,10 @@ export const Chat: React.FC<ChatProps> = (
       {responses.map(({ question, response }, i) => (
         <div
           key={i}
-          className="text-lg text-gray-900 dark:text-white p-4 bg-white dark:bg-gray-800 rounded-md border border-gray-300 dark:border-gray-600 mt-4"
+          className="text-lg text-gray-900  p-4 bg-white  rounded-md border border-gray-300  mt-4"
         >
           <div className="flex justify-end mb-4">
-            <div className="inline-block py-2 px-3 bg-gray-200 dark:bg-gray-700 rounded-full">
+            <div className="inline-block py-2 px-3 bg-gray-200  rounded-full">
               {question}
             </div>
           </div>
@@ -54,7 +53,6 @@ export const Chat: React.FC<ChatProps> = (
                               return match ?
                                 (
                                   <SyntaxHighlighter
-                                    style={materialDark}
                                     language={match[1]}
                                     PreTag="div"
                                   >
@@ -88,7 +86,7 @@ export const Chat: React.FC<ChatProps> = (
         name="question"
         type="text"
         required
-        className="appearance-none rounded-none w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-l-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+        className="appearance-none rounded-none w-full px-3 py-2 border border-gray-300  placeholder-gray-500  text-gray-900  bg-white  rounded-l-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
         placeholder="Demandez à l'IA"
       />
       <input

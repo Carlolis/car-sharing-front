@@ -246,11 +246,11 @@ export default function IA() {
     <>
       {isChatReady ?
         (
-          <div className="flex bg-white dark:bg-gray-900 space-x-4">
-            <div className="min-h-screen w-1/4 p-4 bg-gray-100 dark:bg-gray-800 h-full border-r border-gray-300 dark:border-gray-700 flex flex-col">
+          <div className="flex bg-white  space-x-4">
+            <div className="min-h-screen w-1/4 p-4 bg-gray-100  h-full border-r border-gray-300  flex flex-col">
               <div>
                 <button
-                  className="bg-white text-blue-500 px-4 py-1 rounded my-2 flex items-center space-x-2 hover:bg-blue-500 hover:text-white transition-colors duration-300"
+                  className="bg-white text-blue-500 px-4 py-1 rounded my-2 flex items-center space-x-2 hover:bg-blue-500 hover:text-white transition-colors duration-300 cursor-pointer border-blue-500 border"
                   onClick={() => {
                     setChatHistory([])
 
@@ -262,14 +262,14 @@ export default function IA() {
                     })
                   }}
                 >
-                  <MessageSquareDiff className="w-5 h-5" />
+                  <MessageSquareDiff className="w-15 h-15" />
                   <div>Nouveau Chat</div>
                 </button>
               </div>
 
               <ul className=" space-y-2 flex-grow overflow-y-auto">
                 {chatHistory.map((chat, index) => (
-                  <li key={index} className="p-2 bg-white dark:bg-gray-700 rounded">
+                  <li key={index} className="p-2 bg-white  rounded">
                     <p className="font-bold">{chat.title}</p>
                   </li>
                 ))}
@@ -277,7 +277,7 @@ export default function IA() {
             </div>
             <div className="w-3/4  space-y-8 p-16">
               <div>
-                <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+                <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 ">
                   Demandez à l&apos;IA
                 </h2>
               </div>
@@ -315,7 +315,7 @@ export default function IA() {
           </div>
         ) :
         (
-          <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
+          <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 ">
             {isLoading ?
               <LuLoaderCircle className="mx-auto my-4 text-indigo-600 animate-spin" size={48} /> :
               <FiCommand className="mx-auto my-4 text-indigo-600" size={48} />}
@@ -333,7 +333,7 @@ export default function IA() {
                 className="mt-4 px-6 py-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition duration-300 ease-in-out"
               >
                 <h1 className="text-4xl font-bold text-white">
-                  Réveiller le chat !
+                  Réveillez le chat !
                 </h1>
               </button>
             )}
