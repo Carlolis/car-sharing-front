@@ -3,7 +3,7 @@ import { Config, Match, pipe, Schedule, String } from 'effect'
 import * as A from 'effect/Array'
 import * as T from 'effect/Effect'
 import * as O from 'effect/Option'
-import { Unexpected } from 'effect/ParseResult'
+
 import { MessageSquareDiff } from 'lucide-react'
 import { Ollama } from 'ollama'
 import { useEffect, useState } from 'react'
@@ -18,6 +18,7 @@ import type { ChatChunk } from '~/contexts/ia.util'
 import { IaService } from '~/contexts/ia.util'
 import { IArguments } from '~/lib/models/IA'
 import { Remix } from '~/runtime/Remix'
+import { Unexpected } from '~/runtime/ServerResponse'
 import { IAService as HttpIAService } from '~/services/ia'
 
 export const loader = Remix.loader(
@@ -41,7 +42,7 @@ export const loader = Remix.loader(
   }).pipe(
     T.scoped,
     T.tapError(T.logError),
-    T.catchAll(error => T.fail(new Unexpected(error)))
+    T.catchAll(error => T.fail(new Unexpected({ error: 'error B' })))
   )
 )
 
@@ -143,7 +144,7 @@ export const action = Remix.action(
   }).pipe(
     T.scoped,
     T.tapError(T.logError),
-    T.catchAll(error => T.fail(new Unexpected(error)))
+    T.catchAll(error => T.fail(new Unexpected({ error: 'error A' })))
   )
 )
 

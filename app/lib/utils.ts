@@ -4,14 +4,13 @@ import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import { twMerge } from 'tailwind-merge'
 import type { DashboardArguments } from '~/components/car/DashboardArguments'
-import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
 
 import { TripService } from '~/services/trip'
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const matchTripArgs = (request: DashboardArguments, username: string) =>
+export const matchTripArgs = (request: DashboardArguments) =>
   T.gen(function* () {
     yield* T.logDebug(`Trip action request: ${stringify(request)}`)
     const api = yield* TripService
@@ -23,8 +22,8 @@ export const matchTripArgs = (request: DashboardArguments, username: string) =>
 
           yield* T.logInfo(`Trip deleted: ${stringify(tripId)}`)
 
-          const userStats = yield* api.getTripStatsByUser(username)
-          return { tripId, userStats, _tag: 'delete' }
+          const userStats = yield* api.getTripStatsByUser()
+          return { tripId, userStats, _tag: 'delete' as const }
         })),
       Match.tag('update', ({ tripUpdate }) =>
         T.gen(function* () {
@@ -33,8 +32,8 @@ export const matchTripArgs = (request: DashboardArguments, username: string) =>
           const tripId = yield* api.updateTrip(tripUpdate)
 
           yield* T.logInfo(`Trip updated .... ${stringify(tripId)}`)
-          const userStats = yield* api.getTripStatsByUser(username)
-          return { tripId, userStats, _tag: 'update' }
+          const userStats = yield* api.getTripStatsByUser()
+          return { tripId, userStats, _tag: 'update' as const }
         })),
       Match.tag('create', ({ tripCreate }) =>
         T.gen(function* () {
@@ -43,12 +42,12 @@ export const matchTripArgs = (request: DashboardArguments, username: string) =>
           const tripId = yield* api.createTrip(tripCreate)
 
           yield* T.logInfo(`Trip created .... ${stringify(tripId)}`)
-          const userStats = yield* api.getTripStatsByUser(username)
-          return { tripId, userStats, _tag: 'create' }
+          const userStats = yield* api.getTripStatsByUser()
+          return { tripId, userStats, _tag: 'create' as const }
         })),
       Match.exhaustive
     )(request)
   }).pipe(
-    T.mapError(T.logError),
-    T.catchAll(error => T.succeed(SimpleTaggedError(error.toString())))
+    T.tapError(T.logError)
+    // T.catchAll(error => T.succeed(SimpleTaggedError(error.toString())))
   )

@@ -6,7 +6,7 @@ import { TripService } from '../services/trip'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 
 import { stringify } from 'effect/FastCheck'
-import { NotFound, Redirect } from '~/runtime/ServerResponse'
+import { Unexpected } from '~/runtime/ServerResponse'
 
 import {
   flexRender,
@@ -20,7 +20,6 @@ import { DashboardArguments } from '~/components/car/DashboardArguments'
 import { StatsCard } from '~/components/car/StatsCard'
 import { useTripTable } from '~/components/car/useTripTable'
 import { matchTripArgs } from '~/lib/utils'
-import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
 import type { Route } from './+types/dashboard'
 
 declare module '@tanstack/react-table' {
@@ -39,7 +38,7 @@ export const loader = Remix.loader(
     const user = yield* cookieSession.getUserName()
     const api = yield* TripService
 
-    const userStats = yield* api.getTripStatsByUser(user)
+    const userStats = yield* api.getTripStatsByUser()
 
     const trips = yield* api.getAllTrips()
 
@@ -49,36 +48,39 @@ export const loader = Remix.loader(
 
     return { user, trips, userStats, _tag: 'data' as const }
   }).pipe(
-    T.catchTag('ResponseError', error =>
-      T.gen(function* () {
-        const text = yield* error.response.text
-        yield* T.logError('Error text : ', text)
-        yield* T.logError('Description :', error.description)
-
-        return yield* T.succeed(SimpleTaggedError(stringify(text)))
-      })),
-    T.catchAll(error => T.fail(new NotFound({ message: stringify(error) })))
+    // T.catchTag(
+    //   'NotAuthenticated',
+    //   error => new Redirect({ location: '/login', message: error.message })
+    // ),
+    T.catchTag('RequestError', error => new Unexpected({ error: error.message })),
+    T.catchTag('ResponseError', error => new Unexpected({ error: error.message }))
+    // T.catchAll(error => T.fail(new NotFound({ message: stringify(error) })))
   )
 )
 
-export const action = Remix.action(
-  T.gen(function* () {
-    yield* T.logInfo(`Dashboard action trigged....`)
-    const cookieSession = yield* CookieSessionStorage
-    const user = yield* cookieSession.getUserName()
+export const action = Remix.unwrapAction(
+  T.succeed(
+    T.gen(function* () {
+      yield* T.logInfo(`Dashboard action trigged....`)
 
-    const request = yield* HttpServerRequest.schemaBodyJson(DashboardArguments)
-    return yield* matchTripArgs(request, user)
-  }).pipe(
-    T.tapError(T.logError),
-    T.catchAll(() => new Redirect({ location: '/dashboard' }))
+      const request = yield* HttpServerRequest.schemaBodyJson(DashboardArguments)
+      return yield* matchTripArgs(request)
+    }).pipe(
+      T.tapError(T.logError),
+      T.catchTag('RequestError', error => new Unexpected({ error: error.message })),
+      T.catchTag('ResponseError', error => new Unexpected({ error: error.message })),
+      T.catchTag('HttpBodyError', error => new Unexpected({ error: stringify(error.reason.error) }))
+    )
   )
 )
 
 export default function Dashboard(
-  { loaderData }: Route.ComponentProps
+  { loaderData, actionData }: Route.ComponentProps
 ) {
-  const table = useTripTable(loaderData._tag === 'SimpleTaggedError' ? [] : loaderData.trips)
+  const trips = loaderData.trips || []
+  const table = useTripTable(
+    trips
+  )
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -86,7 +88,17 @@ export default function Dashboard(
         <h2 className="text-2xl font-semibold text-gray-900 mb-8">
           Statistiques Globales
         </h2>
-        {loaderData._tag === 'SimpleTaggedError' ? <>{loaderData.message}</> : loaderData.user && (
+        <>
+          {actionData?._tag === 'create' ?
+            (
+              <>
+                {actionData.tripId}
+              </>
+            ) :
+            <></>}
+        </>
+
+        {loaderData.trips && (
           <>
             <div
               className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
@@ -110,7 +122,7 @@ export default function Dashboard(
             </div>
             <div className="mt-8 ">
               <div className="bg-white shadow-md rounded-lg overflow-hidden ">
-                {loaderData.trips.length > 0 && (
+                {
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       {table.getHeaderGroups().map(headerGroup => (
@@ -150,7 +162,7 @@ export default function Dashboard(
                       ))}
                     </tbody>
                   </table>
-                )}
+                }
               </div>
             </div>
           </>

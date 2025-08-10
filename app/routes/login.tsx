@@ -3,7 +3,7 @@ import { HttpServerRequest } from '@effect/platform'
 import { Match, pipe, Schema as Sc } from 'effect'
 import * as T from 'effect/Effect'
 import { useEffect, useState } from 'react'
-import { Form, useActionData } from 'react-router'
+import { Form, useActionData, useSearchParams } from 'react-router'
 import { Remix } from '~/runtime/Remix'
 
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
@@ -36,6 +36,7 @@ export const action = Remix.action(
 
 export default function Login() {
   const [isNotFound, setIsNotFound] = useState(false)
+  const [isTokenExpired, setIsTokenExpired] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
 
   const actionData = useActionData<typeof action>()
@@ -56,6 +57,15 @@ export default function Login() {
     match(actionData)
   }, [actionData])
 
+  const [searchParams] = useSearchParams()
+
+  useEffect(() => {
+    if (searchParams.has('error')) {
+      setIsTokenExpired(true)
+      setErrorMessage(searchParams.get('error') || '')
+    }
+  }, [searchParams])
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50  py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -71,6 +81,20 @@ export default function Login() {
                 Utilisateur non trouvé {errorMessage}
               </div>
             </div>
+          )}
+          {isTokenExpired && (
+            <>
+              <div className="rounded-md bg-red-50  p-4">
+                <div className="text-sm text-red-700 ">
+                  Merci de vous reconnecter !
+                </div>
+              </div>
+              <div className="rounded-md bg-red-50  p-4">
+                <div className="text-sm text-red-500 ">
+                  Erreur technique, si il y a un bug : {errorMessage}
+                </div>
+              </div>
+            </>
           )}
           <div className="rounded-md shadow-sm -space-y-px">
             <div>

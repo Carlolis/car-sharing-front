@@ -8,16 +8,17 @@ import { Cause, Context, Exit, Layer, ManagedRuntime, Match, pipe } from 'effect
 import type { NoSuchElementException } from 'effect/Cause'
 import * as T from 'effect/Effect'
 import * as L from 'effect/Layer'
-import type { ParseError, Unexpected } from 'effect/ParseResult'
+import type { ParseError } from 'effect/ParseResult'
 import type { ActionFunctionArgs, LoaderFunctionArgs, Params as RemixParams } from 'react-router'
-import { data, redirect } from 'react-router'
+import { redirect } from 'react-router'
 import { SessionStorage } from '~/session'
 import { ConfigLive } from './Config'
 import type { CookieSessionStorage } from './CookieSessionStorage'
 import { CookieSessionStorageLayer } from './CookieSessionStorage'
+import type { NotAuthenticated } from './errors/NotAuthenticatedError'
 import { ResponseHeaders } from './ResponseHeaders'
-import { AppLayer, DevToolsLive } from './Runtime'
-import type { FormError, NotFound, Redirect } from './ServerResponse'
+import { AppLayer } from './Runtime'
+import type { FormError, NotFound, Redirect, Unexpected } from './ServerResponse'
 type Serializable =
   | undefined
   | null
@@ -55,7 +56,14 @@ type RequestEnv =
   | CookieSessionStorage
   | SessionStorage
 
-type ActionError = Redirect | Unexpected | FormError | ParseError | NotFound
+type ActionError =
+  | Redirect
+  | Unexpected
+  | FormError
+  | ParseError
+  | NotFound
+  | NotAuthenticated
+  | NotAuthenticated
 
 type RemixActionHandler<A, R,> = T.Effect<
   A,
@@ -63,7 +71,13 @@ type RemixActionHandler<A, R,> = T.Effect<
   R | AppEnv | RequestEnv
 >
 
-type LoaderError = Redirect | NotFound | Unexpected | NoSuchElementException
+type LoaderError =
+  | Redirect
+  | NotFound
+  | Unexpected
+  | NoSuchElementException
+  | NotAuthenticated
+  | ParseError
 
 type RemixLoaderHandler<A extends Serializable, R,> = T.Effect<
   A,
@@ -74,7 +88,7 @@ type LoaderArgs = LoaderFunctionArgs
 
 type ActionArgs = ActionFunctionArgs
 
-const matchLoaderError = Match.typeTags<Redirect | NotFound | Unexpected | NoSuchElementException>()
+const matchLoaderError = Match.typeTags<LoaderError>()
 const matchActionError = Match.typeTags<ActionError>()
 const makeRequestContext = (
   args: LoaderArgs | ActionArgs
@@ -110,19 +124,24 @@ const loader = <A extends Serializable, R extends AppEnv | RequestEnv,>(
   effect: RemixLoaderHandler<A, R>
 ) => ((args: LoaderFunctionArgs) => {
   const runnable = effect.pipe(
-    T.tapError(e =>
+    T.catchAll(e =>
       T.sync(() =>
         matchLoaderError({
           Unexpected: () => Response.json({ status: 500 }),
-
-          Redirect: () => Response.json({ status: 500 }),
-          // {
-          //   args.response.status = 302
-          //   args.response.headers.set('Location', e.location)
-          //   args.response.headers.set('Set-Cookie', e.headers?.['Set-Cookie'] ?? '')
-          // },
-          NoSuchElementException: () => Response.json({ status: 500 }),
-          NotFound: () => Response.json({ status: 500 })
+          Redirect: e =>
+            redirect(`${e.location}?error=${e.message}`, {
+              headers: e.headers,
+              status: 302,
+              statusText: e.message
+            }),
+          NoSuchElementException: () => Response.json({ status: 401 }),
+          ParseError: e => Response.json({ status: 500, body: e }),
+          NotFound: e => Response.json({ status: 404, body: e }),
+          NotAuthenticated: e =>
+            redirect(`/login?error=${e.message}`, {
+              status: 302,
+              statusText: e.message
+            })
         })(e)
       )
     ),
@@ -160,11 +179,17 @@ const action = <A extends Serializable, R extends AppEnv | RequestEnv,>(
     T.catchAll(e =>
       T.sync(() =>
         matchActionError({
-          Unexpected: () => data({ status: 500 }),
-          FormError: () => data({ status: 400 }),
-          Redirect: e => redirect(e.location, { headers: e.headers, status: 302 }),
-          ParseError: () => data({ status: 400 }),
-          NotFound: () => data({ status: 404 })
+          Unexpected: () => Response.json({ status: 500 }),
+          Redirect: e =>
+            redirect(e.location, { headers: e.headers, status: 302, statusText: e.message }),
+          FormError: () => Response.json({ status: 401 }),
+          NotFound: e => Response.json({ status: 404, body: e }),
+          ParseError: e => Response.json({ status: 500, body: e }),
+          NotAuthenticated: e =>
+            redirect(`/login?error=${e.message}`, {
+              status: 302,
+              statusText: e.message
+            })
         })(e)
       )
     ),

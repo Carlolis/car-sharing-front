@@ -26,9 +26,10 @@ import { HttpServerRequest } from '@effect/platform'
 import { pipe } from 'effect'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
-import { Unexpected } from 'effect/ParseResult'
+
 import { useEffect } from 'react'
 import { CookieSessionStorage } from './runtime/CookieSessionStorage'
+import { Unexpected } from './runtime/ServerResponse'
 interface NavigationPros {
   isAuthenticated: boolean
 }
@@ -61,7 +62,7 @@ export const action = Remix.action(
     const result = yield* cookieSession.logout()
     yield* T.logDebug(`Logout result ${stringify(result)}`)
     return result
-  }).pipe(T.catchAll(error => T.fail(new Unexpected(error))))
+  }).pipe(T.catchAll(error => T.fail(new Unexpected({ error: error.toString() }))))
 )
 
 const Navigation = ({ isAuthenticated }: NavigationPros) => (

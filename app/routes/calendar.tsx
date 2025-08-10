@@ -48,11 +48,9 @@ export const loader = Remix.loader(
 export const action = Remix.action(
   T.gen(function* () {
     yield* T.logInfo(`Dashboard action trigged....`)
-    const cookieSession = yield* CookieSessionStorage
-    const user = yield* cookieSession.getUserName()
 
     const request = yield* HttpServerRequest.schemaBodyJson(DashboardArguments)
-    return yield* matchTripArgs(request, user)
+    return yield* matchTripArgs(request)
   }).pipe(
     T.tapError(T.logError),
     T.catchAll(() => new Redirect({ location: '/calendar' }))

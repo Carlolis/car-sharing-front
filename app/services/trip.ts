@@ -1,10 +1,12 @@
 import { HttpBody, HttpClientRequest, HttpClientResponse } from '@effect/platform'
 import { pipe, Schema as Sc } from 'effect'
 
-import type { HttpClientError } from '@effect/platform/HttpClientError'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
+import { NotAuthenticated } from '~/runtime/errors/NotAuthenticatedError'
+import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
+import { TaggedTripId } from '~/types/TripIdTs'
 import { TripCreate, TripStats, TripUpdate } from '../types/api'
 import { HttpService } from './httpClient'
 
@@ -18,8 +20,23 @@ export class TripService extends T.Service<TripService>()('TripService', {
         const response = yield* defaultClient.execute(deleteUrl)
         yield* T.logInfo('TripService deleteTrip response :', response)
 
-        return response.status
+        return yield* pipe(
+          response,
+          HttpClientResponse.schemaBodyJson(Sc.String),
+          T.map(tripId => TaggedTripId.make({ tripId }))
+        )
       }).pipe(
+        T.catchTag('ResponseError', error =>
+          T.gen(function* () {
+            if (error.response.status === 401 || error.response.status === 400) {
+              return yield* pipe(
+                error.response.text,
+                T.tap(T.logError),
+                T.flatMap(error => T.fail(NotAuthenticated.of(error)))
+              )
+            }
+            return yield* T.fail(error)
+          })),
         T.tapError(T.logError),
         T.annotateLogs(TripService.name, deleteTrip.name)
       )
@@ -43,12 +60,26 @@ export class TripService extends T.Service<TripService>()('TripService', {
 
         if (response.status === 401 || response.status === 400) {
           const error = yield* response.text
-          yield* T.logDebug('Unauthorized Error', error)
+          yield* T.logInfo('Unauthorized Error', error)
           yield* T.logDebug('Error status :', response.status)
         }
 
-        return yield* HttpClientResponse.schemaBodyJson(Sc.String)(response)
+        return yield* pipe(
+          response,
+          HttpClientResponse.schemaBodyJson(Sc.String)
+        )
       }).pipe(
+        T.catchTag('ResponseError', error =>
+          T.gen(function* () {
+            if (error.response.status === 401 || error.response.status === 400) {
+              return yield* pipe(
+                error.response.text,
+                T.tap(T.logError),
+                T.flatMap(error => T.fail(NotAuthenticated.of(error)))
+              )
+            }
+            return yield* T.fail(error)
+          })),
         T.tapError(T.logError),
         T.annotateLogs(TripService.name, createTrip.name)
       )
@@ -75,26 +106,41 @@ export class TripService extends T.Service<TripService>()('TripService', {
           yield* T.logError('Error status :', response.status)
         }
 
-        return yield* HttpClientResponse.schemaBodyJson(Sc.String)(response)
+        return yield* pipe(
+          response,
+          HttpClientResponse.schemaBodyJson(Sc.String),
+          T.map(tripId => TaggedTripId.make({ tripId }))
+        )
       }).pipe(
+        T.catchTag('ResponseError', error =>
+          T.gen(function* () {
+            if (error.response.status === 401 || error.response.status === 400) {
+              return yield* pipe(
+                error.response.text,
+                T.tap(T.logError),
+                T.flatMap(error => T.fail(NotAuthenticated.of(error)))
+              )
+            }
+            return yield* T.fail(error)
+          })),
         T.tapError(T.logError),
         T.annotateLogs(TripService.name, updateTrip.name)
       )
 
-    const getTripStatsByUser: (username: string) => T.Effect<TripStats, HttpClientError, never> = (
-      username: string
-    ) =>
+    const getTripStatsByUser = () =>
       T.gen(function* () {
-        yield* T.logDebug(`Getting stats for user.... ${username}`)
-
+        const cookieSession = yield* CookieSessionStorage
+        yield* T.logDebug(`Getting stats for user.... `)
+        yield* T.logDebug(`Getting token....`)
+        const token = yield* cookieSession.getUserToken()
         const getTripStatsByUser = pipe(
           getRequest,
-          HttpClientRequest.appendUrl(`/trips/total`),
-          HttpClientRequest.setUrlParam('username', username)
+          HttpClientRequest.setHeader('Authorization', `Bearer ${token}`),
+          HttpClientRequest.appendUrl(`/trips/total`)
         )
 
         const response = yield* defaultClient.execute(getTripStatsByUser)
-        yield* T.logDebug(`Stats for user.... ${username}`)
+        yield* T.logDebug(`Stats for user.... `)
 
         return yield* pipe(
           response,
@@ -103,8 +149,19 @@ export class TripService extends T.Service<TripService>()('TripService', {
           T.catchAll(() => T.succeed(TripStats.make({ totalKilometers: 0 })))
         )
       }).pipe(
+        T.catchTag('ResponseError', error =>
+          T.gen(function* () {
+            if (error.response.status === 401 || error.response.status === 400) {
+              return yield* pipe(
+                error.response.text,
+                T.tap(T.logError),
+                T.flatMap(error => T.fail(NotAuthenticated.of(error)))
+              )
+            }
+            return yield* T.fail(error)
+          })),
         T.tapError(T.logError),
-        T.annotateLogs('Trip', getTripStatsByUser.name)
+        T.annotateLogs(TripService.name, getTripStatsByUser.name)
       )
 
     const getAllTrips = () =>
@@ -132,6 +189,17 @@ export class TripService extends T.Service<TripService>()('TripService', {
 
         return responseJson
       }).pipe(
+        T.catchTag('ResponseError', error =>
+          T.gen(function* () {
+            if (error.response.status === 401 || error.response.status === 400) {
+              return yield* pipe(
+                error.response.text,
+                T.tap(T.logError),
+                T.flatMap(error => T.fail(NotAuthenticated.of(error)))
+              )
+            }
+            return yield* T.fail(error)
+          })),
         T.tapError(T.logError),
         T.annotateLogs(TripService.name, getAllTrips.name)
       )
