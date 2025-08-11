@@ -6,6 +6,7 @@ import * as T from 'effect/Effect'
 import type { ParseError } from 'effect/ParseResult'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import type { Redirect } from '~/runtime/ServerResponse'
+import type { Invoice } from '~/types/Invoice'
 import type { InvoiceCreate } from '~/types/InvoiceCreate'
 import { HttpService } from './httpClient'
 
@@ -52,8 +53,26 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
         T.annotateLogs(InvoiceService.name, createInvoice.name)
       )
 
+    const getInvoices = T.succeed<Invoice[]>([
+      {
+        id: '1',
+        distance: 100,
+        date: '2023-10-26',
+        name: 'Invoice 1',
+        drivers: ['maé', 'charles']
+      },
+      {
+        id: '2',
+        distance: 200,
+        date: '2023-10-25',
+        name: 'Invoice 2',
+        drivers: ['brigitte']
+      }
+    ])
+
     return ({
-      createInvoice
+      createInvoice,
+      getInvoices
     })
   })
 }) {}

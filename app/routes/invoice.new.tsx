@@ -4,14 +4,14 @@ import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import { useEffect, useState } from 'react'
 import { Form, useActionData } from 'react-router'
-import { Checkbox } from '~/components/ui/checkbox'
+
 import { Label } from '~/components/ui/label'
 import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
 import { Remix } from '~/runtime/Remix'
 import { Redirect } from '~/runtime/ServerResponse'
 
 import { FilesSchema } from '@effect/platform/Multipart'
-import { prettyErrors } from 'effect/Cause'
+
 import * as O from 'effect/Option'
 import { TreeFormatter } from 'effect/ParseResult'
 import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group'
@@ -208,7 +208,7 @@ export default function CreateInvoice() {
           type="submit"
           className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 hover:cursor-pointer"
         >
-          Créer le trajet
+          Ajouter la facture
         </button>
       </Form>
     </div>
