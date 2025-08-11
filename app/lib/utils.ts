@@ -1,9 +1,10 @@
 import { type ClassValue, clsx } from 'clsx'
-import { Match } from 'effect'
+import { Match, pipe } from 'effect'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import { twMerge } from 'tailwind-merge'
 import type { DashboardArguments } from '~/components/car/DashboardArguments'
+import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
 
 import { TripService } from '~/services/trip'
 export function cn(...inputs: ClassValue[]) {
@@ -48,6 +49,23 @@ export const matchTripArgs = (request: DashboardArguments) =>
       Match.exhaustive
     )(request)
   }).pipe(
-    T.tapError(T.logError)
-    // T.catchAll(error => T.succeed(SimpleTaggedError(error.toString())))
+    T.tapError(T.logError),
+    T.catchTag('ResponseError', error =>
+      T.gen(function* () {
+        if (error.response.status === 405) {
+          return yield* pipe(
+            error.response.text,
+            T.tap(error => T.logError('Unauthorized Error 405', error)),
+            T.flatMap(errorText =>
+              T.succeed(
+                SimpleTaggedError(
+                  `Unauthorized Error 405  ${errorText} for url : ${error.methodAndUrl}`
+                )
+              )
+            )
+          )
+        }
+        return yield* T.fail(error)
+      })),
+    T.catchAll(error => T.succeed(SimpleTaggedError(stringify(error))))
   )

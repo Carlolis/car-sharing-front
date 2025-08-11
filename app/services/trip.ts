@@ -5,7 +5,6 @@ import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import { NotAuthenticated } from '~/runtime/errors/NotAuthenticatedError'
-import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
 import { TaggedTripId } from '~/types/TripIdTs'
 import { TripCreate, TripStats, TripUpdate } from '../types/api'
 import { HttpService } from './httpClient'
@@ -93,7 +92,7 @@ export class TripService extends T.Service<TripService>()('TripService', {
         const body = yield* HttpBody.jsonSchema(TripUpdate)(trip)
         const updateTrip = pipe(
           putRequest,
-          HttpClientRequest.appendUrl(`/trips/${trip.id}`),
+          HttpClientRequest.appendUrl(`/trips`),
           HttpClientRequest.setHeader('Authorization', `Bearer ${token}`),
           HttpClientRequest.setBody(body)
         )

@@ -67,9 +67,9 @@ export const action = Remix.unwrapAction(
       return yield* matchTripArgs(request)
     }).pipe(
       T.tapError(T.logError),
-      T.catchTag('RequestError', error => new Unexpected({ error: error.message })),
-      T.catchTag('ResponseError', error => new Unexpected({ error: error.message })),
-      T.catchTag('HttpBodyError', error => new Unexpected({ error: stringify(error.reason.error) }))
+      T.catchTag('RequestError', error => new Unexpected({ error: error.message }))
+      // T.catchTag('ResponseError', error => new Unexpected({ error: error.message })),
+      // T.catchTag('HttpBodyError', error => new Unexpected({ error: stringify(error.reason.error) }))
     )
   )
 )
@@ -97,6 +97,13 @@ export default function Dashboard(
             ) :
             <></>}
         </>
+        {actionData?._tag === 'SimpleTaggedError' && (
+          <div className="rounded-md bg-red-50  p-4">
+            <div className="text-sm text-red-700 ">
+              {actionData.message}
+            </div>
+          </div>
+        )}
 
         {loaderData.trips && (
           <>

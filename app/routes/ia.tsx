@@ -42,7 +42,7 @@ export const loader = Remix.loader(
   }).pipe(
     T.scoped,
     T.tapError(T.logError),
-    T.catchAll(error => T.fail(new Unexpected({ error: 'error B' })))
+    T.catchAll(_error => T.fail(new Unexpected({ error: 'error B' })))
   )
 )
 
@@ -144,7 +144,7 @@ export const action = Remix.action(
   }).pipe(
     T.scoped,
     T.tapError(T.logError),
-    T.catchAll(error => T.fail(new Unexpected({ error: 'error A' })))
+    T.catchAll(_error => T.fail(new Unexpected({ error: 'error A' })))
   )
 )
 
