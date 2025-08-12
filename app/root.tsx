@@ -27,7 +27,9 @@ import { pipe } from 'effect'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 
-import { useEffect } from 'react'
+import { BarChart3, Brain, Calendar, MapPin, PlusCircle, Receipt } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { SideBar } from './components/sideBar'
 import { CookieSessionStorage } from './runtime/CookieSessionStorage'
 import { Unexpected } from './runtime/ServerResponse'
 interface NavigationPros {
@@ -65,72 +67,43 @@ export const action = Remix.action(
   }).pipe(T.catchAll(error => T.fail(new Unexpected({ error: error.toString() }))))
 )
 
+const menuItems = [
+  {
+    id: 'dashboard',
+    label: 'Tableau de bord',
+    icon: BarChart3,
+    color: '#0077BE',
+    bgColor: '#e6f3ff'
+  },
+  {
+    id: 'calendar',
+    label: 'Réservations',
+    icon: Calendar,
+    color: '#00A8CC',
+    bgColor: '#e6fbff'
+  },
+  {
+    id: 'trip/new',
+    label: 'Nouveau trajet',
+    icon: PlusCircle,
+    color: '#00A8CC',
+    bgColor: '#e6fbff'
+  },
+  {
+    id: 'invoice/new',
+    label: 'Nouvelle Facture',
+    icon: MapPin,
+    color: '#00D4AA',
+    bgColor: '#e6fff9'
+  },
+  { id: 'invoices', label: 'Factures', icon: Receipt, color: '#10E68A', bgColor: '#e6ffe9' },
+  { id: 'ia', label: 'IA', icon: Brain, color: '#10E68A', bgColor: '#e6ffe9' }
+]
+
 const Navigation = ({ isAuthenticated }: NavigationPros) => (
   <nav className="bg-gray-800">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="flex items-center justify-between h-16">
-        <div className="flex items-center">
-          <div className="flex-shrink-0">
-            <NavLink to="/" className="text-white font-bold text-xl">
-              PartageAuto
-            </NavLink>
-          </div>
-          {isAuthenticated && (
-            <div className="ml-10 flex items-baseline space-x-4">
-              <NavLink
-                to={href('/dashboard')}
-                className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Tableau de bord
-              </NavLink>
-              <NavLink
-                to={href('/calendar')}
-                className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Calendrier
-              </NavLink>
-              <NavLink
-                to={href('/trip/new')}
-                className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Nouveau trajet
-              </NavLink>
-              <NavLink
-                to={href('/invoice/new')}
-                className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Facture/Entretien
-              </NavLink>
-              <NavLink
-                to={href('/invoices')}
-                className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Factures
-              </NavLink>
-            </div>
-          )}
-          <NavLink
-            to={href('/ia')}
-            className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-          >
-            IA
-          </NavLink>
-        </div>
-
-        <div className="flex items-center">
-          {isAuthenticated
-            && (
-              <Form method="post">
-                <button
-                  className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium hover:cursor-pointer"
-                  type="submit"
-                >
-                  Déconnexion
-                </button>
-              </Form>
-            )}
-        </div>
-      </div>
+    <div className="flex flex-col justify-between h-16 ">
+      <SideBar menuItems={menuItems} isAuthenticated={isAuthenticated} />
     </div>
   </nav>
 )
@@ -159,7 +132,7 @@ export default function App() {
         {isIAUrl ? <title>AI by Charles</title> : <title>Partage</title>}
       </head>
       <body>
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-white flex  ">
           {!isIAUrl && <Navigation isAuthenticated={isAuthenticated} />}
           <Outlet />
         </div>
@@ -183,7 +156,7 @@ export function ErrorBoundary() {
         <Links />
       </head>
       <body>
-        {/* add the UI you want your users to see */}
+        {stringify(error)}
         <Scripts />
       </body>
     </html>
