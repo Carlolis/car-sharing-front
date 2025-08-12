@@ -13,12 +13,13 @@ import {
   useNavigate,
   useRouteError
 } from 'react-router'
+import calendar from './components/calendar/calendar.css?url'
 import { Remix } from './runtime/Remix'
 import stylesheet from './tailwind.css?url'
-
 export const links: LinksFunction = () => [
   //  { rel: "preconnect", href: "https://fonts.googleapis.com" },
   { rel: 'stylesheet', href: stylesheet },
+  { rel: 'stylesheet', href: calendar },
   { rel: 'stylesheet', href: styles }
 ]
 

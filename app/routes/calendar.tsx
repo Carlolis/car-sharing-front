@@ -16,7 +16,7 @@ import { NotFound, Redirect } from '~/runtime/ServerResponse'
 import { TripService } from '~/services/trip'
 import type { TripUpdate } from '~/types/api'
 import { DriversArrayEnsure } from '~/types/api'
-import '../components/calendar/calendar.css'
+
 import type { Route as t } from './+types/calendar'
 
 export const TripCalendar = Sc.Struct({
@@ -129,7 +129,7 @@ export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps
   )
 
   return (
-    <div className=" px-6 pt-14 lg:px-4">
+    <div className=" px-6 pt-14 lg:px-4 w-full">
       <div className="mx-auto max-w-2xl py-4 sm:py-6 lg:py-7">
         <div className="text-center">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 ">
