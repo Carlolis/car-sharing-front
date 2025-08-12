@@ -1,4 +1,4 @@
-import { LogIn, LogOut } from 'lucide-react'
+import { Car, LogIn, LogOut } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { Form, NavLink } from 'react-router'
@@ -20,11 +20,12 @@ export const SideBar = ({ menuItems, isAuthenticated }: SideBarProps) => {
   }, [])
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full">
+      <div className="flex min-h-screen ">
         {/* Navigation Desktop */}
         <Sidebar className="hidden lg:flex border-r border-slate-200/60 bg-[#f5f2e9]/80 backdrop-blur-sm">
           <SidebarHeader className="border-b border-slate-200/60 p-6">
             {/* <LogoComponent />*/}
+            <Car />
           </SidebarHeader>
           <SidebarContent className="p-4 bg-[#f5f2e9]">
             <SidebarMenu>

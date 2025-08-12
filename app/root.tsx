@@ -100,14 +100,6 @@ const menuItems = [
   { id: 'ia', label: 'IA', icon: Brain, color: '#10E68A', bgColor: '#e6ffe9' }
 ]
 
-const Navigation = ({ isAuthenticated }: NavigationPros) => (
-  <nav className="bg-gray-800">
-    <div className="flex flex-col justify-between h-16 ">
-      <SideBar menuItems={menuItems} isAuthenticated={isAuthenticated} />
-    </div>
-  </nav>
-)
-
 export default function App() {
   const { isAuthenticated, url } = useLoaderData<typeof loader>()
 
@@ -133,7 +125,11 @@ export default function App() {
       </head>
       <body>
         <div className="min-h-screen bg-white flex  ">
-          {!isIAUrl && <Navigation isAuthenticated={isAuthenticated} />}
+          {!isIAUrl && (
+            <div className="min-h-screen bg-white flex max-w-150 ">
+              <SideBar menuItems={menuItems} isAuthenticated={isAuthenticated} />
+            </div>
+          )}
           <Outlet />
         </div>
 

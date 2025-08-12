@@ -17,6 +17,7 @@ import type { TripUpdate } from '~/types/api'
 import { Checkbox } from '../ui/checkbox'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -205,16 +206,19 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
             cell: ({ getValue }) => (
               <Fragment>
                 <Dialog>
-                  <DialogTrigger>
-                    <DeleteButton />
+                  <DialogTrigger asChild>
+                  <DeleteButton />
                   </DialogTrigger>
                   <DialogContent className="bg-white shadow-lg">
                     <DialogHeader>
                       <DialogTitle className="py-2">Êtes vous sûr ?</DialogTitle>
-                      <DialogTrigger>
-                        <DeleteButton tripId={getValue()} submit={submit} route={'/dashboard'} />
-                      </DialogTrigger>
                     </DialogHeader>
+                    <div className="flex justify-end gap-4 pt-4">
+                      <DialogClose asChild>
+                       <DeleteButton />
+                      </DialogClose>
+                      <DeleteButton tripId={getValue()} submit={submit} route={'/dashboard'} />
+                    </div>
                   </DialogContent>
                 </Dialog>
               </Fragment>

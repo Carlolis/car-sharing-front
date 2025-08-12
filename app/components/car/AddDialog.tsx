@@ -24,16 +24,14 @@ export const CreateTrip = (): JSX.Element => {
 
   return (
     <Dialog>
-      <DialogTrigger>
-        <div className="py-2">
-          <button
-            type="submit"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded cursor-pointer transition-colors duration-150 shadow "
-            aria-label="Ajouter un trajet"
-          >
-            Ajouter un trajet
-          </button>
-        </div>
+      <DialogTrigger asChild>
+        <button
+          type="button"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded cursor-pointer transition-colors duration-150 shadow "
+          aria-label="Ajouter un trajet"
+        >
+          Ajouter un trajet
+        </button>
       </DialogTrigger>
       <DialogContent className="bg-white shadow-lg">
         <DialogTitle className="text-2xl font-bold mb-6 px-4 ">
