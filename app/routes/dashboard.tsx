@@ -9,7 +9,6 @@ import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import { Unexpected } from '~/runtime/ServerResponse'
 
 import {
-  flexRender,
   type RowData
 } from '@tanstack/react-table'
 

@@ -1,11 +1,8 @@
 import styles from 'react-datepicker/dist/react-datepicker.css?url'
 import type { LinksFunction } from 'react-router'
 import {
-  Form,
-  href,
   Links,
   Meta,
-  NavLink,
   Outlet,
   Scripts,
   ScrollRestoration,
@@ -29,13 +26,10 @@ import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 
 import { BarChart3, Brain, Calendar, MapPin, PlusCircle, Receipt } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { SideBar } from './components/sideBar'
 import { CookieSessionStorage } from './runtime/CookieSessionStorage'
 import { Unexpected } from './runtime/ServerResponse'
-interface NavigationPros {
-  isAuthenticated: boolean
-}
 
 export const loader = Remix.loader(
   T.gen(function* () {

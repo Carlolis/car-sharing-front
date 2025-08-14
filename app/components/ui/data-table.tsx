@@ -1,7 +1,6 @@
 'use client'
 
 import { flexRender, type Table as TanstackTable } from '@tanstack/react-table'
-import { Route } from 'lucide-react'
 
 interface DataTableProps<TData,> {
   table: TanstackTable<TData>

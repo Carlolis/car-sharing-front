@@ -13,7 +13,7 @@ export const loader = Remix.loader(
   })
 )
 
-export default function InvoicesPage({ loaderData, actionData }: Route.ComponentProps) {
+export default function InvoicesPage({ loaderData }: Route.ComponentProps) {
   const { invoices } = loaderData
   const table = useInvoiceTable(invoices)
 
