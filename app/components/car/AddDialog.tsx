@@ -1,8 +1,11 @@
 import { pipe, Schema as Sc } from 'effect'
+import { Plus } from 'lucide-react'
+import { motion } from 'motion/react'
 import { useState } from 'react'
 import { Form, useSubmit } from 'react-router'
 import { Checkbox } from '~/components/ui/checkbox'
 import { Label } from '~/components/ui/label'
+import { Button } from '../ui/button'
 import {
   Dialog,
   DialogContent,
@@ -14,6 +17,8 @@ import {
 import { TaggedCreateTrip } from './DashboardArguments'
 export const CreateTrip = (): JSX.Element => {
   const [isTripUpdated, setIsTripUpdated] = useState<boolean>(false)
+  const [showForm, setShowForm] = useState<boolean>(false)
+
   const submit = useSubmit()
 
   const personnes = [
@@ -25,13 +30,34 @@ export const CreateTrip = (): JSX.Element => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button
-          type="button"
-          className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded cursor-pointer transition-colors duration-150 shadow "
-          aria-label="Ajouter un trajet"
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="flex-shrink-0"
         >
-          Ajouter un trajet
-        </button>
+          <Button
+            onClick={() => setShowForm(!showForm)}
+            type="button"
+            className={`shadow-lg hover:shadow-xl transition-all duration-300 text-sm lg:text-base px-4 lg:px-6 py-2 lg:py-3 min-h-[44px] whitespace-nowrap ${
+              showForm ?
+                'bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600' :
+                'bg-gradient-to-r from-[#2fd1d1] to-[#00D4AA] hover:from-[#00A8CC] hover:to-[#2fd1d1]'
+            }`}
+            aria-label="Ajouter un trajet"
+          >
+            <Plus
+              className={`h-4 w-4 lg:h-5 lg:w-5 mr-2 transition-transform duration-200 ${
+                showForm ? 'rotate-45' : ''
+              }`}
+            />
+            {showForm ? 'Annuler' : (
+              <>
+                <span className="hidden sm:inline">Nouveau trajet</span>
+                <span className="sm:hidden">Nouveau</span>
+              </>
+            )}
+          </Button>
+        </motion.div>
       </DialogTrigger>
       <DialogContent className="bg-white shadow-lg">
         <DialogTitle className="text-2xl font-bold mb-6 px-4 ">

@@ -1,9 +1,15 @@
 import { Car, LogIn, LogOut } from 'lucide-react'
 import { motion } from 'motion/react'
-import { useEffect, useState } from 'react'
-import { Form, NavLink } from 'react-router'
-import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
-  SidebarProvider } from './ui/sidebar'
+import { Form, NavLink, useLocation } from 'react-router'
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider
+} from './ui/sidebar'
 
 interface SideBarProps {
   menuItems: { id: string; color: string; label: string; icon: React.FC }[]
@@ -11,13 +17,8 @@ interface SideBarProps {
 }
 
 export const SideBar = ({ menuItems, isAuthenticated }: SideBarProps) => {
-  const [currentPage, setCurrentPage] = useState('')
+  const { pathname: currentPage } = useLocation()
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setCurrentPage(window.location.pathname.split('/')[1])
-    }
-  }, [])
   return (
     <SidebarProvider>
       <div className="flex min-h-screen ">
@@ -38,7 +39,7 @@ export const SideBar = ({ menuItems, isAuthenticated }: SideBarProps) => {
                       transition={{ duration: 0.3, delay: index * 0.1 }}
                     >
                       <SidebarMenuButton
-                        isActive={currentPage === item.id}
+                        isActive={currentPage === '/' + item.id}
                         className={`cursor-pointer w-full mb-2 transition-all duration-200 hover:scale-105 group text-base min-h-[44px] ${
                           currentPage === item.id ?
                             'bg-gradient-to-r shadow-lg border-0' :
@@ -46,10 +47,10 @@ export const SideBar = ({ menuItems, isAuthenticated }: SideBarProps) => {
                         }`}
                         style={{
                           fontFamily: 'Lato, sans-serif',
-                          background: currentPage === item.id ?
+                          background: currentPage === '/' + item.id ?
                             `linear-gradient(135deg, ${item.color}20, ${item.color}35)` :
                             undefined,
-                          borderLeft: currentPage === item.id ?
+                          borderLeft: currentPage === '/' + item.id ?
                             `4px solid ${item.color}` :
                             undefined
                         }}
@@ -70,7 +71,7 @@ export const SideBar = ({ menuItems, isAuthenticated }: SideBarProps) => {
                           <NavLink
                             to={item.id}
                             className={`transition-colors duration-200 text-base ${
-                              currentPage === item.id ?
+                              currentPage === '/' + item.id ?
                                 'text-slate-800 font-medium' :
                                 'text-slate-600 group-hover:text-slate-700'
                             }`}

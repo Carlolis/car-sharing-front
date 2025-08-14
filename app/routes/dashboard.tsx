@@ -3,9 +3,9 @@ import * as T from 'effect/Effect'
 import { Remix } from '~/runtime/Remix'
 import { TripService } from '../services/trip'
 
-import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
-
 import { stringify } from 'effect/FastCheck'
+import { motion } from 'motion/react'
+import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import { Unexpected } from '~/runtime/ServerResponse'
 
 import {
@@ -15,6 +15,7 @@ import {
 
 import { HttpServerRequest } from '@effect/platform'
 
+import { BarChart3 } from 'lucide-react'
 import { CreateTrip } from '~/components/car/AddDialog'
 import { DashboardArguments } from '~/components/car/DashboardArguments'
 import { StatsCard } from '~/components/car/StatsCard'
@@ -84,11 +85,39 @@ export default function Dashboard(
   )
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="py-8">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-8">
-          Statistiques Globales
-        </h2>
+    <div className="relative z-10 p-4 lg:p-6">
+      <div className="space-y-6 lg:space-y-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="flex items-center gap-3 lg:gap-4 mb-2">
+            <motion.div
+              animate={{ rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+              className="min-w-[44px] min-h-[44px] lg:min-w-[48px] lg:min-h-[48px] flex items-center justify-center"
+            >
+              <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-[#2fd1d1] to-[#00D4AA] rounded-2xl flex items-center justify-center shadow-lg">
+                <BarChart3 className="h-5 w-5 lg:h-6 lg:w-6 text-white" />
+              </div>
+            </motion.div>
+            <div>
+              <h1
+                className="text-2xl lg:text-3xl font-bold text-black"
+                style={{ fontFamily: 'Lato, sans-serif' }}
+              >
+                Tableau de bord
+              </h1>
+              <p
+                className="text-slate-700 text-sm lg:text-base"
+                style={{ fontFamily: 'Lato, sans-serif' }}
+              >
+                Vue d&apos;ensemble de l&apos;utilisation de la voiture familiale
+              </p>
+            </div>
+          </div>
+        </motion.div>
         <>
           {actionData?._tag === 'create' ?
             (
@@ -120,12 +149,11 @@ export default function Dashboard(
             </div>
 
             <div className="flex justify-between items-center mb-6">
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                <StatsCard
-                  title="Ta distance totale (km)"
-                  value={loaderData.userStats.totalKilometers}
-                />
-              </div>
+              <StatsCard
+                title="Ta distance totale (km)"
+                value={loaderData.userStats.totalKilometers}
+              />
+
               <CreateTrip />
             </div>
             <DataTable table={table} />

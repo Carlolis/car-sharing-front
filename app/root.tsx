@@ -125,17 +125,19 @@ export default function App() {
         {isIAUrl ? <title>AI by Charles</title> : <title>Partage</title>}
       </head>
       <body>
-        <div className="min-h-screen bg-white flex  ">
-          {!isIAUrl && (
-            <div className="min-h-screen bg-white flex max-w-150 ">
-              <SideBar menuItems={menuItems} isAuthenticated={isAuthenticated} />
-            </div>
-          )}
-          <Outlet />
-        </div>
+        <main className="flex-1 bg-[#FBF9F7] relative overflow-hidden">
+          <div className="min-h-screen bg-white flex  ">
+            {!isIAUrl && (
+              <div className="min-h-screen bg-white flex max-w-150 ">
+                <SideBar menuItems={menuItems} isAuthenticated={isAuthenticated} />
+              </div>
+            )}
+            <Outlet />
+          </div>
 
-        <ScrollRestoration />
-        <Scripts />
+          <ScrollRestoration />
+          <Scripts />
+        </main>
       </body>
     </html>
   )
