@@ -74,7 +74,8 @@ export const TripUpdate = Sc.Struct({
   startDate: LocalDate,
   endDate: LocalDate,
   distance: Sc.Number,
-  drivers: DriversArrayEnsure
+  drivers: DriversArrayEnsure,
+  comments: Sc.optional(Sc.String)
 })
 
 export type TripUpdate = Sc.Schema.Type<typeof TripUpdate>

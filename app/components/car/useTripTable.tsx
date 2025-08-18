@@ -6,13 +6,12 @@ import {
   getCoreRowModel,
   useReactTable
 } from '@tanstack/react-table'
-import { pipe } from 'effect'
+import { pipe, Schema as Sc } from 'effect'
 import * as A from 'effect/Array'
 import * as O from 'effect/Option'
-import { useEffect, useMemo, useState } from 'react'
-
 import { Calendar, Edit, MapPin, Route, Trash2, User } from 'lucide-react'
 import { motion } from 'motion/react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSubmit } from 'react-router'
 import type { Drivers } from '~/lib/models/Drivers'
 import type { TripUpdate } from '~/types/api'
@@ -34,7 +33,10 @@ import { DeleteButton } from './DeleteButton'
 
 const columnHelper = createColumnHelper<TripUpdate>()
 
-export function useTripTable(loaderTrips: readonly TripUpdate[]) {
+export function useTripTable(
+  loaderTrips: readonly TripUpdate[],
+  setTripUpdate: (tripUpdate: TripUpdate | undefined) => void
+) {
   const [trips, setTrips] = useState<TripUpdate[]>([])
   useEffect(() => {
     setTrips([...loaderTrips])
@@ -271,7 +273,7 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
           columnHelper.accessor('id', {
             id: 'actions',
             header: () => <span>Actions</span>,
-            cell: ({ getValue }) => (
+            cell: ({ getValue, row }) => (
               <div className="   ">
                 <motion.div
                   whileHover={{ scale: 1.1 }}
@@ -280,6 +282,9 @@ export function useTripTable(loaderTrips: readonly TripUpdate[]) {
                   <Button
                     variant="ghost"
                     size="sm"
+                    onClick={() => {
+                      setTripUpdate(row.original)
+                    }}
                     className="hover:bg-[#00D4AA]/10 hover:text-[#00D4AA] text-[#002820] transition-colors duration-200 min-w-[44px] min-h-[44px] p-0 flex items-center justify-center cursor-pointer"
                   >
                     <Edit className="h-3 w-3 lg:h-4 lg:w-4" />

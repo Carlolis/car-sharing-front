@@ -23,6 +23,7 @@ import { useTripTable } from '~/components/car/useTripTable'
 import { Button } from '~/components/ui/button'
 import { DataTable } from '~/components/ui/data-table'
 import { matchTripArgs } from '~/lib/utils'
+import type { TripUpdate } from '~/types/api'
 import type { Route } from './+types/dashboard'
 
 declare module '@tanstack/react-table' {
@@ -73,9 +74,11 @@ export const action = Remix.unwrapAction(
 export default function Dashboard(
   { loaderData, actionData }: Route.ComponentProps
 ) {
+  const [tripToUpdate, setTripToUpdate] = useState<TripUpdate | undefined>(undefined)
   const trips = loaderData.trips || []
   const table = useTripTable(
-    trips
+    trips,
+    setTripToUpdate
   )
   const [showForm, setShowForm] = useState<boolean>(false)
 
@@ -178,7 +181,13 @@ export default function Dashboard(
                 </Button>
               </motion.div>
             </div>
-            <NewTripForm showForm={showForm} setShowForm={setShowForm} />
+            <NewTripForm
+              key={tripToUpdate ? tripToUpdate.id : 'new-trip-form'}
+              showForm={showForm}
+              setShowForm={setShowForm}
+              updateTrip={tripToUpdate}
+              setTripUpdate={setTripToUpdate}
+            />
             <DataTable table={table} />
           </>
         )}
