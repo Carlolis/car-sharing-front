@@ -1,6 +1,7 @@
 import { Car, LogIn, LogOut } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Form, NavLink, useLocation } from 'react-router'
+import autoPartageLogo from '../assets/logo.png'
 import {
   Sidebar,
   SidebarContent,
@@ -23,12 +24,17 @@ export const SideBar = ({ menuItems, isAuthenticated }: SideBarProps) => {
     <SidebarProvider>
       <div className="flex min-h-screen ">
         {/* Navigation Desktop */}
-        <Sidebar className="hidden lg:flex border-r border-slate-200/60 bg-[#f5f2e9]/80 backdrop-blur-sm">
+        <Sidebar className="hidden lg:flex border-r border-slate-200/60  backdrop-blur-sm">
           <SidebarHeader className="border-b border-slate-200/60 p-6">
             {/* <LogoComponent />*/}
-            <Car />
+            <img
+              src={autoPartageLogo}
+              alt="AutoPartage en famille"
+              className={`h-10 w-auto object-contain`}
+              style={{ fontFamily: 'Lato, sans-serif' }}
+            />
           </SidebarHeader>
-          <SidebarContent className="p-4 bg-[#f5f2e9]">
+          <SidebarContent className="p-4 ">
             <SidebarMenu>
               {isAuthenticated
                 && menuItems.map((item, index) => (

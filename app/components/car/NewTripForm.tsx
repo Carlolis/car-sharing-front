@@ -12,7 +12,11 @@ import { Checkbox } from '../ui/checkbox'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Textarea } from '../ui/textarea'
-import { TaggedCreateTrip, TaggedUpdateTrip } from './DashboardArguments'
+import {
+  DashboardArguments,
+  TaggedCreateTrip,
+  TaggedUpdateTrip
+} from './DashboardArguments'
 interface NewTripFormProps {
   showForm: boolean
   setShowForm: (showForm: boolean) => void
@@ -20,12 +24,33 @@ interface NewTripFormProps {
   setTripUpdate: (tripUpdate: TripUpdate | undefined) => void
 }
 
+const ValidatedTripCreate = pipe(
+  TripCreate,
+  Sc.filter(trip => {
+    if (trip.drivers.length === 0) {
+      return 'Veuillez sélectionner au moins un conducteur.'
+    }
+    if (new Date(trip.startDate) > new Date(trip.endDate)) {
+      return 'La date de début ne peut pas être après la date de fin.'
+    }
+    if (trip.distance < 0) {
+      return 'La distance ne peut pas être négative.'
+    }
+
+    return true
+  })
+)
+
 export const NewTripForm = (
   { showForm, updateTrip, setShowForm, setTripUpdate }: NewTripFormProps
 ) => {
-  {/* Formulaire */}
+  {
+    /* Formulaire */
+  }
   const submit = useSubmit()
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(
+    undefined
+  )
   const personnes = [
     { id: 'maé' as const, name: 'Maé' },
     { id: 'charles' as const, name: 'Charles' },
@@ -35,72 +60,41 @@ export const NewTripForm = (
   const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    pipe(
-      new FormData(event.currentTarget).entries(),
-      Object.fromEntries,
-      trip =>
-        Sc.decodeUnknownEither(
-          pipe(
-            TripCreate,
-            Sc.filter(
-              trip => {
-                if (trip.drivers.length === 0) {
-                  return 'Veuillez sélectionner au moins un conducteur.'
-                }
-                if (new Date(trip.startDate) > new Date(trip.endDate)) {
-                  return 'La date de début ne peut pas être après la date de fin.'
-                }
-                if (trip.distance < 0) {
-                  return 'La distance ne peut pas être négative.'
-                }
+    const formData = new FormData(event.currentTarget)
+    const tripData = {
+      ...Object.fromEntries(formData.entries()),
+      drivers: formData.getAll('drivers')
+    }
 
-                return true
-              }
-            )
-          )
-        )(
-          {
-            ...trip,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            drivers: trip?.drivers == undefined ? [] : trip.drivers
-          }
-        ),
+    pipe(
+      Sc.decodeUnknownEither(ValidatedTripCreate)(tripData),
       E.mapBoth({
-        onLeft: error =>
-          pipe(
+        onLeft: error => {
+          const message = pipe(
             error,
             ParseResult.ArrayFormatter.formatErrorSync,
-            e => setErrorMessage(e[0].message)
-          ),
+            e => e[0].message
+          )
+          setErrorMessage(message)
+        },
         onRight: trip => {
           setShowForm(false)
           setErrorMessage(undefined)
           setTripUpdate(undefined)
 
-          if (updateTrip) {
-            submit(
-              Sc.encodeSync(TaggedUpdateTrip)(TaggedUpdateTrip.make({
-                tripUpdate: { ...trip, id: updateTrip.id }
-              })),
-              {
-                action: '/dashboard',
-                method: 'post',
-                encType: 'application/json'
-              }
-            )
-            return
-          } else {
-            submit(
-              Sc.encodeSync(TaggedCreateTrip)(TaggedCreateTrip.make({
-                tripCreate: { ...trip }
-              })),
-              {
-                action: '/dashboard',
-                method: 'post',
-                encType: 'application/json'
-              }
-            )
-          }
+          const submissionData = updateTrip ?
+            TaggedUpdateTrip.make({
+              tripUpdate: { ...trip, id: updateTrip.id }
+            }) :
+            TaggedCreateTrip.make({
+              tripCreate: { ...trip }
+            })
+
+          submit(Sc.encodeUnknownSync(DashboardArguments)(submissionData), {
+            action: '/dashboard',
+            method: 'post',
+            encType: 'application/json'
+          })
         }
       })
     )
