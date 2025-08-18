@@ -5,13 +5,14 @@ import { AnimatePresence, motion } from 'motion/react'
 import { type FormEvent, useState } from 'react'
 import { Form, useSubmit } from 'react-router'
 import type { TripUpdate } from '~/types/api'
+import { TripCreate } from '~/types/api'
 import { Button } from '../ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Checkbox } from '../ui/checkbox'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Textarea } from '../ui/textarea'
-import { TaggedCreateTrip } from './DashboardArguments'
+import { TaggedCreateTrip, TaggedUpdateTrip } from './DashboardArguments'
 interface NewTripFormProps {
   showForm: boolean
   setShowForm: (showForm: boolean) => void
@@ -38,18 +39,18 @@ export const NewTripForm = (
       new FormData(event.currentTarget).entries(),
       Object.fromEntries,
       trip =>
-        Sc.decodeEither(
+        Sc.decodeUnknownEither(
           pipe(
-            TaggedCreateTrip,
+            TripCreate,
             Sc.filter(
               trip => {
-                if (trip.tripCreate.drivers.length === 0) {
+                if (trip.drivers.length === 0) {
                   return 'Veuillez sélectionner au moins un conducteur.'
                 }
-                if (new Date(trip.tripCreate.startDate) > new Date(trip.tripCreate.endDate)) {
+                if (new Date(trip.startDate) > new Date(trip.endDate)) {
                   return 'La date de début ne peut pas être après la date de fin.'
                 }
-                if (trip.tripCreate.distance < 0) {
+                if (trip.distance < 0) {
                   return 'La distance ne peut pas être négative.'
                 }
 
@@ -57,14 +58,13 @@ export const NewTripForm = (
               }
             )
           )
-        )({
-          _tag: 'create',
-          tripCreate: {
+        )(
+          {
             ...trip,
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             drivers: trip?.drivers == undefined ? [] : trip.drivers
           }
-        }),
+        ),
       E.mapBoth({
         onLeft: error =>
           pipe(
@@ -72,17 +72,36 @@ export const NewTripForm = (
             ParseResult.ArrayFormatter.formatErrorSync,
             e => setErrorMessage(e[0].message)
           ),
-        onRight: trip =>
-          pipe(trip, Sc.encodeSync(TaggedCreateTrip), tripCreate => {
-            setShowForm(false)
-            setErrorMessage(undefined)
-            setTripUpdate(undefined)
-            submit(tripCreate, {
-              action: '/dashboard',
-              method: 'post',
-              encType: 'application/json'
-            })
-          })
+        onRight: trip => {
+          setShowForm(false)
+          setErrorMessage(undefined)
+          setTripUpdate(undefined)
+
+          if (updateTrip) {
+            submit(
+              Sc.encodeSync(TaggedUpdateTrip)(TaggedUpdateTrip.make({
+                tripUpdate: { ...trip, id: updateTrip.id }
+              })),
+              {
+                action: '/dashboard',
+                method: 'post',
+                encType: 'application/json'
+              }
+            )
+            return
+          } else {
+            submit(
+              Sc.encodeSync(TaggedCreateTrip)(TaggedCreateTrip.make({
+                tripCreate: { ...trip }
+              })),
+              {
+                action: '/dashboard',
+                method: 'post',
+                encType: 'application/json'
+              }
+            )
+          }
+        }
       })
     )
   }

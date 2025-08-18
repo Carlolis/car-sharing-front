@@ -25,7 +25,7 @@ import { pipe } from 'effect'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 
-import { BarChart3, Brain, Calendar, MapPin, PlusCircle, Receipt } from 'lucide-react'
+import { BarChart3, Brain, Calendar, MapPin, Receipt } from 'lucide-react'
 import { useEffect } from 'react'
 import { SideBar } from './components/sideBar'
 import { CookieSessionStorage } from './runtime/CookieSessionStorage'

@@ -6,7 +6,7 @@ import {
   getCoreRowModel,
   useReactTable
 } from '@tanstack/react-table'
-import { pipe, Schema as Sc } from 'effect'
+import { pipe } from 'effect'
 import * as A from 'effect/Array'
 import * as O from 'effect/Option'
 import { Calendar, Edit, MapPin, Route, Trash2, User } from 'lucide-react'
