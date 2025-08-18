@@ -4,7 +4,6 @@ const routeDefs = [
   ['', './routes/index.tsx'],
   ['/dashboard', './routes/dashboard.tsx'],
   ['/login', './routes/login.tsx'],
-  ['/trip/new', './routes/trip.new.tsx'],
   ['/ia', './routes/ia.tsx'],
   ['/health', './routes/health.tsx'],
   ['/calendar', './routes/calendar.tsx'],

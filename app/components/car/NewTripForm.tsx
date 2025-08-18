@@ -52,6 +52,7 @@ export const NewTripForm = (
                 if (trip.tripCreate.distance < 0) {
                   return 'La distance ne peut pas être négative.'
                 }
+
                 return true
               }
             )
@@ -266,7 +267,7 @@ export const NewTripForm = (
                     Commentaires (optionnel)
                   </Label>
                   <Textarea
-                    id="commentaires"
+                    id="comments"
                     defaultValue={updateTrip?.comments}
                     name="comments"
                     rows={4}

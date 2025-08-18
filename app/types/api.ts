@@ -57,7 +57,8 @@ export const TripCreate = Sc.Struct({
   startDate: LocalDate,
   endDate: LocalDate,
   distance: Sc.NumberFromString,
-  drivers: DriversArrayEnsure
+  drivers: DriversArrayEnsure,
+  comments: Sc.optional(Sc.String)
 })
 
 export type TripCreate = Sc.Schema.Type<typeof TripCreate>

@@ -78,13 +78,6 @@ const menuItems = [
     bgColor: '#e6fbff'
   },
   {
-    id: 'trip/new',
-    label: 'Nouveau trajet',
-    icon: PlusCircle,
-    color: '#00A8CC',
-    bgColor: '#e6fbff'
-  },
-  {
     id: 'invoice/new',
     label: 'Nouvelle Facture',
     icon: MapPin,
