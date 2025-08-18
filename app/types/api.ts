@@ -47,7 +47,10 @@ export const DriversArrayEnsure = Sc.transform(
     decode: ensure,
     encode: identity
   }
-)
+).annotations({
+  message: () => 'Veuillez entrer une date.',
+  override: true
+})
 
 export const TripCreate = Sc.Struct({
   name: Sc.String,

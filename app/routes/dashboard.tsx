@@ -14,11 +14,13 @@ import {
 
 import { HttpServerRequest } from '@effect/platform'
 
-import { BarChart3 } from 'lucide-react'
-import { CreateTrip } from '~/components/car/AddDialog'
+import { BarChart3, Plus } from 'lucide-react'
+import { useState } from 'react'
 import { DashboardArguments } from '~/components/car/DashboardArguments'
+import { NewTripForm } from '~/components/car/NewTripForm'
 import { StatsCard } from '~/components/car/StatsCard'
 import { useTripTable } from '~/components/car/useTripTable'
+import { Button } from '~/components/ui/button'
 import { DataTable } from '~/components/ui/data-table'
 import { matchTripArgs } from '~/lib/utils'
 import type { Route } from './+types/dashboard'
@@ -49,13 +51,8 @@ export const loader = Remix.loader(
 
     return { user, trips, userStats, _tag: 'data' as const }
   }).pipe(
-    // T.catchTag(
-    //   'NotAuthenticated',
-    //   error => new Redirect({ location: '/login', message: error.message })
-    // ),
     T.catchTag('RequestError', error => new Unexpected({ error: error.message })),
     T.catchTag('ResponseError', error => new Unexpected({ error: error.message }))
-    // T.catchAll(error => T.fail(new NotFound({ message: stringify(error) })))
   )
 )
 
@@ -69,8 +66,6 @@ export const action = Remix.unwrapAction(
     }).pipe(
       T.tapError(T.logError),
       T.catchTag('RequestError', error => new Unexpected({ error: error.message }))
-      // T.catchTag('ResponseError', error => new Unexpected({ error: error.message })),
-      // T.catchTag('HttpBodyError', error => new Unexpected({ error: stringify(error.reason.error) }))
     )
   )
 )
@@ -82,6 +77,7 @@ export default function Dashboard(
   const table = useTripTable(
     trips
   )
+  const [showForm, setShowForm] = useState<boolean>(false)
 
   return (
     <div className="relative z-10 p-4 lg:p-6">
@@ -153,8 +149,36 @@ export default function Dashboard(
                 value={loaderData.userStats.totalKilometers}
               />
 
-              <CreateTrip />
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex-shrink-0"
+              >
+                <Button
+                  onClick={() => setShowForm(!showForm)}
+                  type="button"
+                  className={`shadow-lg hover:shadow-xl transition-all duration-300 text-sm lg:text-base px-4 lg:px-6 py-2 lg:py-3 min-h-[44px] whitespace-nowrap ${
+                    showForm ?
+                      'bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600' :
+                      'bg-gradient-to-r from-[#2fd1d1] to-[#00D4AA] hover:from-[#00A8CC] hover:to-[#2fd1d1]'
+                  }`}
+                  aria-label="Ajouter un trajet"
+                >
+                  <Plus
+                    className={`h-4 w-4 lg:h-5 lg:w-5 mr-2 transition-transform duration-200 ${
+                      showForm ? 'rotate-45' : ''
+                    }`}
+                  />
+                  {showForm ? 'Annuler' : (
+                    <>
+                      <span className="hidden sm:inline">Nouveau trajet</span>
+                      <span className="sm:hidden">Nouveau</span>
+                    </>
+                  )}
+                </Button>
+              </motion.div>
             </div>
+            <NewTripForm showForm={showForm} setShowForm={setShowForm} />
             <DataTable table={table} />
           </>
         )}
