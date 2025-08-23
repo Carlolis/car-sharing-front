@@ -66,26 +66,20 @@ const menuItems = [
   {
     id: 'dashboard',
     label: 'Tableau de bord',
-    icon: BarChart3,
-    color: '#0077BE',
-    bgColor: '#e6f3ff'
+    icon: BarChart3
   },
   {
     id: 'calendar',
     label: 'Réservations',
-    icon: Calendar,
-    color: '#00A8CC',
-    bgColor: '#e6fbff'
+    icon: Calendar
   },
   {
     id: 'invoice/new',
     label: 'Nouvelle Facture',
-    icon: MapPin,
-    color: '#00D4AA',
-    bgColor: '#e6fff9'
+    icon: MapPin
   },
-  { id: 'invoices', label: 'Factures', icon: Receipt, color: '#10E68A', bgColor: '#e6ffe9' },
-  { id: 'ia', label: 'IA', icon: Brain, color: '#10E68A', bgColor: '#e6ffe9' }
+  { id: 'invoices', label: 'Factures', icon: Receipt },
+  { id: 'ia', label: 'IA', icon: Brain }
 ]
 
 export default function App() {

@@ -14,7 +14,8 @@ import {
 } from './ui/sidebar'
 
 interface SideBarProps {
-  menuItems: { id: string; color: string; label: string; icon: React.FC }[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  menuItems: { id: string; label: string; icon: React.ComponentType<any> }[]
   isAuthenticated: boolean
 }
 
@@ -49,7 +50,7 @@ export const SideBar = ({ menuItems, isAuthenticated }: SideBarProps) => {
                         isActive={currentPage === '/' + item.id}
                         className={`w-full mb-3 transition-all duration-200 hover:scale-105 group text-base min-h-[48px] rounded-lg font-body px-4 py-3 ${
                           currentPage === '/' + item.id ?
-                            'bg-[red] text-white shadow-lg border-0' :
+                            '!bg-[#56FCFF]/20 text-white shadow-lg border-0' :
                             'hover:bg-white/10 text-white/90 hover:text-white'
                         }`}
                         style={{
@@ -66,7 +67,13 @@ export const SideBar = ({ menuItems, isAuthenticated }: SideBarProps) => {
                             transition={{ duration: 0.2 }}
                             className="min-w-[24px] min-h-[24px] flex items-center justify-center"
                           >
-                            <item.icon />
+                            <item.icon
+                              className={`h-6 w-6 transition-colors duration-200 ${
+                                currentPage === '/' + item.id ?
+                                  'text-[#56FCFF]' :
+                                  'text-white/80 group-hover:text-white'
+                              }`}
+                            />
                           </motion.div>
 
                           <NavLink
