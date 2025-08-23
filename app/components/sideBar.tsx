@@ -48,8 +48,8 @@ export const SideBar = ({ menuItems, isAuthenticated }: SideBarProps) => {
                       <SidebarMenuButton
                         isActive={currentPage === '/' + item.id}
                         className={`w-full mb-3 transition-all duration-200 hover:scale-105 group text-base min-h-[48px] rounded-lg font-body px-4 py-3 ${
-                          currentPage === item.id ?
-                            'bg-[#56FCFF]/20 text-white shadow-lg border-0' :
+                          currentPage === '/' + item.id ?
+                            'bg-[red] text-white shadow-lg border-0' :
                             'hover:bg-white/10 text-white/90 hover:text-white'
                         }`}
                         style={{
@@ -72,7 +72,7 @@ export const SideBar = ({ menuItems, isAuthenticated }: SideBarProps) => {
                           <NavLink
                             to={item.id}
                             className={`transition-colors duration-200 text-base font-body ${
-                              currentPage === item.id ?
+                              currentPage === '/' + item.id ?
                                 'text-white font-medium' :
                                 'text-white/90 group-hover:text-white'
                             }`}
