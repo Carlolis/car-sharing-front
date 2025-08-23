@@ -127,7 +127,7 @@ export const SideBar = ({ menuItems, isAuthenticated }: SideBarProps) => {
                                 transition={{ duration: 0.2 }}
                                 className="min-w-[24px] min-h-[24px] flex items-center justify-center"
                               >
-                                <LogOut />
+                                <LogOut className="h-6 w-6 transition-colors duration-200 text-red-400 group-hover:text-red-300" />
                               </motion.div>
 
                               <span className={`transition-colors duration-200 text-base `}>

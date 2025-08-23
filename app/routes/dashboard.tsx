@@ -14,7 +14,7 @@ import {
 
 import { HttpServerRequest } from '@effect/platform'
 
-import { BarChart3, Plus } from 'lucide-react'
+import { BarChart3, Car, Plus, Wrench } from 'lucide-react'
 import { useState } from 'react'
 import { DashboardArguments } from '~/components/car/DashboardArguments'
 import { NewTripForm } from '~/components/car/NewTripForm'
@@ -150,6 +150,12 @@ export default function Dashboard(
               <StatsCard
                 title="Ta distance totale (km)"
                 value={loaderData.userStats.totalKilometers}
+                icon={Car}
+              />
+              <StatsCard
+                title="Prochain entretien (km)"
+                value={loaderData.userStats.totalKilometers}
+                icon={Wrench}
               />
 
               <motion.div
