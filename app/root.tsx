@@ -112,10 +112,10 @@ export default function App() {
         {isIAUrl ? <title>AI by Charles</title> : <title>Partage</title>}
       </head>
       <body>
-        <main className="flex-1 bg-[#FBF9F7] relative overflow-hidden">
-          <div className="min-h-screen bg-white flex  ">
+        <main className="flex-1  relative overflow-hidden">
+          <div className="min-h-screen  flex  ">
             {!isIAUrl && (
-              <div className="min-h-screen bg-white flex max-w-150 ">
+              <div className="min-h-screen  flex max-w-150 ">
                 <SideBar menuItems={menuItems} isAuthenticated={isAuthenticated} />
               </div>
             )}
