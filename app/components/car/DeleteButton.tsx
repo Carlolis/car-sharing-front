@@ -28,25 +28,17 @@ export const DeleteButton = ({ tripId, submit, route }: DeleteButtonProps): JSX.
   }
 
   return (
-    <motion.div
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      className="flex-shrink-0"
+    <Button
+      onClick={handleClick}
+      type="button"
+      className="bg-red-600 hover:bg-red-700 text-white font-body"
+      style={{ fontFamily: 'Montserrat, sans-serif' }}
     >
-      <Button
-        onClick={handleClick}
-        type="button"
-        className={`shadow-lg hover:shadow-xl transition-all duration-300 text-sm lg:text-base px-4 lg:px-6 py-2 lg:py-3 min-h-[44px] whitespace-nowrap bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600`}
-        aria-label="Ajouter un trajet"
-      >
-        <Trash2
-          className={`h-4 w-4 lg:h-5 lg:w-5 mr-2 transition-transform duration-200 
-                     
-                    `}
-        />
+      <Trash2
+        className={`h-4 w-4 lg:h-5 lg:w-5 mr-2 transition-transform duration-200 `}
+      />
 
-        Supprimer
-      </Button>
-    </motion.div>
+      Supprimer
+    </Button>
   )
 }

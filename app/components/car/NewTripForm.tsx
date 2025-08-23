@@ -1,6 +1,6 @@
 import { ParseResult, pipe, Schema as Sc } from 'effect'
 import * as E from 'effect/Either'
-import { MapPin } from 'lucide-react'
+import { MapPin, Users } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { type FormEvent, useState } from 'react'
 import { Form, useSubmit } from 'react-router'
@@ -107,13 +107,14 @@ export const NewTripForm = (
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.3, ease: 'easeInOut' }}
+          className="overflow-hidden"
         >
-          <Card className="bg-white/80 backdrop-blur-sm border-slate-200/60 shadow-xl overflow-hidden">
+          <Card className="bg-white border-gray-200 shadow-lg">
             <CardHeader>
               <CardTitle
-                className="text-lg lg:text-xl text-slate-900 flex items-center gap-2"
-                style={{ fontFamily: 'Lato, sans-serif' }}
+                className="text-lg lg:text-xl text-[#004D55] flex items-center gap-2 font-heading"
+                style={{ fontFamily: 'Montserrat Alternates, sans-serif' }}
               >
                 <motion.div
                   animate={{ rotate: 360 }}
@@ -127,7 +128,7 @@ export const NewTripForm = (
                 </span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-4 lg:p-6">
+            <CardContent className="space-y-6">
               <Form
                 action="/dashboard"
                 method="post"
@@ -139,17 +140,13 @@ export const NewTripForm = (
                     {errorMessage}
                   </div>
                 )}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: 0.1 }}
-                  className="grid grid-cols-1 md:grid-cols-2 gap-4"
-                >
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label
                       htmlFor="dateDebut"
-                      className="text-slate-800 text-sm lg:text-base"
-                      style={{ fontFamily: 'Lato, sans-serif' }}
+                      className="text-[#004D55] text-sm lg:text-base font-body"
+                      style={{ fontFamily: 'Montserrat, sans-serif' }}
                     >
                       Date de début <span className="text-red-500">*</span>
                     </Label>
@@ -161,16 +158,17 @@ export const NewTripForm = (
                         // d.setDate(d.getDate() + 1)
                         return d.toISOString().split('T')[0]
                       })()}
-                      className="bg-white/80 border-slate-300/60 focus:border-[#2fd1d1] focus:ring-[#2fd1d1]/20 text-sm lg:text-base min-h-[44px]"
-                      style={{ fontFamily: 'Lato, sans-serif' }}
+                      className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
+                      style={{ fontFamily: 'Montserrat, sans-serif' }}
                       required
                     />
                   </div>
+
                   <div>
                     <Label
                       htmlFor="dateFin"
-                      className="text-slate-800 text-sm lg:text-base"
-                      style={{ fontFamily: 'Lato, sans-serif' }}
+                      className="text-[#004D55] text-sm lg:text-base font-body"
+                      style={{ fontFamily: 'Montserrat, sans-serif' }}
                     >
                       Date de fin <span className="text-red-500">*</span>
                     </Label>
@@ -180,44 +178,22 @@ export const NewTripForm = (
                       defaultValue={updateTrip?.endDate ?
                         updateTrip.endDate.toISOString().split('T')[0] :
                         undefined}
-                      className="bg-white/80 border-slate-300/60 focus:border-[#2fd1d1] focus:ring-[#2fd1d1]/20 text-sm lg:text-base min-h-[44px]"
-                      style={{ fontFamily: 'Lato, sans-serif' }}
+                      className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
+                      style={{ fontFamily: 'Montserrat, sans-serif' }}
                       required
                     />
                   </div>
-                </motion.div>
+                </div>
 
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: 0.2 }}
-                  className="grid grid-cols-1 md:grid-cols-2 gap-4"
-                >
-                  <div>
-                    <Label
-                      htmlFor="distance"
-                      className="text-slate-800 text-sm lg:text-base"
-                      style={{ fontFamily: 'Lato, sans-serif' }}
-                    >
-                      Distance (km) <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      name="distance"
-                      type="number"
-                      step="0.1"
-                      defaultValue={updateTrip?.distance}
-                      className="bg-white/80 border-slate-300/60 focus:border-[#2fd1d1] focus:ring-[#2fd1d1]/20 text-sm lg:text-base min-h-[44px]"
-                      style={{ fontFamily: 'Lato, sans-serif' }}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label
-                      className="text-slate-800 text-sm lg:text-base"
-                      style={{ fontFamily: 'Lato, sans-serif' }}
-                    >
-                      Personnes <span className="text-red-500">*</span>
-                    </Label>
+                <div>
+                  <Label
+                    htmlFor="personne"
+                    className="text-[#004D55] text-sm lg:text-base font-body"
+                    style={{ fontFamily: 'Montserrat, sans-serif' }}
+                  >
+                    Personnes <span className="text-red-500">*</span>
+                  </Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="bg-white/80 border border-slate-300/60 rounded-md p-3 space-y-3 min-h-[44px] flex flex-col justify-center">
                       {personnes.map((membre, index) => (
                         <motion.div
@@ -240,11 +216,31 @@ export const NewTripForm = (
                           >
                             {membre.name}
                           </Label>
+                          <Users className="h-4 w-4 text-[#004D55]" />
                         </motion.div>
                       ))}
                     </div>
+
+                    <div>
+                      <Label
+                        htmlFor="distance"
+                        className="text-[#004D55] text-sm lg:text-base font-body"
+                        style={{ fontFamily: 'Montserrat, sans-serif' }}
+                      >
+                        Distance (km) <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        name="distance"
+                        type="number"
+                        step="0.1"
+                        defaultValue={updateTrip?.distance}
+                        className="bg-white/80 border-slate-300/60 focus:border-[#2fd1d1] focus:ring-[#2fd1d1]/20 text-sm lg:text-base min-h-[44px]"
+                        style={{ fontFamily: 'Lato, sans-serif' }}
+                        required
+                      />
+                    </div>
                   </div>
-                </motion.div>
+                </div>
 
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
@@ -253,15 +249,15 @@ export const NewTripForm = (
                 >
                   <Label
                     htmlFor="destination"
-                    className="text-slate-800 text-sm lg:text-base"
-                    style={{ fontFamily: 'Lato, sans-serif' }}
+                    className="text-[#004D55] text-sm lg:text-base font-body"
+                    style={{ fontFamily: 'Montserrat, sans-serif' }}
                   >
-                    Titre
+                    Destination <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     name="name"
                     defaultValue={updateTrip?.name}
-                    placeholder="Ex: Bureau, Supermarché, École..."
+                    placeholder="Ex: Benque, Supermarché, École..."
                     className="bg-white/80 border-slate-300/60 focus:border-[#2fd1d1] focus:ring-[#2fd1d1]/20 text-sm lg:text-base min-h-[44px]"
                     style={{ fontFamily: 'Lato, sans-serif' }}
                   />
@@ -274,11 +270,12 @@ export const NewTripForm = (
                 >
                   <Label
                     htmlFor="commentaires"
-                    className="text-slate-800 text-sm lg:text-base"
-                    style={{ fontFamily: 'Lato, sans-serif' }}
+                    className="text-[#004D55] text-sm lg:text-base font-body"
+                    style={{ fontFamily: 'Montserrat, sans-serif' }}
                   >
                     Commentaires (optionnel)
                   </Label>
+
                   <Textarea
                     id="comments"
                     defaultValue={updateTrip?.comments}
@@ -290,32 +287,25 @@ export const NewTripForm = (
                   />
                 </motion.div>
 
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.6 }}
-                  className="flex flex-col sm:flex-row gap-2"
-                >
+                <div className="flex flex-col sm:flex-row gap-3 pt-4">
                   <Button
                     type="submit"
-                    className="bg-gradient-to-r from-[#00D4AA] to-[#10E68A] hover:from-[#00A8CC] hover:to-[#00D4AA] shadow-lg hover:shadow-xl transition-all duration-300 text-sm lg:text-base px-4 lg:px-6 py-2 lg:py-3 min-h-[44px]"
-                    style={{ fontFamily: 'Lato, sans-serif' }}
+                    className="order-1 sm:order-2 flex-1 bg-[#004D55] hover:bg-[#003640] text-[#f6f6f6] text-sm lg:text-base py-2 lg:py-3 min-h-[44px] font-body"
+                    style={{ fontFamily: 'Montserrat, sans-serif' }}
                   >
-                    {updateTrip ? 'Modifier' : 'Enregistrer'}
+                    {updateTrip ? 'Modifier le trajet' : 'Enregistrer le trajet'}
                   </Button>
                   <Button
-                    type="button"
-                    variant="outline"
                     onClick={() => {
                       setShowForm(false)
                       setTripUpdate(undefined)
                     }}
-                    className="border-slate-300/60 hover:bg-slate-50 hover:shadow-md transition-all duration-200 text-sm lg:text-base px-4 lg:px-6 py-2 lg:py-3 min-h-[44px]"
-                    style={{ fontFamily: 'Lato, sans-serif' }}
+                    className="order-2 sm:order-1 border-gray-300 text-[#004D55] hover:bg-gray-50 text-sm lg:text-base py-2 lg:py-3 min-h-[44px] font-body"
+                    style={{ fontFamily: 'Montserrat, sans-serif' }}
                   >
                     Annuler
                   </Button>
-                </motion.div>
+                </div>
               </Form>
             </CardContent>
           </Card>

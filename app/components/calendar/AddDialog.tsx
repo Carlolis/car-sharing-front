@@ -7,6 +7,9 @@ import { Label } from '~/components/ui/label'
 import type { TripUpdate } from '~/types/api'
 import { TaggedCreateTrip } from '../car/DashboardArguments'
 import { DeleteButton } from '../car/DeleteButton'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader,
+  AlertDialogTitle } from '../ui/alert-dialog'
 import {
   Dialog,
   DialogContent,
@@ -189,18 +192,46 @@ export const TripDialog = (
           </div>
         </DialogHeader>
       </DialogContent>
-      <Dialog open={!!tripIdToDelete} onOpenChange={() => setTripIdToDelete(undefined)}>
-        <DialogContent className="bg-white shadow-lg">
-          <DialogHeader>
-            <DialogTitle className="py-2">Êtes vous sûr ?</DialogTitle>
-            <DeleteButton
-              tripId={tripIdToDelete}
-              submit={handleDeleteSubmit}
-              route={'/calendar'}
-            />
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
+      <AlertDialog open={!!tripIdToDelete} onOpenChange={() => setTripIdToDelete(undefined)}>
+        <AlertDialogContent className="bg-white border-gray-200 shadow-lg">
+          <AlertDialogHeader>
+            <AlertDialogTitle
+              className="text-lg text-[#004D55] font-heading"
+              style={{ fontFamily: 'Montserrat Alternates, sans-serif' }}
+            >
+              Confirmer la suppression
+            </AlertDialogTitle>
+            <AlertDialogDescription
+              className="text-[#6B7280] font-body"
+              style={{ fontFamily: 'Montserrat, sans-serif' }}
+            >
+              Est-ce que tu es sûr de supprimer ce trajet ?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogTitle className="py-2">Confirmer la suppression</AlertDialogTitle>
+
+          <AlertDialogFooter className="gap-3">
+            <AlertDialogCancel
+              asChild
+              className="border-gray-300 text-[#004D55] hover:bg-gray-50 font-body"
+              style={{ fontFamily: 'Montserrat, sans-serif' }}
+            >
+              Non
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => setTripIdToDelete(undefined)}
+              className="bg-red-600 hover:bg-red-700 text-white font-body"
+              style={{ fontFamily: 'Montserrat, sans-serif' }}
+            >
+              <DeleteButton
+                tripId={tripIdToDelete}
+                submit={handleDeleteSubmit}
+                route={'/calendar'}
+              />
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   )
 }

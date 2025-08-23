@@ -9,24 +9,26 @@ import {
 import { pipe } from 'effect'
 import * as A from 'effect/Array'
 import * as O from 'effect/Option'
-import { Calendar, Edit, MapPin, Route, Trash2, User } from 'lucide-react'
+import { Calendar, Edit, MapPin, Trash2, User } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useEffect, useMemo, useState } from 'react'
 import { useSubmit } from 'react-router'
 import type { Drivers } from '~/lib/models/Drivers'
 import type { TripUpdate } from '~/types/api'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '../ui/alert-dialog'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
-import { CardTitle } from '../ui/card'
 import { Checkbox } from '../ui/checkbox'
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '../ui/dialog'
 import { Label } from '../ui/label'
 import { TaggedUpdateTrip } from './DashboardArguments'
 import { DeleteButton } from './DeleteButton'
@@ -48,34 +50,18 @@ export function useTripTable(
     () => [
       {
         id: 'header',
-        header: () => (
-          <div className="flex items-center gap-3 p-4">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{
-                duration: 20,
-                repeat: Infinity,
-                ease: 'linear'
-              }}
-              className="min-w-[40px] min-h-[40px] lg:min-w-[44px] lg:min-h-[44px] flex items-center justify-center"
-            >
-              <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-br from-[#2fd1d1] to-[#00D4AA] rounded-xl flex items-center justify-center">
-                <Route className="h-4 w-4 lg:h-5 lg:w-5 text-white" />
-              </div>
-            </motion.div>
-            <CardTitle
-              className="text-lg lg:text-xl text-slate-900"
-              style={{ fontFamily: 'Lato, sans-serif' }}
-            >
-              Historique des trajets
-            </CardTitle>
-          </div>
-        ),
         footer: props => props.column.id,
         columns: [
           columnHelper.accessor('startDate', {
             id: 'startDate',
-            header: () => <span>Date de début</span>,
+            header: () => (
+              <span
+                className="text-left p-4 text-[#004D55] font-semibold text-sm"
+                style={{ fontFamily: 'Montserrat, sans-serif' }}
+              >
+                Date de début
+              </span>
+            ),
             footer: props => props.column.id,
             cell: ({ getValue, row: { index }, column: { id }, table }) => {
               const initialValue = getValue<Date>()
@@ -107,7 +93,14 @@ export function useTripTable(
           }),
           columnHelper.accessor('endDate', {
             id: 'endDate',
-            header: () => <span>Date de fin</span>,
+            header: () => (
+              <span
+                className="text-left p-4 text-[#004D55] font-semibold text-sm"
+                style={{ fontFamily: 'Montserrat, sans-serif' }}
+              >
+                Date de fin
+              </span>
+            ),
             footer: props => props.column.id,
             cell: ({ getValue, row: { index }, column: { id }, table }) => {
               const initialValue = getValue<Date>()
@@ -139,7 +132,14 @@ export function useTripTable(
 
           columnHelper.accessor('drivers', {
             id: 'drivers',
-            header: () => <span>Personnes</span>,
+            header: () => (
+              <span
+                className="text-left p-4 text-[#004D55] font-semibold text-sm"
+                style={{ fontFamily: 'Montserrat, sans-serif' }}
+              >
+                Personnes
+              </span>
+            ),
             footer: props => props.column.id,
             cell: ({ getValue, row: { index }, column: { id }, table }) => {
               const initialValues = getValue<TripUpdate['drivers']>()
@@ -205,7 +205,14 @@ export function useTripTable(
           }),
           columnHelper.accessor('name', {
             id: 'name',
-            header: () => <span>Titre</span>,
+            header: () => (
+              <span
+                className="text-left p-4 text-[#004D55] font-semibold text-sm"
+                style={{ fontFamily: 'Montserrat, sans-serif' }}
+              >
+                Titre
+              </span>
+            ),
             footer: props => props.column.id,
             cell: ({ getValue, row: { index }, column: { id }, table }) => {
               const initialValue = getValue()
@@ -237,7 +244,14 @@ export function useTripTable(
           }),
           columnHelper.accessor('distance', {
             id: 'distance',
-            header: () => <span>Distance</span>,
+            header: () => (
+              <span
+                className="text-left p-4 text-[#004D55] font-semibold text-sm"
+                style={{ fontFamily: 'Montserrat, sans-serif' }}
+              >
+                Distance
+              </span>
+            ),
             footer: props => props.column.id,
             cell: ({ getValue, row: { index }, column: { id }, table }) => {
               const initialValue = getValue<number>()
@@ -272,7 +286,14 @@ export function useTripTable(
           }),
           columnHelper.accessor('id', {
             id: 'actions',
-            header: () => <span>Actions</span>,
+            header: () => (
+              <span
+                className="text-left p-4 text-[#004D55] font-semibold text-sm"
+                style={{ fontFamily: 'Montserrat, sans-serif' }}
+              >
+                Actions
+              </span>
+            ),
             cell: ({ getValue, row }) => (
               <div className="   ">
                 <motion.div
@@ -294,8 +315,8 @@ export function useTripTable(
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Dialog>
-                    <DialogTrigger>
+                  <AlertDialog>
+                    <AlertDialogTrigger>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -303,22 +324,43 @@ export function useTripTable(
                       >
                         <Trash2 className="h-3 w-3 lg:h-4 lg:w-4" />
                       </Button>
-                    </DialogTrigger>{' '}
-                    <DialogContent className="bg-white shadow-lg" aria-describedby="delete">
-                      <DialogHeader>
-                        <DialogTitle className="py-2">Êtes vous sûr ?</DialogTitle>
-                      </DialogHeader>
-                      <div className="flex justify-end gap-4 pt-4">
-                        <DialogClose>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="bg-white border-gray-200 shadow-lg">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle
+                          className="text-lg text-[#004D55] font-heading"
+                          style={{ fontFamily: 'Montserrat Alternates, sans-serif' }}
+                        >
+                          Confirmer la suppression
+                        </AlertDialogTitle>
+                        <AlertDialogDescription
+                          className="text-[#6B7280] font-body"
+                          style={{ fontFamily: 'Montserrat, sans-serif' }}
+                        >
+                          Est-ce que tu es sûr de supprimer ce trajet ?
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+
+                      <AlertDialogFooter className="gap-3">
+                        <AlertDialogCancel
+                          className="border-gray-300 text-[#004D55] hover:bg-gray-50 font-body"
+                          style={{ fontFamily: 'Montserrat, sans-serif' }}
+                        >
+                          Non
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          asChild
+                          style={{ fontFamily: 'Montserrat, sans-serif' }}
+                        >
                           <DeleteButton
                             tripId={getValue()}
                             submit={submit}
                             route={'/dashboard'}
                           />
-                        </DialogClose>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </motion.div>
               </div>
             )

@@ -14,7 +14,7 @@ import {
 
 import { HttpServerRequest } from '@effect/platform'
 
-import { BarChart3, Car, Plus, Wrench } from 'lucide-react'
+import { BarChart3, Car, Gauge, MapPin, Minus, Plus, Wrench } from 'lucide-react'
 import { useState } from 'react'
 import { DashboardArguments } from '~/components/car/DashboardArguments'
 import { NewTripForm } from '~/components/car/NewTripForm'
@@ -81,7 +81,14 @@ export default function Dashboard(
     setTripToUpdate
   )
   const [showForm, setShowForm] = useState<boolean>(false)
+  const handleToggleForm = () => {
+    if (tripToUpdate) {
+      setTripToUpdate(undefined)
+      return
+    }
 
+    setShowForm(!showForm)
+  }
   return (
     <div className="relative z-10 p-6 lg:p-12 w-full">
       <div className="space-y-6 lg:space-y-8 mx-auto px-10">
@@ -89,31 +96,28 @@ export default function Dashboard(
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
+          className="flex items-center gap-3 lg:gap-4"
         >
-          <div className="flex items-center gap-3 lg:gap-4 mb-2">
-            <motion.div
-              animate={{ rotate: [0, 10, -10, 0] }}
-              transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-              className="min-w-[44px] min-h-[44px] lg:min-w-[48px] lg:min-h-[48px] flex items-center justify-center"
+          <motion.div
+            animate={{ rotate: [0, 10, -10, 0] }}
+            transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
+            className="w-12 h-12 bg-gradient-title-icon rounded-2xl flex items-center justify-center"
+          >
+            <Gauge className="h-6 w-6 text-[#F9F7F3]" />
+          </motion.div>
+          <div>
+            <h1
+              className="text-2xl lg:text-3xl font-semibold text-[#004D55] font-heading"
+              style={{ fontFamily: 'Montserrat Alternates, sans-serif' }}
             >
-              <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-[#2fd1d1] to-[#00D4AA] rounded-2xl flex items-center justify-center shadow-lg">
-                <BarChart3 className="h-5 w-5 lg:h-6 lg:w-6 text-white" />
-              </div>
-            </motion.div>
-            <div>
-              <h1
-                className="text-2xl lg:text-3xl font-bold text-black"
-                style={{ fontFamily: 'Lato, sans-serif' }}
-              >
-                Tableau de bord
-              </h1>
-              <p
-                className="text-slate-700 text-sm lg:text-base"
-                style={{ fontFamily: 'Lato, sans-serif' }}
-              >
-                Vue d&apos;ensemble de l&apos;utilisation de la voiture familiale
-              </p>
-            </div>
+              Dashboard
+            </h1>
+            <p
+              className="text-[#6B7280] text-sm lg:text-base font-body"
+              style={{ fontFamily: 'Montserrat, sans-serif' }}
+            >
+              Vue d&apos;ensemble de l&apos;activité familiale
+            </p>
           </div>
         </motion.div>
         <>
@@ -146,54 +150,80 @@ export default function Dashboard(
               </span>
             </div>
 
-            <div className="flex justify-between items-center mb-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-24"
+            >
               <StatsCard
                 title="Ta distance totale (km)"
                 value={loaderData.userStats.totalKilometers}
                 icon={Car}
+                bgColor="distance"
               />
               <StatsCard
                 title="Prochain entretien (km)"
-                value={loaderData.userStats.totalKilometers}
+                value={'A faire'}
                 icon={Wrench}
+                bgColor="entretien"
               />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+            >
+              <div className="flex items-center gap-3 lg:gap-4 mt-4">
+                <motion.div
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
+                  className="w-12 h-12 bg-gradient-title-icon rounded-2xl flex items-center justify-center"
+                >
+                  <MapPin className="h-6 w-6 text-[#F9F7F3]" />
+                </motion.div>
+                <div>
+                  <h2
+                    className="text-2xl lg:text-3xl font-semibold text-[#004D55] font-heading"
+                    style={{ fontFamily: 'Montserrat Alternates, sans-serif' }}
+                  >
+                    Historique de trajets
+                  </h2>
+                  <p
+                    className="text-[#6B7280] text-sm lg:text-base font-body"
+                    style={{ fontFamily: 'Montserrat, sans-serif' }}
+                  >
+                    Gestion des déplacements familiaux
+                  </p>
+                </div>
+              </div>
 
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex-shrink-0"
+                className="flex-shrink-0 ml-auto"
               >
                 <Button
-                  onClick={() => {
-                    if (tripToUpdate) {
-                      setTripToUpdate(undefined)
-                      return
-                    }
-
-                    setShowForm(!showForm)
-                  }}
-                  type="button"
-                  className={`shadow-lg hover:shadow-xl transition-all duration-300 text-sm lg:text-base px-4 lg:px-6 py-2 lg:py-3 min-h-[44px] whitespace-nowrap ${
-                    showForm || tripToUpdate ?
-                      'bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600' :
-                      'bg-gradient-to-r from-[#2fd1d1] to-[#00D4AA] hover:from-[#00A8CC] hover:to-[#2fd1d1]'
+                  onClick={handleToggleForm}
+                  className={`shadow-lg hover:shadow-xl transition-all duration-300 text-sm lg:text-base px-4 lg:px-6 py-2 lg:py-3 min-h-[44px] whitespace-nowrap rounded-lg ${
+                    showForm ?
+                      'bg-red-600 hover:bg-red-700 text-white' :
+                      'bg-[#004D55] hover:bg-[#003640] text-white'
                   }`}
-                  aria-label="Ajouter un trajet"
+                  style={{ fontFamily: 'Montserrat, sans-serif' }}
                 >
-                  <Plus
-                    className={`h-4 w-4 lg:h-5 lg:w-5 mr-2 transition-transform duration-200 ${
-                      showForm || tripToUpdate ? 'rotate-45' : ''
-                    }`}
-                  />
-                  {showForm || tripToUpdate ? 'Annuler' : (
-                    <>
-                      <span className="hidden sm:inline">Nouveau trajet</span>
-                      <span className="sm:hidden">Nouveau</span>
-                    </>
-                  )}
+                  {showForm ?
+                    <Minus className="h-4 w-4 lg:h-5 lg:w-5 mr-2" /> :
+                    <Plus className="h-4 w-4 lg:h-5 lg:w-5 mr-2" />}
+                  <span className="hidden sm:inline">
+                    {showForm ? 'Annuler' : 'Nouveau trajet'}
+                  </span>
+                  <span className="sm:hidden">{showForm ? 'Annuler' : 'Nouveau'}</span>
                 </Button>
               </motion.div>
-            </div>
+            </motion.div>
             <NewTripForm
               key={tripToUpdate ? tripToUpdate.id : 'new-trip-form'}
               showForm={showForm}
