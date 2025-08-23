@@ -9,7 +9,7 @@ import {
 import { pipe } from 'effect'
 import * as A from 'effect/Array'
 import * as O from 'effect/Option'
-import { Calendar, Edit, MapPin, Trash2, User } from 'lucide-react'
+import { Calendar, Edit, Edit3, MapPin, Trash2, User } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useEffect, useMemo, useState } from 'react'
 import { useSubmit } from 'react-router'
@@ -266,21 +266,18 @@ export function useTripTable(
               }, [initialValue])
 
               return (
-                <Badge
-                  className="px-0 text-black border-0 shadow-sm text-xs lg:text-sm max-w-14 "
-                  style={{
-                    background: `linear-gradient(135deg, #BADE9440, #BADE9460)`,
-                    fontFamily: 'Lato, sans-serif'
-                  }}
+                <span
+                  className="text-sm font-medium text-gray-900 font-body"
+                  style={{ fontFamily: 'Montserrat, sans-serif' }}
                 >
                   <input
-                    className="py-1 w-1/2"
+                    className="py-1 w-1/3 bg-amber-50 "
                     value={value}
                     onChange={e => setValue(+e.target.value)}
                     onBlur={onBlur}
                   />
                   <span>km</span>
-                </Badge>
+                </span>
               )
             }
           }),
@@ -306,9 +303,9 @@ export function useTripTable(
                     onClick={() => {
                       setTripUpdate(row.original)
                     }}
-                    className="hover:bg-[#00D4AA]/10 hover:text-[#00D4AA] text-[#002820] transition-colors duration-200 min-w-[44px] min-h-[44px] p-0 flex items-center justify-center cursor-pointer"
+                    className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 hover:text-blue-700"
                   >
-                    <Edit className="h-3 w-3 lg:h-4 lg:w-4" />
+                    <Edit3 className="h-3 w-3 lg:h-4 lg:w-4" />
                   </Button>
                 </motion.div>
                 <motion.div
@@ -320,9 +317,9 @@ export function useTripTable(
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="hover:bg-red-50 hover:text-red-600 text-red-900 transition-colors duration-200 min-w-[44px] min-h-[44px] p-0 flex items-center justify-center cursor-pointer"
+                        className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 hover:text-red-700"
                       >
-                        <Trash2 className="h-3 w-3 lg:h-4 lg:w-4" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent className="bg-white border-gray-200 shadow-lg">
