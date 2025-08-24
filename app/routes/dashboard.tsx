@@ -14,7 +14,7 @@ import {
 
 import { HttpServerRequest } from '@effect/platform'
 
-import { BarChart3, Car, Gauge, MapPin, Minus, Plus, Wrench } from 'lucide-react'
+import { Car, Gauge, MapPin, Minus, Plus, Wrench } from 'lucide-react'
 import { useState } from 'react'
 import { DashboardArguments } from '~/components/car/DashboardArguments'
 import { NewTripForm } from '~/components/car/NewTripForm'

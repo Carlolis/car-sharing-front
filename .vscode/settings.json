@@ -5,6 +5,7 @@
     "Freshdesk",
     "hookform",
     "isbot",
+    "luxon",
     "oidc",
     "passwordless",
     "signup",

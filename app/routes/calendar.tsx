@@ -1,10 +1,10 @@
-import * as T from 'effect/Effect'
-import { DateTime } from 'luxon'
-
 import { HttpServerRequest } from '@effect/platform'
 import { pipe, Schema as Sc } from 'effect'
 import * as A from 'effect/Array'
+import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
+import { DateTime } from 'luxon'
+import { motion } from 'motion/react'
 import { useCallback, useMemo, useState } from 'react'
 import { Calendar, type Event, luxonLocalizer } from 'react-big-calendar'
 import { TripDialog } from '~/components/calendar/AddDialog'
@@ -17,6 +17,8 @@ import { TripService } from '~/services/trip'
 import type { TripUpdate } from '~/types/api'
 import { DriversArrayEnsure } from '~/types/api'
 
+import { Calendar1, Minus, Plus } from 'lucide-react'
+import { Button } from '~/components/ui/button'
 import type { Route as t } from './+types/calendar'
 
 export const TripCalendar = Sc.Struct({
@@ -58,7 +60,7 @@ export const action = Remix.action(
 )
 
 export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps) {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isFormOpen, setIsFormOpen] = useState(false)
   const [startDate, setStartDate] = useState(new Date())
 
   const [tripToUpdate, setTripToUpdate] = useState<TripUpdate | undefined>(undefined)
@@ -108,7 +110,7 @@ export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps
         setStartDate(startDate)
       }
 
-      setIsOpen(true)
+      setIsFormOpen(true)
     },
     []
   )
@@ -117,7 +119,7 @@ export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps
     (event: Event) => {
       const resourceTrip = Sc.decodeUnknownSync(TripCalendar)(event.resource)
       setTripToUpdate(resourceTrip)
-      setIsOpen(true)
+      setIsFormOpen(true)
 
       // // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       // if (event.resource && event.resource.id) {
@@ -129,16 +131,64 @@ export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps
   )
 
   return (
-    <div className=" px-6 pt-14 lg:px-4 w-full">
-      <div className="mx-auto max-w-2xl py-4 sm:py-6 lg:py-7">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 ">
-            Calendrier des réservations
-          </h2>
-        </div>
-      </div>
-      <div className="max-w-7xl mx-auto ">
+    <div className="relative z-10 p-6 lg:p-12 w-full">
+      <div className="space-y-6 lg:space-y-8 mx-auto px-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+        >
+          <div className="flex items-center gap-3 lg:gap-4">
+            <motion.div
+              animate={{ rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
+              className="w-12 h-12 bg-gradient-title-icon rounded-2xl flex items-center justify-center"
+            >
+              <Calendar1 className="h-6 w-6 text-[#F9F7F3]" />
+            </motion.div>
+            <div>
+              <h1
+                className="text-2xl lg:text-3xl font-semibold text-[#004D55] font-heading"
+                style={{ fontFamily: 'Montserrat Alternates, sans-serif' }}
+              >
+                Calendrier des réservations
+              </h1>
+              <p
+                className="text-[#6B7280] text-sm lg:text-base font-body"
+                style={{ fontFamily: 'Montserrat, sans-serif' }}
+              >
+                Gérer la disponibilité de la voiture
+              </p>
+            </div>
+          </div>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex-shrink-0"
+          >
+            <Button
+              onClick={() => setIsFormOpen(isFormOpen => !isFormOpen)}
+              className={`shadow-lg hover:shadow-xl transition-all duration-300 text-sm lg:text-base px-4 lg:px-6 py-2 lg:py-3 min-h-[44px] whitespace-nowrap rounded-lg ${
+                isFormOpen ?
+                  'bg-red-600 hover:bg-red-700 text-white' :
+                  'bg-[#004D55] hover:bg-[#003640] text-white'
+              }`}
+              style={{ fontFamily: 'Montserrat, sans-serif' }}
+            >
+              {isFormOpen ?
+                <Minus className="h-4 w-4 lg:h-5 lg:w-5 mr-2" /> :
+                <Plus className="h-4 w-4 lg:h-5 lg:w-5 mr-2" />}
+              <span className="hidden sm:inline">
+                {isFormOpen ? 'Annuler' : 'Nouvelle réservation'}
+              </span>
+              <span className="sm:hidden">{isFormOpen ? 'Annuler' : 'Nouvelle'}</span>
+            </Button>
+          </motion.div>
+        </motion.div>
+
         <Calendar
+          className="w-full bg-white border-gray-200 shadow-sm rounded-xl"
           culture="fr"
           messages={messages}
           views={views}
@@ -146,19 +196,19 @@ export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps
           events={myEvents}
           startAccessor="start"
           endAccessor="end"
-          style={{ height: '50rem', margin: '20px' }}
           onSelectSlot={handleSelectSlot}
           selectable="ignoreEvents"
           onSelectEvent={handleSelectEvent}
         />
+
+        <TripDialog
+          isOpen={isFormOpen}
+          setIsOpen={setIsFormOpen}
+          startDate={startDate}
+          updateTrip={tripToUpdate}
+          setTripUpdate={setTripToUpdate}
+        />
       </div>
-      <TripDialog
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-        startDate={startDate}
-        updateTrip={tripToUpdate}
-        setTripUpdate={setTripToUpdate}
-      />
     </div>
   )
 }

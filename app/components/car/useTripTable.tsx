@@ -9,7 +9,7 @@ import {
 import { pipe } from 'effect'
 import * as A from 'effect/Array'
 import * as O from 'effect/Option'
-import { Calendar, Edit, Edit3, MapPin, Trash2, User } from 'lucide-react'
+import { Calendar, Edit3, MapPin, Trash2, User } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useEffect, useMemo, useState } from 'react'
 import { useSubmit } from 'react-router'

@@ -1,83 +1,85 @@
-.rbc-row-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+.rbc-calendar {
+  height: auto; /* fixe la hauteur globale */
 }
 
 /* Week header */
 .rbc-header {
-  background: #f3f4f6;
-  color: #22223b;
+  color: #004d55;
+  font-family: 'Montserrat';
   overflow: hidden;
   flex: 1 0 0%;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding: 8px 0;
+  padding: 24px 0;
   text-align: center;
   vertical-align: middle;
   font-weight: 700;
   font-size: 1rem;
-  min-height: 0;
-  border-bottom: 1px solid #e2e8f0;
-  border-right: 1px solid #e2e8f0;
+
   letter-spacing: 0.5px;
 }
 
 .rbc-row-content {
   position: relative;
+  height: 8rem;
+  cursor: pointer;
 }
 
 /* Month header */
 .rbc-toolbar {
   display: flex;
+  flex-direction: row-reverse;
   align-items: center;
   margin-bottom: 10px;
   font-size: 18px;
 
-  padding: 0 0.25rem 0 0.25rem;
+  padding: 1rem;
   border-bottom: solid 1px hsl(var(--border));
-  margin-bottom: 0;
 }
 .rbc-toolbar .rbc-toolbar-label {
   flex-grow: 1;
-  text-align: center;
-  font-weight: 700;
+  text-transform: capitalize;
+  text-align: left;
+  color: #004d55;
+  font-weight: 400;
+  font-family: 'Montserrat';
+  font-size: x-large;
+}
+
+.rbc-day-bg {
+  flex: 1 0 0%;
+  background: transparent;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px; /* arrondi plus léger */
+  transition: background 0.2s;
+  margin: 0.2rem;
+  cursor: pointer;
 }
 
 .rbc-event,
 .rbc-slot-selection {
   background-color: green;
-  z-index: 9999;
+
   color: white;
-  padding: 3px;
+  padding: 0.4rem;
+  margin: 0 0.2rem;
   border-radius: 4px;
   cursor: pointer;
 }
 
 .rbc-event.rbc-selected {
   background-color: blue;
-  z-index: 9999;
 }
 
-.rbc-row {
-  display: flex;
-  flex-direction: row;
-}
 .rbc-row-segment {
   padding: 0 1px 1px 1px;
 }
 
 .rbc-month-view {
-  position: relative;
-
   display: flex;
   flex-direction: column;
-  flex: 1 0 0;
-  width: 100%;
-  user-select: none;
-  height: 100%;
+  height: auto;
+  padding: 1.2rem 1.2rem;
 }
 
 .rbc-month-row {
@@ -86,30 +88,10 @@
   flex-direction: column;
   flex: 1 0 0;
   flex-basis: 0px;
-  overflow: hidden;
-  height: 100%;
-}
-
-.rbc-date-cell {
-  flex: 1 1 0;
-  min-width: 0;
-  padding-right: 5px;
-  text-align: right;
-}
-.rbc-date-cell.rbc-now {
-  font-weight: bold;
-  color: red;
 }
 
 .rbc-month-row + .rbc-month-row {
   border-top: 1px solid hsl(var(--border));
-}
-
-.rbc-row-bg {
-  display: flex;
-  flex-direction: row;
-  flex: 1 0 0;
-  overflow: hidden;
 }
 
 .rbc-overlay > * + * {
@@ -130,26 +112,67 @@
 .rbc-btn-group {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: 1rem;
 }
 
-.rbc-toolbar button:hover {
-  background: #2563eb;
-  color: #fff;
+.rbc-toolbar button:hover:first-child {
+  background: #45e8e5;
 }
 
-.rbc-day-bg {
-  cursor: pointer;
-  padding: 1rem;
-  flex: 1 0 0%;
-  background: #f8fafc;
-  border-right: 1px solid #e2e8f0;
-  border-left: 1px solid #e2e8f0;
-  transition: background 0.2s;
+.rbc-toolbar button:first-child {
+  background: #56fcff;
+  color: #004d55;
+  font-weight: 400;
 }
+
+.rbc-toolbar button:hover:not(:first-child) {
+  background: #004d55;
+  color: white;
+}
+
+.rbc-toolbar button:not(:first-child) {
+  background: white;
+  color: #004d55;
+  border-color: #004d55;
+  border-style: solid;
+  border-width: 1px;
+  font-weight: 400;
+}
+
+.rbc-row-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: row;
+  flex: 1 0 0;
+  overflow: hidden;
+}
+.rbc-row {
+  display: flex;
+  flex-direction: row;
+}
+
 .rbc-day-bg:hover {
-  background: #bae6fd;
+  background: rgba(186, 230, 253, 0.5);
+}
+
+.rbc-date-cell {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 2px 4px;
+  text-align: left;
+  color: #004d55;
+}
+.rbc-date-cell.rbc-now {
+  font-weight: bold;
+  color: red;
+}
+.rbc-button-link {
+  font-weight: 600;
+  margin: 0.8rem;
 }
 
 .rbc-event:hover {
