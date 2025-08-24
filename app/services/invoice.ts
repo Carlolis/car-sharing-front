@@ -38,7 +38,9 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
         }
 
         formData.append('date', invoice.date.toISOString().split('T')[0])
-        formData.append('mileage', JSON.stringify(invoice.mileage))
+
+        if (invoice.mileage.length) formData.append('mileage', JSON.stringify(+invoice.mileage))
+
         formData.append('amount', JSON.stringify(invoice.amount))
 
         formData.append('fileName', JSON.stringify(invoice.fileName))

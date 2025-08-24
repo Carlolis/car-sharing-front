@@ -25,7 +25,7 @@ import type { Route } from './+types/invoices'
 const InvoiceCreateForm = Sc.Struct({
   name: Sc.String,
   date: LocalDate,
-  mileage: Sc.NumberFromString,
+  mileage: Sc.String,
   drivers: DriversArrayEnsure,
   fileBytes: Sc.optional(FilesSchema),
   kind: Sc.String,
