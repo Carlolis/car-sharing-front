@@ -11,7 +11,7 @@ export function DataTable<TData,>({ table }: DataTableProps<TData>) {
   return (
     <Card className="bg-white shadow-sm p-0">
       <CardContent className="p-0">
-        <div className="hidden lg:block overflow-x-auto">
+        <div className=" block overflow-x-auto">
           <table className="w-full">
             <thead>
               {table.getHeaderGroups().map((headerGroup, i, arr) => (

@@ -104,12 +104,8 @@ export default function App() {
       </head>
       <body>
         <main className="flex-1  relative overflow-hidden">
-          <div className="min-h-screen  flex  ">
-            {!isIAUrl && (
-              <div className="min-h-screen  flex max-w-150 ">
-                <SideBar menuItems={menuItems} isAuthenticated={isAuthenticated} />
-              </div>
-            )}
+          <div className="min-h-screen lg:flex lg:flex-row flex-col flex">
+            {!isIAUrl && <SideBar menuItems={menuItems} isAuthenticated={isAuthenticated} />}
             <Outlet />
           </div>
 

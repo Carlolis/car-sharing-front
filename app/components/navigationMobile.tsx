@@ -27,7 +27,7 @@ const NavigationMobile: React.FC<NavigationMobileProps> = ({
   if (!isOpen) return null
 
   return (
-    <>
+    <div className="flex flex-col w-full">
       {/* Overlay */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -46,7 +46,7 @@ const NavigationMobile: React.FC<NavigationMobileProps> = ({
         transition={{ type: 'tween', duration: 0.3 }}
         className="fixed inset-y-0 left-0 w-full bg-[#004D55] z-50  shadow-2xl text-white"
       >
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col w-full ">
           {/* Header avec plus d'espace pour le logo */}
           <div className="flex items-center justify-between p-6 border-b border-white/10 bg-[#004D55] min-h-[80px]">
             <div className="flex-1 flex justify-center pr-12">
@@ -66,50 +66,61 @@ const NavigationMobile: React.FC<NavigationMobileProps> = ({
           <div className="flex-1 p-6 bg-[#004D55]">
             <div className="space-y-3">
               {menuItems.map((item, index) => (
-                <motion.div
+                <NavLink
+                  onClick={onClose}
                   key={item.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  to={item.id}
+                  className={`transition-colors duration-200 text-base font-body cursor-pointer  ${
+                    currentPage === '/' + item.id ?
+                      'text-white font-medium' :
+                      'text-white/90 group-hover:text-white'
+                  }`}
+                  style={{ fontFamily: 'Montserrat, sans-serif' }}
                 >
-                  <Button
-                    variant="ghost"
-                    className={`w-full justify-start p-6 min-h-[68px] text-lg transition-all duration-200 rounded-lg font-body ${
-                      currentPage === item.id ?
-                        'bg-[#56FCFF]/20 text-white shadow-lg' :
-                        'text-white/90 hover:text-white'
-                    }`}
-                    style={{
-                      fontFamily: 'Montserrat, sans-serif'
-                    }}
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 }}
                   >
-                    <motion.div
-                      className="flex items-center gap-4 w-full"
-                      whileHover={{ x: 2 }}
-                      transition={{ duration: 0.2 }}
+                    <Button
+                      variant="ghost"
+                      className={`w-full justify-start p-6 min-h-[68px] text-lg transition-all duration-200 rounded-lg font-body ${
+                        currentPage === item.id ?
+                          'bg-[#56FCFF]/20 text-white shadow-lg' :
+                          'text-white/90 hover:text-white'
+                      }`}
+                      style={{
+                        fontFamily: 'Montserrat, sans-serif'
+                      }}
                     >
                       <motion.div
-                        whileHover={{ rotate: 5, scale: 1.1 }}
+                        className="flex items-center gap-4 w-full"
+                        whileHover={{ x: 2 }}
                         transition={{ duration: 0.2 }}
-                        className="min-w-[40px] min-h-[40px] flex items-center justify-center"
                       >
-                        <item.icon
-                          className={`h-10 w-10 transition-colors duration-200 ${
-                            currentPage === item.id ? 'text-[#56FCFF]' : 'text-white/80'
+                        <motion.div
+                          whileHover={{ rotate: 5, scale: 1.1 }}
+                          transition={{ duration: 0.2 }}
+                          className="min-w-[40px] min-h-[40px] flex items-center justify-center"
+                        >
+                          <item.icon
+                            className={`h-10 w-10 transition-colors duration-200 ${
+                              currentPage === item.id ? 'text-[#56FCFF]' : 'text-white/80'
+                            }`}
+                          />
+                        </motion.div>
+                        <span
+                          className={`transition-colors duration-200 text-lg font-body ${
+                            currentPage === item.id ? 'text-white font-medium' : 'text-white/90'
                           }`}
-                        />
+                          style={{ fontFamily: 'Montserrat, sans-serif' }}
+                        >
+                          {item.label}
+                        </span>
                       </motion.div>
-                      <span
-                        className={`transition-colors duration-200 text-lg font-body ${
-                          currentPage === item.id ? 'text-white font-medium' : 'text-white/90'
-                        }`}
-                        style={{ fontFamily: 'Montserrat, sans-serif' }}
-                      >
-                        {item.label}
-                      </span>
-                    </motion.div>
-                  </Button>
-                </motion.div>
+                    </Button>
+                  </motion.div>
+                </NavLink>
               ))}
             </div>
           </div>
@@ -118,7 +129,8 @@ const NavigationMobile: React.FC<NavigationMobileProps> = ({
           (
             <Form method="post">
               <SidebarMenuButton
-                className="cursor-pointer w-full mb-2 transition-all duration-200 hover:scale-105 group text-base min-h-[44px] hover:bg-white/10 hover:shadow-md"
+                onClick={onClose}
+                className="p-8 cursor-pointer w-full mb-2 transition-all duration-200 hover:scale-105 group text-base min-h-[44px] hover:bg-white/10 hover:shadow-md"
                 type="submit"
                 style={{
                   fontFamily: 'Lato, sans-serif'
@@ -190,7 +202,7 @@ const NavigationMobile: React.FC<NavigationMobileProps> = ({
             </SidebarMenuButton>
           )}
       </motion.div>
-    </>
+    </div>
   )
 }
 

@@ -13,8 +13,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarProvider,
-  SidebarTrigger
+  SidebarProvider
 } from './ui/sidebar'
 
 interface SideBarProps {
@@ -29,27 +28,25 @@ export const SideBar = ({ menuItems, isAuthenticated }: SideBarProps) => {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen border-r-0 ">
+      <div className="flex lg:min-h-screen border-r-0 w-full">
         {/* Navigation Mobile */}
-        <div className="lg:hidden flex border-r-0 bg-[#004D55] text-white w-[300px]">
+        <div className="lg:hidden flex justify-around border-r-0 bg-[#004D55] text-white w-full px-4 p-2 lg:w-50">
           <Button
-            variant="ghost"
-            size="sm"
             onClick={() => setIsMobileMenuOpen(true)}
-            className="min-w-[54px] min-h-[54px] p-0 flex items-center justify-center text-[rgba(86,252,255,1)] hover:text-[#004D55]/80"
+            className="flex items-center justify-center text-[rgba(86,252,255,1)] hover:text-[#004D55]/80 w-12 h-12"
           >
-            <Menu className="h-14 w-14" />
+            <Menu className="!w-12 !h-12" />
           </Button>
           <img
             src={autoPartageLogo}
             alt="AutoPartage en famille"
-            className={`h-15 w-auto object-contain`}
+            className={`h-10 w-auto object-contain `}
             style={{ fontFamily: 'Lato, sans-serif' }}
           />
         </div>
 
         {/* Navigation Desktop */}
-        <Sidebar className="!hidden lg:!flex border-r-0 bg-[#004D55] text-white w-[300px]">
+        <Sidebar className="!hidden lg:!flex border-r-0 bg-[#004D55] text-white">
           <SidebarHeader className="border-b border-white/10 p-8 bg-[#004D55]">
             {/* <LogoComponent />*/}
             <img

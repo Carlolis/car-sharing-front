@@ -1,7 +1,7 @@
 import * as T from 'effect/Effect'
 import { LogIn } from 'lucide-react'
 import { motion } from 'motion/react'
-import { Link, NavLink } from 'react-router'
+import { NavLink } from 'react-router'
 import { Button } from '~/components/ui/button'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import { Remix } from '~/runtime/Remix'
