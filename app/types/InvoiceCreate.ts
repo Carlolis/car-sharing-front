@@ -5,7 +5,8 @@ import { DriversArrayEnsure, LocalDate } from './api'
 export const InvoiceCreate = Sc.Struct({
   name: Sc.String,
   date: LocalDate,
-  distance: Sc.NumberFromString,
+  mileage: Sc.NumberFromString,
+  amount: Sc.NumberFromString,
   drivers: DriversArrayEnsure,
   fileBytes: Sc.optional(Uint8Array),
   fileName: Sc.optional(Sc.String),

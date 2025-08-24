@@ -3,7 +3,7 @@ import { Match, pipe } from 'effect'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import { twMerge } from 'tailwind-merge'
-import type { DashboardArguments } from '~/components/car/DashboardArguments'
+import type { DashboardArguments } from '~/components/dashboard/DashboardArguments'
 import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
 
 import { TripService } from '~/services/trip'

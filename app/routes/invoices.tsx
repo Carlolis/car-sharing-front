@@ -9,33 +9,39 @@ import { TreeFormatter } from 'effect/ParseResult'
 import { Minus, Plus, Receipt } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useState } from 'react'
-import { Link, useActionData, useFetcher, useNavigation } from 'react-router'
+import { useNavigation } from 'react-router'
 import InvoiceForm from '~/components/invoice/invoiceForm'
+import { Reimbursement } from '~/components/invoice/reimbursement'
 import { useInvoiceTable } from '~/components/invoice/useInvoiceTable'
 import { Button } from '~/components/ui/button'
 import { DataTable } from '~/components/ui/data-table'
 import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
 import { Remix } from '~/runtime/Remix'
-import { Redirect } from '~/runtime/ServerResponse'
+import { Redirect, Unexpected } from '~/runtime/ServerResponse'
 import { InvoiceService } from '~/services/invoice'
 import { DriversArrayEnsure, LocalDate } from '~/types/api'
 import type { Route } from './+types/invoices'
-export const loader = Remix.loader(
-  T.gen(function* () {
-    const invoiceService = yield* InvoiceService
-    const invoices = yield* invoiceService.getInvoices
-    return { invoices }
-  })
-)
 
 const InvoiceCreateForm = Sc.Struct({
   name: Sc.String,
   date: LocalDate,
-  distance: Sc.NumberFromString,
+  mileage: Sc.NumberFromString,
   drivers: DriversArrayEnsure,
   fileBytes: Sc.optional(FilesSchema),
-  kind: Sc.String
+  kind: Sc.String,
+  amount: Sc.NumberFromString
 })
+
+export const loader = Remix.loader(
+  T.gen(function* () {
+    const invoiceService = yield* InvoiceService
+    const invoices = yield* invoiceService.getAllInvoices()
+    return { invoices }
+  }).pipe(
+    T.catchTag('RequestError', error => new Unexpected({ error: error.message })),
+    T.catchTag('ResponseError', error => new Unexpected({ error: error.message }))
+  )
+)
 
 export const action = Remix.action(
   T.gen(function* () {
@@ -211,6 +217,7 @@ export default function InvoicesPage({ loaderData, actionData }: Route.Component
           </a>
         </motion.div>
         <DataTable table={table} />
+        <Reimbursement />
       </div>
     </div>
   )

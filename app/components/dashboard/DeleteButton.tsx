@@ -1,7 +1,7 @@
 import type { SubmitFunction } from 'react-router'
 
 import { Trash2 } from 'lucide-react'
-import { motion } from 'motion/react'
+
 import type { RoutePaths } from '../../routes'
 import { Button } from '../ui/button'
 import { TaggedDeleteTrip } from './DashboardArguments'

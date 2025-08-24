@@ -185,9 +185,25 @@ export default function InvoiceForm(
                   </Label>
                   <Input
                     type="number"
-                    name="distance"
+                    name="mileage"
                     min="0"
                     step="1"
+                    className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
+                    style={{ fontFamily: 'Montserrat, sans-serif' }}
+                  />
+                </div>
+                <div>
+                  <Label
+                    className="text-[#004D55] text-sm lg:text-base font-body"
+                    style={{ fontFamily: 'Montserrat, sans-serif' }}
+                  >
+                    Montant (€) <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    type="number"
+                    name="amount"
+                    min="0"
+                    step="0.1"
                     className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
                     style={{ fontFamily: 'Montserrat, sans-serif' }}
                   />

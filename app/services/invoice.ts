@@ -3,16 +3,18 @@ import { pipe, Schema as Sc } from 'effect'
 
 import type { HttpClientError } from '@effect/platform/HttpClientError'
 import * as T from 'effect/Effect'
+import { stringify } from 'effect/FastCheck'
 import type { ParseError } from 'effect/ParseResult'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
+import { NotAuthenticated } from '~/runtime/errors/NotAuthenticatedError'
 import type { Redirect } from '~/runtime/ServerResponse'
-import type { Invoice } from '~/types/Invoice'
+import { Invoice } from '~/types/Invoice'
 import type { InvoiceCreate } from '~/types/InvoiceCreate'
 import { HttpService } from './httpClient'
 
 export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService', {
   effect: T.gen(function* () {
-    const { defaultClient, postRequest } = yield* HttpService
+    const { defaultClient, postRequest, getRequest } = yield* HttpService
 
     const createInvoice: (
       invoice: InvoiceCreate
@@ -35,9 +37,11 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
         }
 
         formData.append('date', invoice.date.toISOString().split('T')[0])
-        formData.append('distance', JSON.stringify(invoice.distance))
+        formData.append('mileage', JSON.stringify(invoice.mileage))
+        formData.append('amount', JSON.stringify(invoice.amount))
+
         formData.append('fileName', JSON.stringify(invoice.fileName))
-        formData.append('kind', JSON.stringify(invoice.kind))
+        formData.append('kind', invoice.kind)
         invoice.drivers.forEach(driver => formData.append('drivers', driver))
 
         const createInvoiceRequest = pipe(
@@ -56,26 +60,49 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
         T.annotateLogs(InvoiceService.name, createInvoice.name)
       )
 
-    const getInvoices = T.succeed<Invoice[]>([
-      {
-        id: '1',
-        distance: 100,
-        date: '2023-10-26',
-        name: 'Fausse Facture',
-        drivers: ['maé', 'charles']
-      },
-      {
-        id: '2',
-        distance: 200,
-        date: '2023-10-25',
-        name: 'Fausse Facture 2',
-        drivers: ['brigitte']
-      }
-    ])
+    const getAllInvoices = () =>
+      T.gen(function* () {
+        const cookieSession = yield* CookieSessionStorage
+        yield* T.logDebug(`Getting token....`)
+        const token = yield* cookieSession.getUserToken()
+        yield* T.logDebug(`Found token....`, token)
+
+        const getAllTripsRequest = pipe(
+          getRequest,
+          HttpClientRequest.appendUrl('/invoices'),
+          HttpClientRequest.setHeader('Content-Type', 'application/json'),
+          HttpClientRequest.setHeader('Authorization', `Bearer ${token}`)
+        )
+        const response = yield* defaultClient.execute(getAllTripsRequest)
+
+        const responseJson = yield* pipe(
+          HttpClientResponse.schemaBodyJson(Sc.Array(Invoice))(response),
+          T.tapError(T.logError),
+          T.catchAll(() => T.succeed<readonly Invoice[]>([]))
+        )
+
+        yield* T.logInfo(`Found ${stringify(responseJson)} invoices`)
+
+        return responseJson
+      }).pipe(
+        T.catchTag('ResponseError', error =>
+          T.gen(function* () {
+            if (error.response.status === 401 || error.response.status === 400) {
+              return yield* pipe(
+                error.response.text,
+                T.tap(T.logError),
+                T.flatMap(error => T.fail(NotAuthenticated.of(error)))
+              )
+            }
+            return yield* T.fail(error)
+          })),
+        T.tapError(T.logError),
+        T.annotateLogs(InvoiceService.name, getAllInvoices.name)
+      )
 
     return ({
       createInvoice,
-      getInvoices
+      getAllInvoices
     })
   })
 }) {}

@@ -14,13 +14,12 @@ import {
 
 import { HttpServerRequest } from '@effect/platform'
 
-import { Bug, Car, Gauge, MapPin, Minus, Plus, Receipt, Wrench } from 'lucide-react'
+import { Bug, Car, Gauge, MapPin, Minus, Plus, Wrench } from 'lucide-react'
 import { useState } from 'react'
-import { Link } from 'react-router'
-import { DashboardArguments } from '~/components/car/DashboardArguments'
-import { StatsCard } from '~/components/car/StatsCard'
-import { NewTripForm } from '~/components/car/tripForm'
-import { useTripTable } from '~/components/car/useTripTable'
+import { DashboardArguments } from '~/components/dashboard/DashboardArguments'
+import { StatsCard } from '~/components/dashboard/StatsCard'
+import { NewTripForm } from '~/components/dashboard/tripForm'
+import { useTripTable } from '~/components/dashboard/useTripTable'
 import { Button } from '~/components/ui/button'
 import { DataTable } from '~/components/ui/data-table'
 import { matchTripArgs } from '~/lib/utils'
