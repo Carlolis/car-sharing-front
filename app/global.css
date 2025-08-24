@@ -66,6 +66,7 @@
   --color-reservations-light: #e8f4f6;
   --color-trajets-light: #fdf2f8;
   --color-factures-light: #fff7ed;
+  --color-bugs: #dc2626;
 
   /* Nouvelles couleurs des membres - Mae corrigée */
   --color-brigitte: #f2809f;
@@ -77,6 +78,7 @@
   --gradient-entretien: linear-gradient(135deg, #f6a9be 0%, #f9f7f3 100%);
   --gradient-distance: linear-gradient(135deg, #85c3ca 0%, #e3edeb 100%);
   --gradient-factures: linear-gradient(135deg, #48d4d6 0%, #e0f7f8 100%);
+  --gradient-bugs: linear-gradient(135deg, #f66969 0%, #f9f7f3 100%);
 
   /* Dégradé pour les icônes de titre */
   --gradient-title-icon: linear-gradient(
@@ -173,6 +175,7 @@
   --color-reservations: var(--color-reservations);
   --color-trajets: var(--color-trajets);
   --color-factures: var(--color-factures);
+  --color-bugs: var(--color-bugs);
   --color-dashboard-light: var(--color-dashboard-light);
   --color-reservations-light: var(--color-reservations-light);
   --color-trajets-light: var(--color-trajets-light);
@@ -314,6 +317,10 @@ html {
 /* Classes utilitaires pour les dégradés */
 .bg-gradient-assistance {
   background: var(--gradient-assistance);
+}
+
+.bg-gradient-bugs {
+  background: var(--gradient-bugs);
 }
 
 .bg-gradient-entretien {

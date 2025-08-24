@@ -9,7 +9,7 @@ import { TreeFormatter } from 'effect/ParseResult'
 import { Minus, Plus, Receipt } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useState } from 'react'
-import { useActionData, useFetcher, useNavigation } from 'react-router'
+import { Link, useActionData, useFetcher, useNavigation } from 'react-router'
 import InvoiceForm from '~/components/invoice/invoiceForm'
 import { useInvoiceTable } from '~/components/invoice/useInvoiceTable'
 import { Button } from '~/components/ui/button'
@@ -190,6 +190,26 @@ export default function InvoicesPage({ loaderData, actionData }: Route.Component
           updateInvoice={false}
           isLoading={navigation.formAction == '/invoices'}
         />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex items-center justify-between"
+        >
+          <h2 className="text-xl lg:text-2xl font-semibold text-[#004D55] font-heading">
+            Vos Factures
+          </h2>
+          <a
+            href="https://nextcloud.ilieff.fr/s/xWDqt7PjWN6S8ok"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center px-4 py-2 bg-gradient-factures text-[#004D55] rounded-lg shadow-md hover:shadow-lg transition-all duration-300 text-sm lg:text-base font-medium"
+            style={{ fontFamily: 'Montserrat, sans-serif' }}
+          >
+            <Receipt className="h-4 w-4 mr-2" />
+            Voir toutes les factures sur Nextcloud
+          </a>
+        </motion.div>
         <DataTable table={table} />
       </div>
     </div>

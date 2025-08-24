@@ -20,7 +20,7 @@ export default function Index({ loaderData: { user } }: Route.ComponentProps) {
     <div className="relative z-10 p-6 lg:p-12 w-full">
       {user && (
         <div
-          className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
+          className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mx-6"
           role="alert"
         >
           <strong className="font-bold">Bravo !</strong>
@@ -75,11 +75,7 @@ export default function Index({ loaderData: { user } }: Route.ComponentProps) {
                   </motion.div>
                 </Button>
               ) :
-              (
-                <Link to="/dashboard" className="text-2xl font-bold leading-8 text-blue-700">
-                  Voir le tableau de bord <span aria-hidden="true">→</span>
-                </Link>
-              )}
+              null}
           </div>
         </div>
       </div>

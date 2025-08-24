@@ -14,8 +14,9 @@ import {
 
 import { HttpServerRequest } from '@effect/platform'
 
-import { Car, Gauge, MapPin, Minus, Plus, Wrench } from 'lucide-react'
+import { Bug, Car, Gauge, MapPin, Minus, Plus, Receipt, Wrench } from 'lucide-react'
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { DashboardArguments } from '~/components/car/DashboardArguments'
 import { StatsCard } from '~/components/car/StatsCard'
 import { NewTripForm } from '~/components/car/tripForm'
@@ -146,13 +147,31 @@ export default function Dashboard(
               className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
               role="alert"
             >
-              <strong className="font-bold">Bravo !</strong>
-              <span>{' '}</span>
+              <strong className="font-bold">Bravo !</strong>{' '}
               <span className="block sm:inline">
                 Vous êtes connecté en tant que {loaderData.user}
               </span>
             </div>
-
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="flex items-center justify-between"
+            >
+              <h2 className="text-xl lg:text-2xl font-semibold text-[#004D55] font-heading">
+                Bugs et Suggestions
+              </h2>
+              <a
+                href="https://nextcloud.ilieff.fr/s/xWDqt7PjWN6S8ok"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-4 py-2 bg-gradient-bugs text-[#004D55] rounded-lg shadow-md hover:shadow-lg transition-all duration-300 text-sm lg:text-base font-medium"
+                style={{ fontFamily: 'Montserrat, sans-serif' }}
+              >
+                <Bug className="h-4 w-4 mr-2" />
+                Signaler des bugs ou des améliorations
+              </a>
+            </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
