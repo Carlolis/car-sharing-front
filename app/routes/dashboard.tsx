@@ -168,7 +168,7 @@ export default function Dashboard(
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
                 <Bug className="h-4 w-4 mr-2" />
-                Signaler des bugs ou des améliorations
+                Signaler des bugs/améliorations
               </a>
             </motion.div>
             <motion.div
