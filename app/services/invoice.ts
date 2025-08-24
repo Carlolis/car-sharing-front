@@ -12,6 +12,7 @@ import { Invoice } from '~/types/Invoice'
 import type { InvoiceCreate } from '~/types/InvoiceCreate'
 import { HttpService } from './httpClient'
 
+// @effect-diagnostics-next-line leakingRequirements:off
 export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService', {
   effect: T.gen(function* () {
     const { defaultClient, postRequest, getRequest } = yield* HttpService

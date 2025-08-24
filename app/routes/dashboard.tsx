@@ -161,7 +161,7 @@ export default function Dashboard(
                 Bugs et Suggestions
               </h2>
               <a
-                href="https://nextcloud.ilieff.fr/s/xWDqt7PjWN6S8ok"
+                href="https://nextcloud.ilieff.fr/s/kYtspimb5PTzn2W"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center px-4 py-2 bg-gradient-bugs text-[#004D55] rounded-lg shadow-md hover:shadow-lg transition-all duration-300 text-sm lg:text-base font-medium"
