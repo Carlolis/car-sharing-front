@@ -40,40 +40,40 @@ export default function Index({ loaderData: { user } }: Route.ComponentProps) {
           <div className="mt-10 flex items-center justify-center gap-x-6">
             {!user ?
               (
-                <Button
-                  className=" text-white cursor-pointer w-full mb-2 transition-all duration-200 hover:scale-105 group text-base min-h-[44px] hover:shadow-md bg-[#004d55]"
-                  style={{
-                    fontFamily: 'Lato, sans-serif'
-                  }}
+                <NavLink
+                  to={'/login'}
+                  className="transition-colors duration-200 text-base font-body  group-hover:text-white"
+                  style={{ fontFamily: 'Montserrat, sans-serif' }}
                 >
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, delay: 0.5 }}
+                  <Button
+                    className=" text-white cursor-pointer w-full mb-2 transition-all duration-200 hover:scale-105 group text-base min-h-[44px] hover:shadow-md bg-[#004d55]"
+                    style={{
+                      fontFamily: 'Lato, sans-serif'
+                    }}
                   >
                     <motion.div
-                      className="flex items-center gap-3 w-full"
-                      whileHover={{ x: 2 }}
-                      transition={{ duration: 0.2 }}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.5 }}
                     >
                       <motion.div
-                        whileHover={{ scale: 1.1 }}
+                        className="flex items-center gap-3 w-full"
+                        whileHover={{ x: 2 }}
                         transition={{ duration: 0.2 }}
-                        className="min-w-[24px] min-h-[24px] flex items-center justify-center"
                       >
-                        <LogIn color="white" />
-                      </motion.div>
+                        <motion.div
+                          whileHover={{ scale: 1.1 }}
+                          transition={{ duration: 0.2 }}
+                          className="min-w-[24px] min-h-[24px] flex items-center justify-center"
+                        >
+                          <LogIn color="white" />
+                        </motion.div>
 
-                      <NavLink
-                        to={'/login'}
-                        className="transition-colors duration-200 text-base font-body  group-hover:text-white"
-                        style={{ fontFamily: 'Montserrat, sans-serif' }}
-                      >
                         Connexion
-                      </NavLink>
+                      </motion.div>
                     </motion.div>
-                  </motion.div>
-                </Button>
+                  </Button>
+                </NavLink>
               ) :
               null}
           </div>
