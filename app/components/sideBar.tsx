@@ -1,4 +1,4 @@
-import { Car, LogIn, LogOut } from 'lucide-react'
+import { LogIn, LogOut } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Form, NavLink, useLocation } from 'react-router'
 import autoPartageLogo from '../assets/logo.png'
@@ -106,7 +106,7 @@ export const SideBar = ({ menuItems, isAuthenticated }: SideBarProps) => {
                     (
                       <Form method="post">
                         <SidebarMenuButton
-                          className="cursor-pointer w-full mb-2 transition-all duration-200 hover:scale-105 group text-base min-h-[44px] hover:bg-white/70 hover:shadow-md"
+                          className="cursor-pointer w-full mb-2 transition-all duration-200 hover:scale-105 group text-base min-h-[44px] hover:bg-white/10 hover:shadow-md"
                           type="submit"
                           style={{
                             fontFamily: 'Lato, sans-serif'
@@ -130,7 +130,9 @@ export const SideBar = ({ menuItems, isAuthenticated }: SideBarProps) => {
                                 <LogOut className="h-6 w-6 transition-colors duration-200 text-red-400 group-hover:text-red-300" />
                               </motion.div>
 
-                              <span className={`transition-colors duration-200 text-base `}>
+                              <span
+                                className={`transition-colors duration-200 text-base  `}
+                              >
                                 Déconnexion
                               </span>
                             </motion.div>
@@ -140,7 +142,7 @@ export const SideBar = ({ menuItems, isAuthenticated }: SideBarProps) => {
                     ) :
                     (
                       <SidebarMenuButton
-                        className="cursor-pointer w-full mb-2 transition-all duration-200 hover:scale-105 group text-base min-h-[44px] hover:bg-white/70 hover:shadow-md"
+                        className="cursor-pointer w-full mb-2 transition-all duration-200 hover:scale-105 group text-base min-h-[44px] hover:bg-white/10 hover:shadow-md"
                         type="submit"
                         style={{
                           fontFamily: 'Lato, sans-serif'

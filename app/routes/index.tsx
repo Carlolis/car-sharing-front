@@ -1,9 +1,11 @@
 import * as T from 'effect/Effect'
-import { Link } from 'react-router'
+import { LogIn } from 'lucide-react'
+import { motion } from 'motion/react'
+import { Link, NavLink } from 'react-router'
+import { Button } from '~/components/ui/button'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import { Remix } from '~/runtime/Remix'
 import type { Route } from './+types'
-
 export const loader = Remix.loader(
   T.gen(function* () {
     const cookieSession = yield* CookieSessionStorage
@@ -15,7 +17,7 @@ export const loader = Remix.loader(
 
 export default function Index({ loaderData: { user } }: Route.ComponentProps) {
   return (
-    <div className=" px-6 pt-14 lg:px-8">
+    <div className="relative z-10 p-6 lg:p-12 w-full">
       {user && (
         <div
           className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
@@ -29,18 +31,49 @@ export default function Index({ loaderData: { user } }: Route.ComponentProps) {
       )}
       <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
         <div className="text-center">
-          <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+          <h1
+            className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl"
+            style={{ fontFamily: 'Montserrat Alternates, sans-serif' }}
+          >
             Partagez la voiture simplement
           </h1>
           <div className="mt-10 flex items-center justify-center gap-x-6">
             {!user ?
               (
-                <Link
-                  to="/login"
-                  className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
+                <Button
+                  className=" text-white cursor-pointer w-full mb-2 transition-all duration-200 hover:scale-105 group text-base min-h-[44px] hover:shadow-md bg-[#004d55]"
+                  style={{
+                    fontFamily: 'Lato, sans-serif'
+                  }}
                 >
-                  Connexion
-                </Link>
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: 0.5 }}
+                  >
+                    <motion.div
+                      className="flex items-center gap-3 w-full"
+                      whileHover={{ x: 2 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        transition={{ duration: 0.2 }}
+                        className="min-w-[24px] min-h-[24px] flex items-center justify-center"
+                      >
+                        <LogIn color="white" />
+                      </motion.div>
+
+                      <NavLink
+                        to={'/login'}
+                        className="transition-colors duration-200 text-base font-body  group-hover:text-white"
+                        style={{ fontFamily: 'Montserrat, sans-serif' }}
+                      >
+                        Connexion
+                      </NavLink>
+                    </motion.div>
+                  </motion.div>
+                </Button>
               ) :
               (
                 <Link to="/dashboard" className="text-2xl font-bold leading-8 text-blue-700">

@@ -2,10 +2,13 @@ import { HttpServerRequest } from '@effect/platform'
 
 import { Match, pipe, Schema as Sc } from 'effect'
 import * as T from 'effect/Effect'
+import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { Form, useActionData, useSearchParams } from 'react-router'
 import { Remix } from '~/runtime/Remix'
 
+import { LogIn } from 'lucide-react'
+import { Button } from '~/components/ui/button'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
 import { AuthService } from '../services/auth'
@@ -67,8 +70,8 @@ export default function Login() {
   }, [searchParams])
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50  py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="p-24 w-full">
+      <div className="max-w-200 mx-auto">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 ">
             Connexion
@@ -108,14 +111,35 @@ export default function Login() {
             </div>
           </div>
 
-          <div>
-            <button
-              type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          <Button
+            className="cursor-pointer text-white w-full mb-2 transition-all duration-200 hover:scale-105 group text-base min-h-[44px] hover:shadow-md bg-[#004d55]"
+            type="submit"
+            style={{
+              fontFamily: 'Lato, sans-serif'
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3, delay: 0.5 }}
             >
-              Se connecter
-            </button>
-          </div>
+              <motion.div
+                className="flex items-center gap-3 w-full"
+                whileHover={{ x: 2 }}
+                transition={{ duration: 0.2 }}
+              >
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ duration: 0.2 }}
+                  className="min-w-[24px] min-h-[24px] flex items-center justify-center"
+                >
+                  <LogIn color="white" />
+                </motion.div>
+
+                Connexion
+              </motion.div>
+            </motion.div>
+          </Button>
         </Form>
       </div>
     </div>
