@@ -1,7 +1,10 @@
-import { LogIn, LogOut } from 'lucide-react'
+import { LogIn, LogOut, Menu } from 'lucide-react'
 import { motion } from 'motion/react'
+import { useState } from 'react'
 import { Form, NavLink, useLocation } from 'react-router'
 import autoPartageLogo from '../assets/logo.png'
+import NavigationMobile from './navigationMobile'
+import { Button } from './ui/button'
 import {
   Sidebar,
   SidebarContent,
@@ -10,7 +13,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarProvider
+  SidebarProvider,
+  SidebarTrigger
 } from './ui/sidebar'
 
 interface SideBarProps {
@@ -21,12 +25,31 @@ interface SideBarProps {
 
 export const SideBar = ({ menuItems, isAuthenticated }: SideBarProps) => {
   const { pathname: currentPage } = useLocation()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
     <SidebarProvider>
       <div className="flex min-h-screen border-r-0 ">
+        {/* Navigation Mobile */}
+        <div className="lg:hidden flex border-r-0 bg-[#004D55] text-white w-[300px]">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="min-w-[54px] min-h-[54px] p-0 flex items-center justify-center text-[rgba(86,252,255,1)] hover:text-[#004D55]/80"
+          >
+            <Menu className="h-14 w-14" />
+          </Button>
+          <img
+            src={autoPartageLogo}
+            alt="AutoPartage en famille"
+            className={`h-15 w-auto object-contain`}
+            style={{ fontFamily: 'Lato, sans-serif' }}
+          />
+        </div>
+
         {/* Navigation Desktop */}
-        <Sidebar className="hidden lg:flex border-r-0 bg-[#004D55] text-white w-[300px]">
+        <Sidebar className="!hidden lg:!flex border-r-0 bg-[#004D55] text-white w-[300px]">
           <SidebarHeader className="border-b border-white/10 p-8 bg-[#004D55]">
             {/* <LogoComponent />*/}
             <img
@@ -181,6 +204,22 @@ export const SideBar = ({ menuItems, isAuthenticated }: SideBarProps) => {
             </SidebarMenu>
           </SidebarFooter>
         </Sidebar>
+        {/* Navigation Mobile */}
+        <NavigationMobile
+          isOpen={isMobileMenuOpen}
+          onClose={() => setIsMobileMenuOpen(false)}
+          logoComponent={
+            <img
+              src={autoPartageLogo}
+              alt="AutoPartage en famille"
+              className={`h-15 w-auto object-contain`}
+              style={{ fontFamily: 'Lato, sans-serif' }}
+            />
+          }
+          menuItems={menuItems}
+          isAuthenticated={isAuthenticated}
+          currentPage={currentPage}
+        />
       </div>
     </SidebarProvider>
   )
