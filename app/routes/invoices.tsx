@@ -33,7 +33,8 @@ const InvoiceCreateForm = Sc.Struct({
   date: LocalDate,
   distance: Sc.NumberFromString,
   drivers: DriversArrayEnsure,
-  fileBytes: Sc.optional(FilesSchema)
+  fileBytes: Sc.optional(FilesSchema),
+  kind: Sc.String
 })
 
 export const action = Remix.action(
@@ -45,6 +46,7 @@ export const action = Remix.action(
     const invoiceCreate = yield* HttpServerRequest.schemaBodyForm(
       InvoiceCreateForm
     )
+
     const file = pipe(invoiceCreate.fileBytes, O.fromNullable, O.map(file => file[0].path))
 
     const fs = yield* FileSystem
@@ -57,12 +59,19 @@ export const action = Remix.action(
       T.tapError(T.logWarning),
       T.catchAll(() => T.succeed(undefined))
     )
+    const fileName = pipe(
+      invoiceCreate?.fileBytes,
+      O.fromNullable,
+      O.flatMapNullable(fileBytes => fileBytes[0]),
+      O.map(r => r.name),
+      O.getOrUndefined
+    )
 
     // yield* T.logInfo(`Creating Invoice.... ${stringify(invoiceCreate)}`)
     const tripId = yield* api.createInvoice({
       ...invoiceCreate,
       fileBytes: content,
-      filePath: O.getOrElse(file, () => undefined)
+      fileName
     }).pipe(
       T.as({ invoiceName: invoiceCreate.name, _tag: 'InvoiceName' as const })
     )
@@ -80,7 +89,7 @@ export const action = Remix.action(
         }),
       ParseError: error =>
         T.gen(function* () {
-          yield* T.logError('Parse error  : ', TreeFormatter.formatErrorSync(error))
+          yield* T.logError('Invoice Action Parse error  : ', TreeFormatter.formatErrorSync(error))
           return yield* T.succeed(SimpleTaggedError(TreeFormatter.formatErrorSync(error)))
         })
     }),

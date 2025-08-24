@@ -75,11 +75,6 @@ const menuItems = [
     label: 'Réservations',
     icon: Calendar
   },
-  {
-    id: 'invoice/new',
-    label: 'Nouvelle Facture',
-    icon: MapPin
-  },
   { id: 'invoices', label: 'Factures', icon: Receipt },
   { id: 'ia', label: 'IA', icon: Brain }
 ]

@@ -90,13 +90,13 @@ export default function InvoiceForm({ actionData, showForm, updateInvoice }: Inv
             </CardHeader>
 
             {errorMessage && (
-              <div className="mb-4 p-4 text-red-700 bg-red-100 rounded">
+              <div className="m-6 p-4 text-red-700 bg-red-100 rounded">
                 {errorMessage}
               </div>
             )}
 
             {tripInfos && (
-              <div className="mb-4 p-4 text-green-700 bg-green-100 rounded">
+              <div className="m-6 p-4 text-green-700 bg-green-100 rounded">
                 {tripInfos}
               </div>
             )}
@@ -133,6 +133,7 @@ export default function InvoiceForm({ actionData, showForm, updateInvoice }: Inv
                       Type <span className="text-red-500">*</span>
                     </Label>
                     <Select
+                      name="kind"
                       required
                     >
                       <SelectTrigger
@@ -181,9 +182,8 @@ export default function InvoiceForm({ actionData, showForm, updateInvoice }: Inv
                   <Input
                     type="number"
                     name="distance"
-                    required
                     min="0"
-                    step="0.1"
+                    step="1"
                     className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
                     style={{ fontFamily: 'Montserrat, sans-serif' }}
                   />
@@ -201,9 +201,9 @@ export default function InvoiceForm({ actionData, showForm, updateInvoice }: Inv
                       <div key={personne.id} className="flex items-center gap-3 ">
                         <RadioGroupItem
                           id={personne.id}
-                          value={personne.name}
+                          value={personne.id}
                         />
-                        <Label htmlFor={personne.id}>{personne.name}</Label>
+                        <Label>{personne.name}</Label>
                       </div>
                     ))}
                   </RadioGroup>

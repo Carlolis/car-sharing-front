@@ -247,7 +247,7 @@ export default function IA() {
     <>
       {isChatReady ?
         (
-          <div className="flex bg-white  space-x-4">
+          <div className="relative z-10 p-6 lg:p-12 w-full flex">
             <div className="min-h-screen w-1/4 p-4 bg-gray-100  h-full border-r border-gray-300  flex flex-col">
               <div>
                 <button

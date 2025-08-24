@@ -36,6 +36,8 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
 
         formData.append('date', invoice.date.toISOString().split('T')[0])
         formData.append('distance', JSON.stringify(invoice.distance))
+        formData.append('fileName', JSON.stringify(invoice.fileName))
+        formData.append('kind', JSON.stringify(invoice.kind))
         invoice.drivers.forEach(driver => formData.append('drivers', driver))
 
         const createInvoiceRequest = pipe(
