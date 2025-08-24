@@ -18,7 +18,7 @@ export function useInvoiceTable(loaderInvoices: readonly Invoice[]) {
   const columns = useMemo<ColumnDef<Invoice>[]>(
     () => [
       {
-        header: 'Invoice Infos',
+        header: 'Invoice Infos EN COURS PAS FINIS FAUSSE DONNéES',
         footer: props => props.column.id,
         columns: [
           columnHelper.accessor('name', {

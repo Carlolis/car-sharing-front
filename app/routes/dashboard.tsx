@@ -17,8 +17,8 @@ import { HttpServerRequest } from '@effect/platform'
 import { Car, Gauge, MapPin, Minus, Plus, Wrench } from 'lucide-react'
 import { useState } from 'react'
 import { DashboardArguments } from '~/components/car/DashboardArguments'
-import { NewTripForm } from '~/components/car/NewTripForm'
 import { StatsCard } from '~/components/car/StatsCard'
+import { NewTripForm } from '~/components/car/tripForm'
 import { useTripTable } from '~/components/car/useTripTable'
 import { Button } from '~/components/ui/button'
 import { DataTable } from '~/components/ui/data-table'
@@ -75,12 +75,15 @@ export default function Dashboard(
   { loaderData, actionData }: Route.ComponentProps
 ) {
   const [updateTrip, setUpdateTrip] = useState<TripUpdate | undefined>(undefined)
+  const [showForm, setShowForm] = useState<boolean>(false)
+
   const trips = loaderData.trips || []
+
   const table = useTripTable(
     trips,
     setUpdateTrip
   )
-  const [showForm, setShowForm] = useState<boolean>(false)
+
   const handleToggleForm = () => {
     if (updateTrip) {
       setUpdateTrip(undefined)

@@ -17,7 +17,7 @@ import type { TripUpdate } from '~/types/api'
 import { DriversArrayEnsure } from '~/types/api'
 
 import { Calendar1, Minus, Plus } from 'lucide-react'
-import { NewTripForm } from '~/components/car/NewTripForm'
+import { NewTripForm } from '~/components/car/tripForm'
 import { Button } from '~/components/ui/button'
 import type { Route as t } from './+types/calendar'
 

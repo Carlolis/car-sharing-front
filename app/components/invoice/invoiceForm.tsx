@@ -1,0 +1,251 @@
+import { identity, Match } from 'effect'
+import { AnimatePresence, motion } from 'motion/react'
+import { useEffect, useState } from 'react'
+import { Form } from 'react-router'
+import { Label } from '~/components/ui/label'
+
+import { Edit3, Plus, Receipt } from 'lucide-react'
+import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group'
+import { Button } from '../ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { Input } from '../ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+
+interface InvoiceFormProps {
+  actionData: {
+    invoiceName: string
+    _tag: 'InvoiceName'
+  } | {
+    message: string
+    _tag: 'SimpleTaggedError'
+  } | undefined
+  showForm: boolean
+  updateInvoice: boolean
+}
+
+export default function InvoiceForm({ actionData, showForm, updateInvoice }: InvoiceFormProps) {
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
+  const [tripInfos, setTripInfos] = useState<string | undefined>(undefined)
+
+  const typesFactures = [
+    'Carburant',
+    'Entretien',
+    'Assurance',
+    'Réparation',
+    'Contrôle technique',
+    'Péage',
+    'Parking',
+    'Lavage',
+    'Autre',
+    'Remboursement'
+  ]
+  useEffect(() => {
+    const match = Match.type<typeof actionData>().pipe(
+      Match.when(
+        undefined,
+        identity
+      ),
+      Match.tag('InvoiceName', ({ invoiceName }) => {
+        setTripInfos(`La facture ${invoiceName} a été enregistrée avec succès`)
+      }),
+      Match.tag('SimpleTaggedError', ({ message }) => {
+        setErrorMessage(message)
+      }),
+      Match.orElse(() => {
+        setErrorMessage('Une erreur inconnue est survenue lors de la création du trajet')
+      })
+    )
+
+    match(actionData)
+  }, [actionData])
+
+  const personnes = [
+    { id: 'maé' as const, name: 'Maé' },
+    { id: 'charles' as const, name: 'Charles' },
+    { id: 'brigitte' as const, name: 'Brigitte' }
+  ]
+
+  return (
+    <AnimatePresence>
+      {(showForm || updateInvoice) && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.3, ease: 'easeInOut' }}
+          className="overflow-hidden"
+        >
+          <Card className="bg-white border-gray-200 shadow-lg">
+            <CardHeader>
+              <CardTitle
+                className="text-lg lg:text-xl text-[#004D55] flex items-center gap-2 font-heading"
+                style={{ fontFamily: 'Montserrat Alternates, sans-serif' }}
+              >
+                <Receipt className="h-5 w-5 text-[#004D55]" />
+
+                <span className="text-base lg:text-xl">
+                  {updateInvoice ? 'Modifier une facture' : 'Créer une nouvelle facture'}
+                </span>
+              </CardTitle>
+            </CardHeader>
+
+            {errorMessage && (
+              <div className="mb-4 p-4 text-red-700 bg-red-100 rounded">
+                {errorMessage}
+              </div>
+            )}
+
+            {tripInfos && (
+              <div className="mb-4 p-4 text-green-700 bg-green-100 rounded">
+                {tripInfos}
+              </div>
+            )}
+            <CardContent>
+              <Form
+                method="post"
+                className="space-y-4"
+                encType="multipart/form-data"
+              >
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label
+                      className="text-[#004D55] text-sm lg:text-base font-body"
+                      style={{ fontFamily: 'Montserrat, sans-serif' }}
+                    >
+                      Date <span className="text-red-500">*</span>
+                    </Label>
+
+                    <Input
+                      type="date"
+                      name="date"
+                      required
+                      defaultValue={new Date().toISOString().split('T')[0]}
+                      className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
+                      style={{ fontFamily: 'Montserrat, sans-serif' }}
+                    />
+                  </div>
+                  <div>
+                    <Label
+                      htmlFor="type"
+                      className="text-[#004D55] text-sm lg:text-base font-body"
+                      style={{ fontFamily: 'Montserrat, sans-serif' }}
+                    >
+                      Type <span className="text-red-500">*</span>
+                    </Label>
+                    <Select
+                      required
+                    >
+                      <SelectTrigger
+                        className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
+                        style={{ fontFamily: 'Montserrat, sans-serif' }}
+                      >
+                        <SelectValue placeholder="Sélectionner un type" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white">
+                        {typesFactures.map(type => (
+                          <SelectItem key={type} value={type}>
+                            <span
+                              className="text-sm lg:text-base font-body"
+                              style={{ fontFamily: 'Montserrat, sans-serif' }}
+                            >
+                              {type}
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div>
+                  <Label
+                    className="text-[#004D55] text-sm lg:text-base font-body"
+                    style={{ fontFamily: 'Montserrat, sans-serif' }}
+                  >
+                    Titre <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    name="name"
+                    required
+                    className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
+                    style={{ fontFamily: 'Montserrat, sans-serif' }}
+                  />
+                </div>
+                <div>
+                  <Label
+                    className="text-[#004D55] text-sm lg:text-base font-body"
+                    style={{ fontFamily: 'Montserrat, sans-serif' }}
+                  >
+                    Kilométrage
+                  </Label>
+                  <Input
+                    type="number"
+                    name="distance"
+                    required
+                    min="0"
+                    step="0.1"
+                    className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
+                    style={{ fontFamily: 'Montserrat, sans-serif' }}
+                  />
+                </div>
+
+                <div>
+                  <Label
+                    className="text-[#004D55] text-sm lg:text-base font-body"
+                    style={{ fontFamily: 'Montserrat, sans-serif' }}
+                  >
+                    Payé par <span className="text-red-500">*</span>
+                  </Label>
+                  <RadioGroup className="flex flex-col gap-2 py-2" name="drivers">
+                    {personnes.map(personne => (
+                      <div key={personne.id} className="flex items-center gap-3 ">
+                        <RadioGroupItem
+                          id={personne.id}
+                          value={personne.name}
+                        />
+                        <Label htmlFor={personne.id}>{personne.name}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+
+                <div>
+                  <Label className="text-[#004D55] text-sm lg:text-base font-body">
+                    Un fichier pdf/image ?
+                  </Label>
+                  <Input
+                    type="file"
+                    accept=".pdf, .png, .jpg, .jpeg"
+                    name="fileBytes"
+                    className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
+                    style={{ fontFamily: 'Montserrat, sans-serif' }}
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full bg-[#004D55] hover:bg-[#003640] text-sm lg:text-base py-2 lg:py-3 min-h-[44px] font-body text-white"
+                  style={{ fontFamily: 'Montserrat, sans-serif' }}
+                >
+                  {updateInvoice ?
+                    (
+                      <>
+                        <Edit3 className="h-4 w-4 mr-2" />
+                        Modifier la facture
+                      </>
+                    ) :
+                    (
+                      <>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Ajouter la facture
+                      </>
+                    )}
+                </Button>
+              </Form>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}

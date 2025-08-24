@@ -32,7 +32,7 @@ export const SideBar = ({ menuItems, isAuthenticated }: SideBarProps) => {
             <img
               src={autoPartageLogo}
               alt="AutoPartage en famille"
-              className={`h-10 w-auto object-contain`}
+              className={`h-15 w-auto object-contain`}
               style={{ fontFamily: 'Lato, sans-serif' }}
             />
           </SidebarHeader>
@@ -46,49 +46,48 @@ export const SideBar = ({ menuItems, isAuthenticated }: SideBarProps) => {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.3, delay: index * 0.1 }}
                     >
-                      <SidebarMenuButton
-                        isActive={currentPage === '/' + item.id}
-                        className={`w-full mb-3 transition-all duration-200 hover:scale-105 group text-base min-h-[48px] rounded-lg font-body px-4 py-3 ${
+                      <NavLink
+                        to={item.id}
+                        className={`transition-colors duration-200 text-base font-body cursor-pointer  ${
                           currentPage === '/' + item.id ?
-                            '!bg-[#56FCFF]/20 text-white shadow-lg border-0' :
-                            'hover:bg-white/10 text-white/90 hover:text-white'
+                            'text-white font-medium' :
+                            'text-white/90 group-hover:text-white'
                         }`}
-                        style={{
-                          fontFamily: 'Montserrat, sans-serif'
-                        }}
+                        style={{ fontFamily: 'Montserrat, sans-serif' }}
                       >
-                        <motion.div
-                          className="flex items-center gap-4 w-full"
-                          whileHover={{ x: 2 }}
-                          transition={{ duration: 0.2 }}
+                        <SidebarMenuButton
+                          isActive={currentPage === '/' + item.id}
+                          className={` cursor-pointer w-full mb-3 transition-all duration-200 hover:scale-105 group text-base min-h-[48px] rounded-lg font-body px-4 py-3 ${
+                            currentPage === '/' + item.id ?
+                              '!bg-[#56FCFF]/20 text-white shadow-lg border-0' :
+                              'hover:bg-white/10 text-white/90 hover:text-white'
+                          }`}
+                          style={{
+                            fontFamily: 'Montserrat, sans-serif'
+                          }}
                         >
                           <motion.div
-                            whileHover={{ rotate: 5, scale: 1.1 }}
+                            className="flex items-center gap-4 w-full"
+                            whileHover={{ x: 2 }}
                             transition={{ duration: 0.2 }}
-                            className="min-w-[24px] min-h-[24px] flex items-center justify-center"
                           >
-                            <item.icon
-                              className={`h-6 w-6 transition-colors duration-200 ${
-                                currentPage === '/' + item.id ?
-                                  'text-[#56FCFF]' :
-                                  'text-white/80 group-hover:text-white'
-                              }`}
-                            />
-                          </motion.div>
-
-                          <NavLink
-                            to={item.id}
-                            className={`transition-colors duration-200 text-base font-body ${
-                              currentPage === '/' + item.id ?
-                                'text-white font-medium' :
-                                'text-white/90 group-hover:text-white'
-                            }`}
-                            style={{ fontFamily: 'Montserrat, sans-serif' }}
-                          >
+                            <motion.div
+                              whileHover={{ rotate: 5, scale: 1.1 }}
+                              transition={{ duration: 0.2 }}
+                              className="min-w-[24px] min-h-[24px] flex items-center justify-center"
+                            >
+                              <item.icon
+                                className={`h-6 w-6 transition-colors duration-200 ${
+                                  currentPage === '/' + item.id ?
+                                    'text-[#56FCFF]' :
+                                    'text-white/80 group-hover:text-white'
+                                }`}
+                              />
+                            </motion.div>
                             {item.label}
-                          </NavLink>
-                        </motion.div>
-                      </SidebarMenuButton>
+                          </motion.div>
+                        </SidebarMenuButton>
+                      </NavLink>
                     </motion.div>
                   </SidebarMenuItem>
                 ))}
