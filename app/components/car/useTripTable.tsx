@@ -346,7 +346,6 @@ export function useTripTable(
                           Non
                         </AlertDialogCancel>
                         <AlertDialogAction
-                          asChild
                           style={{ fontFamily: 'Montserrat, sans-serif' }}
                         >
                           <DeleteButton

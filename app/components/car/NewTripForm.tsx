@@ -22,6 +22,7 @@ interface NewTripFormProps {
   setShowForm: (showForm: boolean) => void
   updateTrip?: TripUpdate
   setTripUpdate: (tripUpdate: TripUpdate | undefined) => void
+  startDate?: Date
 }
 
 const ValidatedTripCreate = pipe(
@@ -42,7 +43,7 @@ const ValidatedTripCreate = pipe(
 )
 
 export const NewTripForm = (
-  { showForm, updateTrip, setShowForm, setTripUpdate }: NewTripFormProps
+  { showForm, updateTrip, setShowForm, setTripUpdate, startDate }: NewTripFormProps
 ) => {
   {
     /* Formulaire */
@@ -91,7 +92,7 @@ export const NewTripForm = (
             })
 
           submit(Sc.encodeUnknownSync(DashboardArguments)(submissionData), {
-            action: '/dashboard',
+            // action: '/dashboard',
             method: 'post',
             encType: 'application/json'
           })
@@ -154,7 +155,11 @@ export const NewTripForm = (
                       name="startDate"
                       type="date"
                       defaultValue={(() => {
-                        const d = updateTrip?.startDate ? updateTrip.startDate : new Date()
+                        const d = updateTrip?.startDate ?
+                          updateTrip.startDate :
+                          startDate ?
+                          startDate :
+                          new Date()
                         // d.setDate(d.getDate() + 1)
                         return d.toISOString().split('T')[0]
                       })()}
@@ -257,6 +262,7 @@ export const NewTripForm = (
                   <Input
                     name="name"
                     defaultValue={updateTrip?.name}
+                    required
                     placeholder="Ex: Benque, Supermarché, École..."
                     className="bg-white/80 border-slate-300/60 focus:border-[#2fd1d1] focus:ring-[#2fd1d1]/20 text-sm lg:text-base min-h-[44px]"
                     style={{ fontFamily: 'Lato, sans-serif' }}

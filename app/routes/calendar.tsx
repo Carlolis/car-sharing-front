@@ -7,7 +7,6 @@ import { DateTime } from 'luxon'
 import { motion } from 'motion/react'
 import { useCallback, useMemo, useState } from 'react'
 import { Calendar, type Event, luxonLocalizer } from 'react-big-calendar'
-import { TripDialog } from '~/components/calendar/AddDialog'
 import { DashboardArguments } from '~/components/car/DashboardArguments'
 import { matchTripArgs } from '~/lib/utils'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
@@ -18,6 +17,7 @@ import type { TripUpdate } from '~/types/api'
 import { DriversArrayEnsure } from '~/types/api'
 
 import { Calendar1, Minus, Plus } from 'lucide-react'
+import { NewTripForm } from '~/components/car/NewTripForm'
 import { Button } from '~/components/ui/button'
 import type { Route as t } from './+types/calendar'
 
@@ -60,10 +60,10 @@ export const action = Remix.action(
 )
 
 export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps) {
-  const [isFormOpen, setIsFormOpen] = useState(false)
-  const [startDate, setStartDate] = useState(new Date())
+  const [showForm, setShowForm] = useState(false)
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined)
 
-  const [tripToUpdate, setTripToUpdate] = useState<TripUpdate | undefined>(undefined)
+  const [updateTrip, setUpdateTrip] = useState<TripUpdate | undefined>(undefined)
   const myEvents = pipe(
     trips,
     A.map(trip => ({
@@ -94,7 +94,6 @@ export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps
         previous: 'Précédent',
         next: 'Suivant',
         today: `Aujourd'hui`,
-        agenda: 'Ordre du jour',
 
         showMore: (total: number) => `+${total} plus`
       }
@@ -102,33 +101,38 @@ export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps
     []
   )
 
-  const handleSelectSlot = useCallback(
-    (event: Event) => {
-      if (event.start) {
-        const startDate = event.start
-        startDate.setDate(startDate.getDate() + 1)
-        setStartDate(startDate)
-      }
+  const handleSelectSlot = (event: Event) => {
+    if (event.start) {
+      const startDate = event.start
+      startDate.setDate(startDate.getDate() + 1)
+      setStartDate(startDate)
+    }
+    setUpdateTrip(undefined)
+    setShowForm(true)
+  }
 
-      setIsFormOpen(true)
-    },
-    []
-  )
+  const handleSelectEvent = (event: Event) => {
+    const resourceTrip = Sc.decodeUnknownSync(TripCalendar)(event.resource)
+    setShowForm(false)
+    setStartDate(undefined)
+    setUpdateTrip({ ...resourceTrip })
 
-  const handleSelectEvent = useCallback(
-    (event: Event) => {
-      const resourceTrip = Sc.decodeUnknownSync(TripCalendar)(event.resource)
-      setTripToUpdate(resourceTrip)
-      setIsFormOpen(true)
+    // // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    // if (event.resource && event.resource.id) {
+    //   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+    //   setTripIdToDelete(event.resource.id)
+    // }
+  }
 
-      // // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      // if (event.resource && event.resource.id) {
-      //   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-      //   setTripIdToDelete(event.resource.id)
-      // }
-    },
-    []
-  )
+  const handleToggleForm = () => {
+    setStartDate(undefined)
+    if (updateTrip) {
+      setUpdateTrip(undefined)
+      return
+    }
+
+    setShowForm(!showForm)
+  }
 
   return (
     <div className="relative z-10 p-6 lg:p-12 w-full">
@@ -168,25 +172,34 @@ export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps
             className="flex-shrink-0"
           >
             <Button
-              onClick={() => setIsFormOpen(isFormOpen => !isFormOpen)}
+              onClick={handleToggleForm}
               className={`shadow-lg hover:shadow-xl transition-all duration-300 text-sm lg:text-base px-4 lg:px-6 py-2 lg:py-3 min-h-[44px] whitespace-nowrap rounded-lg ${
-                isFormOpen ?
+                (showForm || updateTrip) ?
                   'bg-red-600 hover:bg-red-700 text-white' :
                   'bg-[#004D55] hover:bg-[#003640] text-white'
               }`}
               style={{ fontFamily: 'Montserrat, sans-serif' }}
             >
-              {isFormOpen ?
+              {(showForm || updateTrip) ?
                 <Minus className="h-4 w-4 lg:h-5 lg:w-5 mr-2" /> :
                 <Plus className="h-4 w-4 lg:h-5 lg:w-5 mr-2" />}
               <span className="hidden sm:inline">
-                {isFormOpen ? 'Annuler' : 'Nouvelle réservation'}
+                {(showForm || updateTrip) ? 'Annuler' : 'Nouveau trajet'}
               </span>
-              <span className="sm:hidden">{isFormOpen ? 'Annuler' : 'Nouvelle'}</span>
+              <span className="sm:hidden">
+                {(showForm || updateTrip) ? 'Annuler' : 'Nouveau'}
+              </span>
             </Button>
           </motion.div>
         </motion.div>
-
+        <NewTripForm
+          key={updateTrip ? updateTrip.id : 'new-trip-form'}
+          showForm={showForm}
+          setShowForm={setShowForm}
+          setTripUpdate={setUpdateTrip}
+          updateTrip={updateTrip}
+          startDate={startDate}
+        />
         <Calendar
           className="w-full bg-white border-gray-200 shadow-sm rounded-xl"
           culture="fr"
@@ -199,14 +212,6 @@ export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps
           onSelectSlot={handleSelectSlot}
           selectable="ignoreEvents"
           onSelectEvent={handleSelectEvent}
-        />
-
-        <TripDialog
-          isOpen={isFormOpen}
-          setIsOpen={setIsFormOpen}
-          startDate={startDate}
-          updateTrip={tripToUpdate}
-          setTripUpdate={setTripToUpdate}
         />
       </div>
     </div>

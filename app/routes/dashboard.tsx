@@ -74,16 +74,16 @@ export const action = Remix.unwrapAction(
 export default function Dashboard(
   { loaderData, actionData }: Route.ComponentProps
 ) {
-  const [tripToUpdate, setTripToUpdate] = useState<TripUpdate | undefined>(undefined)
+  const [updateTrip, setUpdateTrip] = useState<TripUpdate | undefined>(undefined)
   const trips = loaderData.trips || []
   const table = useTripTable(
     trips,
-    setTripToUpdate
+    setUpdateTrip
   )
   const [showForm, setShowForm] = useState<boolean>(false)
   const handleToggleForm = () => {
-    if (tripToUpdate) {
-      setTripToUpdate(undefined)
+    if (updateTrip) {
+      setUpdateTrip(undefined)
       return
     }
 
@@ -208,28 +208,30 @@ export default function Dashboard(
                 <Button
                   onClick={handleToggleForm}
                   className={`shadow-lg hover:shadow-xl transition-all duration-300 text-sm lg:text-base px-4 lg:px-6 py-2 lg:py-3 min-h-[44px] whitespace-nowrap rounded-lg ${
-                    showForm ?
+                    (showForm || updateTrip) ?
                       'bg-red-600 hover:bg-red-700 text-white' :
                       'bg-[#004D55] hover:bg-[#003640] text-white'
                   }`}
                   style={{ fontFamily: 'Montserrat, sans-serif' }}
                 >
-                  {showForm ?
+                  {(showForm || updateTrip) ?
                     <Minus className="h-4 w-4 lg:h-5 lg:w-5 mr-2" /> :
                     <Plus className="h-4 w-4 lg:h-5 lg:w-5 mr-2" />}
                   <span className="hidden sm:inline">
-                    {showForm ? 'Annuler' : 'Nouveau trajet'}
+                    {(showForm || updateTrip) ? 'Annuler' : 'Nouveau trajet'}
                   </span>
-                  <span className="sm:hidden">{showForm ? 'Annuler' : 'Nouveau'}</span>
+                  <span className="sm:hidden">
+                    {(showForm || updateTrip) ? 'Annuler' : 'Nouveau'}
+                  </span>
                 </Button>
               </motion.div>
             </motion.div>
             <NewTripForm
-              key={tripToUpdate ? tripToUpdate.id : 'new-trip-form'}
+              key={updateTrip ? updateTrip.id : 'new-trip-form'}
               showForm={showForm}
               setShowForm={setShowForm}
-              updateTrip={tripToUpdate}
-              setTripUpdate={setTripToUpdate}
+              updateTrip={updateTrip}
+              setTripUpdate={setUpdateTrip}
             />
             <DataTable table={table} />
           </>
