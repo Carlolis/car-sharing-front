@@ -18,10 +18,17 @@
 
   letter-spacing: 0.5px;
 }
+.rbc-event-content {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 .rbc-row-content {
   position: relative;
-  height: 8rem;
+  height: 8.5rem;
   cursor: pointer;
 }
 
@@ -58,7 +65,7 @@
 
 .rbc-event,
 .rbc-slot-selection {
-  background-color: green;
+  background-color: #0967c6;
 
   color: white;
   padding: 0.4rem;
@@ -68,7 +75,11 @@
 }
 
 .rbc-event.rbc-selected {
-  background-color: blue;
+  background-color: rgb(0, 76, 255) 176;
+}
+
+.rbc-event:hover {
+  background-color: #0b4176;
 }
 
 .rbc-row-segment {
@@ -173,8 +184,4 @@
 .rbc-button-link {
   font-weight: 600;
   margin: 0.8rem;
-}
-
-.rbc-event:hover {
-  background-color: orange;
 }
