@@ -91,6 +91,11 @@ export const ModelSelect = ({ setSelectedModel }: ModelSSelectProps) => (
 
               🇺🇸 Gemma 3 12b
             </SelectItem>
+            <SelectItem className="cursor-pointer" value="gpt-oss:20b">
+              <FaCircle className="inline-block mr-1 text-green-600" />
+
+              🇺🇸 Chat GPT OSS
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
