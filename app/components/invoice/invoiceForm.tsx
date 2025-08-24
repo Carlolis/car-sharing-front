@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Form } from 'react-router'
 import { Label } from '~/components/ui/label'
 
+import { Loader } from 'components/ui/shadcn-io/ai/loader'
 import { Edit3, Plus, Receipt } from 'lucide-react'
 import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group'
 import { Button } from '../ui/button'
@@ -21,9 +22,12 @@ interface InvoiceFormProps {
   } | undefined
   showForm: boolean
   updateInvoice: boolean
+  isLoading: boolean
 }
 
-export default function InvoiceForm({ actionData, showForm, updateInvoice }: InvoiceFormProps) {
+export default function InvoiceForm(
+  { actionData, showForm, updateInvoice, isLoading }: InvoiceFormProps
+) {
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
   const [tripInfos, setTripInfos] = useState<string | undefined>(undefined)
 
@@ -224,10 +228,11 @@ export default function InvoiceForm({ actionData, showForm, updateInvoice }: Inv
 
                 <Button
                   type="submit"
+                  disabled={isLoading}
                   className="w-full bg-[#004D55] hover:bg-[#003640] text-sm lg:text-base py-2 lg:py-3 min-h-[44px] font-body text-white"
                   style={{ fontFamily: 'Montserrat, sans-serif' }}
                 >
-                  {updateInvoice ?
+                  {isLoading ? <Loader /> : updateInvoice ?
                     (
                       <>
                         <Edit3 className="h-4 w-4 mr-2" />

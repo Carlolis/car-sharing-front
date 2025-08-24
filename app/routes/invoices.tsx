@@ -9,7 +9,7 @@ import { TreeFormatter } from 'effect/ParseResult'
 import { Minus, Plus, Receipt } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useState } from 'react'
-import { useActionData } from 'react-router'
+import { useActionData, useFetcher, useNavigation } from 'react-router'
 import InvoiceForm from '~/components/invoice/invoiceForm'
 import { useInvoiceTable } from '~/components/invoice/useInvoiceTable'
 import { Button } from '~/components/ui/button'
@@ -82,6 +82,7 @@ export const action = Remix.action(
       ResponseError: error =>
         T.gen(function* () {
           const text = yield* error.response.text
+          yield* T.logError('Status Code : ', error.response.status)
           yield* T.logError('Error text : ', text)
           yield* T.logError('Description :', error.description)
 
@@ -102,6 +103,8 @@ export const action = Remix.action(
 )
 
 export default function InvoicesPage({ loaderData, actionData }: Route.ComponentProps) {
+  const navigation = useNavigation()
+
   const [showForm, setShowForm] = useState<boolean>(false)
   const { invoices } = loaderData
   const table = useInvoiceTable(invoices)
@@ -181,7 +184,12 @@ export default function InvoicesPage({ loaderData, actionData }: Route.Component
             </Button>
           </motion.div>
         </motion.div>
-        <InvoiceForm actionData={actionData} showForm={showForm} updateInvoice={false} />
+        <InvoiceForm
+          actionData={actionData}
+          showForm={showForm}
+          updateInvoice={false}
+          isLoading={navigation.formAction == '/invoices'}
+        />
         <DataTable table={table} />
       </div>
     </div>

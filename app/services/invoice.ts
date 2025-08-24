@@ -49,6 +49,7 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
         const response = yield* defaultClient.execute(createInvoiceRequest).pipe(
           T.tapError(T.logError)
         )
+
         return yield* HttpClientResponse.schemaBodyJson(Sc.String)(response)
       }).pipe(
         T.tapError(T.logError),
@@ -60,14 +61,14 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
         id: '1',
         distance: 100,
         date: '2023-10-26',
-        name: 'Invoice 1',
+        name: 'Fausse Facture',
         drivers: ['maé', 'charles']
       },
       {
         id: '2',
         distance: 200,
         date: '2023-10-25',
-        name: 'Invoice 2',
+        name: 'Fausse Facture 2',
         drivers: ['brigitte']
       }
     ])
