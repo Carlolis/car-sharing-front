@@ -210,7 +210,7 @@ export default function Dashboard(
                     className="text-2xl lg:text-3xl font-semibold text-[#004D55] font-heading"
                     style={{ fontFamily: 'Montserrat Alternates, sans-serif' }}
                   >
-                    Historique de trajets
+                    Historique des trajets/réservations
                   </h2>
                   <p
                     className="text-[#6B7280] text-sm lg:text-base font-body"
