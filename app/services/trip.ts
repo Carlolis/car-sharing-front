@@ -5,7 +5,7 @@ import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import { NotAuthenticated } from '~/runtime/errors/NotAuthenticatedError'
-import { TaggedTripId } from '~/types/TripIdTs'
+import { TaggedTripId } from '~/types/TripId'
 import { TripCreate, TripStats, TripUpdate } from '../types/api'
 import { HttpService } from './httpClient'
 

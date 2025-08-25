@@ -10,12 +10,13 @@ import { NotAuthenticated } from '~/runtime/errors/NotAuthenticatedError'
 import type { Redirect } from '~/runtime/ServerResponse'
 import { Invoice } from '~/types/Invoice'
 import type { InvoiceCreate } from '~/types/InvoiceCreate'
+import { TaggedInvoiceId } from '~/types/InvoiceId'
 import { HttpService } from './httpClient'
 
 // @effect-diagnostics-next-line leakingRequirements:off
 export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService', {
   effect: T.gen(function* () {
-    const { defaultClient, postRequest, getRequest } = yield* HttpService
+    const { defaultClient, postRequest, getRequest, deleteRequest } = yield* HttpService
 
     const createInvoice: (
       invoice: InvoiceCreate
@@ -70,13 +71,13 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
         const token = yield* cookieSession.getUserToken()
         yield* T.logDebug(`Found token....`, token)
 
-        const getAllTripsRequest = pipe(
+        const getAllInvoicesRequest = pipe(
           getRequest,
           HttpClientRequest.appendUrl('/invoices'),
           HttpClientRequest.setHeader('Content-Type', 'application/json'),
           HttpClientRequest.setHeader('Authorization', `Bearer ${token}`)
         )
-        const response = yield* defaultClient.execute(getAllTripsRequest)
+        const response = yield* defaultClient.execute(getAllInvoicesRequest)
 
         const responseJson = yield* pipe(
           HttpClientResponse.schemaBodyJson(Sc.Array(Invoice))(response),
@@ -103,7 +104,35 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
         T.annotateLogs(InvoiceService.name, getAllInvoices.name)
       )
 
+    const deleteInvoice = (invoiceId: string) =>
+      T.gen(function* () {
+        const deleteUrl = pipe(deleteRequest, HttpClientRequest.appendUrl(`/invoices/${invoiceId}`))
+        const response = yield* defaultClient.execute(deleteUrl)
+        yield* T.logInfo('InvoiceService deleteInvoice response :', response)
+
+        return yield* pipe(
+          response,
+          HttpClientResponse.schemaBodyJson(Sc.String),
+          T.map(invoiceId => TaggedInvoiceId.make({ invoiceId }))
+        )
+      }).pipe(
+        T.catchTag('ResponseError', error =>
+          T.gen(function* () {
+            if (error.response.status === 401 || error.response.status === 400) {
+              return yield* pipe(
+                error.response.text,
+                T.tap(T.logError),
+                T.flatMap(error => T.fail(NotAuthenticated.of(error)))
+              )
+            }
+            return yield* T.fail(error)
+          })),
+        T.tapError(T.logError),
+        T.annotateLogs(InvoiceService.name, deleteInvoice.name)
+      )
+
     return ({
+      deleteInvoice,
       createInvoice,
       getAllInvoices
     })
