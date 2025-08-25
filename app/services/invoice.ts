@@ -84,7 +84,7 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
           T.catchAll(() => T.succeed<readonly Invoice[]>([]))
         )
 
-        yield* T.logInfo(`Found ${stringify(responseJson)} invoices`)
+        yield* T.logInfo(`Found ${stringify(responseJson.length)} invoices`)
 
         return responseJson
       }).pipe(
