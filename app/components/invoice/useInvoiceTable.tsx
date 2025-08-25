@@ -12,7 +12,57 @@ import type { Invoice } from '~/types/Invoice'
 import { Badge } from '../ui/badge'
 
 const columnHelper = createColumnHelper<Invoice>()
-
+// Nouvelles couleurs avec un meilleur contraste pour l'accessibilité
+const getTypeColors = (type: string) => {
+  const colorMap: { [key: string]: { bg: string; text: string; border: string } } = {
+    'Carburant': {
+      bg: '#004D55',
+      text: '#FFFFFF',
+      border: '#003640'
+    },
+    'Entretien': {
+      bg: '#D91A5B',
+      text: '#FFFFFF',
+      border: '#B91450'
+    },
+    'Assurance': {
+      bg: '#EA6100',
+      text: '#FFFFFF',
+      border: '#D15500'
+    },
+    'Réparation': {
+      bg: '#DC2626',
+      text: '#FFFFFF',
+      border: '#B91C1C'
+    },
+    'Contrôle technique': {
+      bg: '#0891B2',
+      text: '#FFFFFF',
+      border: '#0E7490'
+    },
+    'Péage': {
+      bg: '#059669',
+      text: '#FFFFFF',
+      border: '#047857'
+    },
+    'Parking': {
+      bg: '#7C3AED',
+      text: '#FFFFFF',
+      border: '#6D28D9'
+    },
+    'Lavage': {
+      bg: '#C2410C',
+      text: '#FFFFFF',
+      border: '#9A3412'
+    },
+    'Autre': {
+      bg: '#374151',
+      text: '#FFFFFF',
+      border: '#1F2937'
+    }
+  }
+  return colorMap[type] || { bg: '#374151', text: '#FFFFFF', border: '#1F2937' }
+}
 export function useInvoiceTable(loaderInvoices: readonly Invoice[]) {
   const [invoices, setInvoices] = useState<Invoice[]>([])
   useEffect(() => {
@@ -78,14 +128,24 @@ export function useInvoiceTable(loaderInvoices: readonly Invoice[]) {
                 Type
               </span>
             ),
-            cell: ({ getValue }) => (
-              <span
-                className="text-left p-4 text-[#004D55]  text-sm"
-                style={{ fontFamily: 'Montserrat, sans-serif' }}
-              >
-                {getValue()}
-              </span>
-            ),
+            cell: ({ getValue }) => {
+              const type = getValue()
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+              const typeColors = getTypeColors(type)
+
+              return (
+                <Badge
+                  className="text-xs px-2 py-1 font-body font-medium border-0"
+                  style={{
+                    backgroundColor: typeColors.bg,
+                    color: typeColors.text,
+                    fontFamily: 'Montserrat, sans-serif'
+                  }}
+                >
+                  {type}
+                </Badge>
+              )
+            },
             footer: props => props.column.id
           }),
           columnHelper.accessor('name', {
