@@ -137,7 +137,7 @@ export function useTripTable(
                 className="text-left p-4 text-[#004D55] font-semibold text-sm"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
-                Personnes
+                Conducteurs
               </span>
             ),
             footer: props => props.column.id,
