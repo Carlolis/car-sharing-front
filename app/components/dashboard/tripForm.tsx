@@ -196,7 +196,7 @@ export const NewTripForm = (
                     className="text-[#004D55] text-sm lg:text-base font-body"
                     style={{ fontFamily: 'Montserrat, sans-serif' }}
                   >
-                    Personnes <span className="text-red-500">*</span>
+                    Conducteurs <span className="text-red-500">*</span>
                   </Label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="bg-white/80 border border-slate-300/60 rounded-md p-3 space-y-3 min-h-[44px] flex flex-col justify-center">
