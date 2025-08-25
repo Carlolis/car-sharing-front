@@ -22,7 +22,7 @@ export function DataTable<TData,>({ table }: DataTableProps<TData>) {
                 >
                   {headerGroup.headers.map(header => (
                     <th
-                      className="py-1 text-slate-800 text-sm lg:text-base min-w-[120px] text-left px-2"
+                      className="py-1  lg:text-base sm:min-w-[120px] text-center sm:text-left sm:px-2 "
                       style={{ fontFamily: 'Lato, sans-serif' }}
                       key={header.id}
                       colSpan={header.colSpan}
@@ -46,7 +46,13 @@ export function DataTable<TData,>({ table }: DataTableProps<TData>) {
                   {row.getVisibleCells().map(cell => (
                     <td
                       key={cell.id}
-                      className={`p-2 ${cell.column.id === 'distance' ? 'w-32' : ''}`}
+                      className={`sm:p-2 p-1 ${
+                        cell.column.id === 'drivers' ?
+                          'max-w-20' :
+                          cell.column.id === 'distance' ?
+                          'max-w-8' :
+                          'max-w-16'
+                      }  sm:w-28`}
                     >
                       {flexRender(
                         cell.column.columnDef.cell,

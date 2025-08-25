@@ -19,6 +19,7 @@ import { DriversArrayEnsure } from '~/types/api'
 import { Calendar1, Minus, Plus } from 'lucide-react'
 import { NewTripForm } from '~/components/dashboard/tripForm'
 import { Button } from '~/components/ui/button'
+import { useIsMobile } from '~/components/ui/use-mobile'
 import type { Route as t } from './+types/calendar'
 
 export const TripCalendar = Sc.Struct({
@@ -60,6 +61,7 @@ export const action = Remix.action(
 )
 
 export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps) {
+  const isMobile = useIsMobile()
   const [showForm, setShowForm] = useState(false)
   const [startDate, setStartDate] = useState<Date | undefined>(undefined)
 
@@ -183,11 +185,11 @@ export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps
               {(showForm || updateTrip) ?
                 <Minus className="h-4 w-4 lg:h-5 lg:w-5 mr-2" /> :
                 <Plus className="h-4 w-4 lg:h-5 lg:w-5 mr-2" />}
-              <span className="hidden sm:inline">
-                {(showForm || updateTrip) ? 'Annuler' : 'Nouveau trajet'}
-              </span>
-              <span className="sm:hidden">
-                {(showForm || updateTrip) ? 'Annuler' : 'Nouveau'}
+
+              <span className="hidden  sm:inline">
+                {(showForm || updateTrip) ?
+                  'Annuler' :
+                  `${isMobile ? 'Nouveau' : 'Nouveau trajet'}`}
               </span>
             </Button>
           </motion.div>

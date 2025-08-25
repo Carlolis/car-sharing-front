@@ -30,6 +30,7 @@ import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { Checkbox } from '../ui/checkbox'
 import { Label } from '../ui/label'
+import { useIsMobile } from '../ui/use-mobile'
 import { TaggedUpdateTrip } from './DashboardArguments'
 import { DeleteButton } from './DeleteButton'
 
@@ -39,6 +40,7 @@ export function useTripTable(
   loaderTrips: readonly TripUpdate[],
   setTripUpdate: (tripUpdate: TripUpdate | undefined) => void
 ) {
+  const isMobile = useIsMobile()
   const [trips, setTrips] = useState<TripUpdate[]>([])
   useEffect(() => {
     setTrips([...loaderTrips])
@@ -56,10 +58,10 @@ export function useTripTable(
             id: 'startDate',
             header: () => (
               <span
-                className="text-left p-4 text-[#004D55] font-semibold text-sm"
+                className="text-left sm:p-4 p-1 text-[#004D55] font-semibold text-xs sm:text-sm"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
-                Date de début
+                {isMobile ? 'Début' : 'Date de début'}
               </span>
             ),
             footer: props => props.column.id,
@@ -74,13 +76,13 @@ export function useTripTable(
               }, [initialValue])
               return (
                 <div
-                  className="font-medium text-slate-900 flex items-center gap-1 text-sm lg:text-base"
+                  className="font-medium text-slate-900 flex items-center gap-1 text-xs sm:text-sm lg:text-base w-18 sm:w-full"
                   style={{ fontFamily: 'Lato, sans-serif' }}
                 >
-                  <Calendar className="h-3 w-3 text-slate-500 flex-shrink-0" />
+                  {isMobile ? null : <Calendar className="h-3 w-3 text-slate-500 flex-shrink-0" />}
                   <DatePicker
-                    dateFormat={'dd/MM/yyyy'}
-                    className="p-2 w-full"
+                    dateFormat={'dd/M/yyyy'}
+                    className="sm:p-2 sm:w-full w-18"
                     selected={startDate}
                     onChange={date => {
                       setStartDate(date)
@@ -95,10 +97,10 @@ export function useTripTable(
             id: 'endDate',
             header: () => (
               <span
-                className="text-left p-4 text-[#004D55] font-semibold text-sm"
+                className="text-left sm:p-4 p-1 text-[#004D55] font-semibold text-xs sm:text-sm"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
-                Date de fin
+                {isMobile ? 'Fin' : ' Date de fin'}
               </span>
             ),
             footer: props => props.column.id,
@@ -113,12 +115,13 @@ export function useTripTable(
               }, [initialValue])
               return (
                 <div
-                  className="font-medium text-slate-900 flex items-center gap-1 text-sm lg:text-base"
+                  className="font-medium text-slate-900 flex items-center gap-1 text-xs sm:text-sm lg:text-base"
                   style={{ fontFamily: 'Lato, sans-serif' }}
                 >
-                  <Calendar className="h-3 w-3 text-slate-500 flex-shrink-0" />
+                  {isMobile ? null : <Calendar className="h-3 w-3 text-slate-500 flex-shrink-0" />}
                   <DatePicker
-                    dateFormat={'dd/MM/yyyy'}
+                    dateFormat={'dd/M/yyyy'}
+                    className="sm:p-2 sm:w-full w-24 "
                     selected={startDate}
                     onChange={date => {
                       setStartDate(date)
@@ -134,10 +137,10 @@ export function useTripTable(
             id: 'drivers',
             header: () => (
               <span
-                className="text-left p-4 text-[#004D55] font-semibold text-sm"
+                className="text-left sm:p-4 p-1 text-[#004D55]  font-semibold text-xs sm:text-sm"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
-                Conducteurs
+                {isMobile ? 'Qui' : 'Conducteurs'}
               </span>
             ),
             footer: props => props.column.id,
@@ -163,18 +166,18 @@ export function useTripTable(
               ]
 
               return (
-                <div className="flex flex-col gap-2 py-1 min-w-[200px] cursor-pointer">
+                <div className="flex flex-col sm:gap-2 gap-1 py-1 sm:min-w-[200px]  cursor-pointer">
                   {personnes.map(personne => (
                     <Badge
                       key={personne.id}
-                      className="text-white border-0 shadow-sm text-xs lg:text-sm px-2 py-1 "
+                      className="text-white border-0 shadow-sm text-xs lg:text-sm px-2 py-1  "
                       style={{
                         background: `linear-gradient(135deg,#55C3E9CC, #55C3E9)`,
                         fontFamily: 'Lato, sans-serif'
                       }}
                     >
                       <Checkbox
-                        className="cursor-pointer"
+                        className="cursor-pointer "
                         disabled={drivers.length === 1 && drivers[0] == personne.id}
                         checked={A.contains(personne.id)(drivers)}
                         onCheckedChange={checked => {
@@ -182,7 +185,9 @@ export function useTripTable(
                             const personneIndex = pipe(
                               drivers,
                               A.findFirstIndex(v => v === personne.id),
-                              O.getOrElse(() => -1)
+                              O.getOrElse(() =>
+                                -1
+                              )
                             )
                             const newDrivers = A.remove(personneIndex)(drivers)
 
@@ -195,8 +200,10 @@ export function useTripTable(
                           }
                         }}
                       />
-                      <Label htmlFor="toggle">{personne.name}</Label>
-                      <User className="h-3 w-3 mr-1 flex-shrink-0" />
+                      <Label htmlFor="toggle " className="text-xs sm:text-sm">
+                        {personne.name}
+                      </Label>
+                      {isMobile ? null : <User className="h-3 w-3 mr-1 flex-shrink-0 " />}
                     </Badge>
                   ))}
                 </div>
@@ -207,7 +214,7 @@ export function useTripTable(
             id: 'name',
             header: () => (
               <span
-                className="text-left p-4 text-[#004D55] font-semibold text-sm"
+                className="text-left sm:p-4 p-1 text-[#004D55] font-semibold text-xs sm:text-sm"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
                 Titre
@@ -228,12 +235,12 @@ export function useTripTable(
 
               return (
                 <div
-                  className="font-medium text-slate-900 flex items-center gap-1 text-sm lg:text-base"
+                  className="font-medium text-slate-900 flex items-center text-xs sm:text-sm lg:text-base p-1"
                   style={{ fontFamily: 'Lato, sans-serif' }}
                 >
-                  <MapPin className="h-3 w-3 text-slate-500 flex-shrink-0" />
+                  {isMobile ? null : <MapPin className="h-3 w-3 text-slate-500 flex-shrink-0" />}
                   <input
-                    className=" p-2 w-full"
+                    className=" sm:p-2 w-full truncate"
                     value={value as string}
                     onChange={e => setValue(e.target.value)}
                     onBlur={onBlur}
@@ -246,10 +253,10 @@ export function useTripTable(
             id: 'distance',
             header: () => (
               <span
-                className="text-left p-4 text-[#004D55] font-semibold text-sm"
+                className="text-left sm:p-4 p-1 text-[#004D55] font-semibold text-xs sm:text-sm"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
-                Distance
+                {isMobile ? 'Km' : 'Distance'}
               </span>
             ),
             footer: props => props.column.id,
@@ -267,16 +274,16 @@ export function useTripTable(
 
               return (
                 <span
-                  className="text-sm font-medium text-gray-900 font-body"
+                  className="text-xs sm:text-sm font-medium text-gray-900 font-body"
                   style={{ fontFamily: 'Montserrat, sans-serif' }}
                 >
                   <input
-                    className="py-1 w-1/3 bg-amber-50 "
+                    className="py-1 w-1/3 bg-amber-50 min-w-8"
                     value={value}
                     onChange={e => setValue(+e.target.value)}
                     onBlur={onBlur}
                   />
-                  <span>km</span>
+                  {isMobile ? null : <span>km</span>}
                 </span>
               )
             }
@@ -285,7 +292,7 @@ export function useTripTable(
             id: 'actions',
             header: () => (
               <span
-                className="text-left p-4 text-[#004D55] font-semibold text-sm"
+                className="text-left sm:p-4 p-1 text-[#004D55] font-semibold text-xs sm:text-sm"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
                 Actions
@@ -338,14 +345,15 @@ export function useTripTable(
                         </AlertDialogDescription>
                       </AlertDialogHeader>
 
-                      <AlertDialogFooter className="gap-3">
+                      <AlertDialogFooter className="gap-3 flex flex-row justify-around px-4">
                         <AlertDialogCancel
-                          className="border-gray-300 text-[#004D55] hover:bg-gray-50 font-body"
+                          className="border-gray-300 text-[#004D55] hover:bg-gray-50 font-body max-w-20"
                           style={{ fontFamily: 'Montserrat, sans-serif' }}
                         >
                           Non
                         </AlertDialogCancel>
                         <AlertDialogAction
+                          className="max-w-60"
                           style={{ fontFamily: 'Montserrat, sans-serif' }}
                         >
                           <DeleteButton

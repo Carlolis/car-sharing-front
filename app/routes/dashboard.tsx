@@ -22,6 +22,7 @@ import { NewTripForm } from '~/components/dashboard/tripForm'
 import { useTripTable } from '~/components/dashboard/useTripTable'
 import { Button } from '~/components/ui/button'
 import { DataTable } from '~/components/ui/data-table'
+import { useIsMobile } from '~/components/ui/use-mobile'
 import { matchTripArgs } from '~/lib/utils'
 import type { TripUpdate } from '~/types/api'
 import type { Route } from './+types/dashboard'
@@ -74,6 +75,7 @@ export const action = Remix.unwrapAction(
 export default function Dashboard(
   { loaderData, actionData }: Route.ComponentProps
 ) {
+  const isMobile = useIsMobile()
   const [updateTrip, setUpdateTrip] = useState<TripUpdate | undefined>(undefined)
   const [showForm, setShowForm] = useState<boolean>(false)
 
@@ -93,8 +95,8 @@ export default function Dashboard(
     setShowForm(!showForm)
   }
   return (
-    <div className="relative z-10 p-6 lg:p-12 w-full">
-      <div className="space-y-6 lg:space-y-8 mx-auto px-10">
+    <div className="relative z-10 p-3 lg:p-12 w-full">
+      <div className="space-y-6 lg:space-y-8 mx-auto sm:px-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -157,7 +159,7 @@ export default function Dashboard(
               transition={{ duration: 0.5 }}
               className="flex items-center justify-between"
             >
-              <h2 className="text-xl lg:text-2xl font-semibold text-[#004D55] font-heading">
+              <h2 className=" text-sm  sm:text-2xl font-semibold text-[#004D55] font-heading">
                 Bugs et Suggestions
               </h2>
               <a
@@ -168,7 +170,7 @@ export default function Dashboard(
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
                 <Bug className="h-4 w-4 mr-2" />
-                Signaler des bugs/améliorations
+                {isMobile ? 'Signaler' : 'Signaler des bugs/améliorations'}
               </a>
             </motion.div>
             <motion.div
@@ -238,11 +240,10 @@ export default function Dashboard(
                   {(showForm || updateTrip) ?
                     <Minus className="h-4 w-4 lg:h-5 lg:w-5 mr-2" /> :
                     <Plus className="h-4 w-4 lg:h-5 lg:w-5 mr-2" />}
-                  <span className="hidden sm:inline">
-                    {(showForm || updateTrip) ? 'Annuler' : 'Nouveau trajet'}
-                  </span>
-                  <span className="sm:hidden">
-                    {(showForm || updateTrip) ? 'Annuler' : 'Nouveau'}
+                  <span className=" sm:inline">
+                    {(showForm || updateTrip) ?
+                      'Annuler' :
+                      `${isMobile ? 'Nouveau' : 'Nouveau trajet'}`}
                   </span>
                 </Button>
               </motion.div>
