@@ -23,13 +23,13 @@ interface InvoiceFormProps {
   showForm: boolean
   updateInvoice: boolean
   isLoading: boolean
+  setShowForm: (showForm: boolean) => void
 }
 
 export default function InvoiceForm(
-  { actionData, showForm, updateInvoice, isLoading }: InvoiceFormProps
+  { actionData, showForm, updateInvoice, isLoading, setShowForm }: InvoiceFormProps
 ) {
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
-  const [tripInfos, setTripInfos] = useState<string | undefined>(undefined)
 
   const typesFactures = [
     'Carburant',
@@ -50,7 +50,7 @@ export default function InvoiceForm(
         identity
       ),
       Match.tag('InvoiceName', ({ invoiceName }) => {
-        setTripInfos(`La facture ${invoiceName} a été enregistrée avec succès`)
+        setShowForm(false)
       }),
       Match.tag('SimpleTaggedError', ({ message }) => {
         setErrorMessage(message)
@@ -61,7 +61,7 @@ export default function InvoiceForm(
     )
 
     match(actionData)
-  }, [actionData])
+  }, [actionData, setShowForm])
 
   const personnes = [
     { id: 'maé' as const, name: 'Maé' },
@@ -99,11 +99,6 @@ export default function InvoiceForm(
               </div>
             )}
 
-            {tripInfos && (
-              <div className="m-6 p-4 text-green-700 bg-green-100 rounded">
-                {tripInfos}
-              </div>
-            )}
             <CardContent>
               <Form
                 method="post"

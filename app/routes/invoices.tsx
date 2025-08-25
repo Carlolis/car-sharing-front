@@ -195,6 +195,7 @@ export default function InvoicesPage({ loaderData, actionData }: Route.Component
           showForm={showForm}
           updateInvoice={false}
           isLoading={navigation.formAction == '/invoices'}
+          setShowForm={setShowForm}
         />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
