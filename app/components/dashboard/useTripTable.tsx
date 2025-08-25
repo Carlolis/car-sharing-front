@@ -372,7 +372,7 @@ export function useTripTable(
         ]
       }
     ],
-    [submit]
+    [submit, isMobile, setTripUpdate]
   )
 
   const table = useReactTable({
