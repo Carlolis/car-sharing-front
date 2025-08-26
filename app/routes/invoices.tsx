@@ -126,8 +126,8 @@ export default function InvoicesPage({ loaderData, actionData }: Route.Component
     setShowForm(!showForm)
   }
   return (
-    <div className="relative z-10 p-6 lg:p-12 w-full">
-      <div className="space-y-6 lg:space-y-8 mx-auto px-10">
+    <div className="relative z-10 p-3 lg:p-12 w-full">
+      <div className="space-y-6 lg:space-y-8 mx-auto sm:px-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

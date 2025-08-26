@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState } from 'react'
 
 import type { Invoice } from '~/types/Invoice'
 import { Badge } from '../ui/badge'
+import { useIsMobile } from '../ui/use-mobile'
 
 const columnHelper = createColumnHelper<Invoice>()
 // Nouvelles couleurs avec un meilleur contraste pour l'accessibilité
@@ -64,6 +65,7 @@ const getTypeColors = (type: string) => {
   return colorMap[type] || { bg: '#374151', text: '#FFFFFF', border: '#1F2937' }
 }
 export function useInvoiceTable(loaderInvoices: readonly Invoice[]) {
+  const isMobile = useIsMobile()
   const [invoices, setInvoices] = useState<Invoice[]>([])
   useEffect(() => {
     setInvoices([...loaderInvoices])
@@ -74,7 +76,7 @@ export function useInvoiceTable(loaderInvoices: readonly Invoice[]) {
       {
         id: 'invoices',
         header: () => (
-          <div className="flex items-center gap-3 w-full p-2">
+          <div className="flex items-center gap-3 w-full p-2 ">
             <motion.div
               animate={{ scale: [1, 1.1, 1] }}
               transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
@@ -83,7 +85,7 @@ export function useInvoiceTable(loaderInvoices: readonly Invoice[]) {
               <Receipt className="h-5 w-5 text-[#004D55]" />
             </motion.div>
             <span
-              className="text-lg lg:text-xl text-[#004D55] font-semibold text-left font-heading"
+              className="text-sm sm:text-lg  lg:text-xl text-[#004D55] font-semibold text-left font-heading"
               style={{ fontFamily: 'Montserrat Alternates, sans-serif' }}
             >
               Liste des factures
@@ -103,7 +105,7 @@ export function useInvoiceTable(loaderInvoices: readonly Invoice[]) {
           columnHelper.accessor('date', {
             header: () => (
               <span
-                className="text-left p-4 text-[#004D55] font-semibold text-sm"
+                className="text-left sm:p-4 text-[#004D55] font-semibold text-xs sm:text-sm"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
                 Date
@@ -112,17 +114,23 @@ export function useInvoiceTable(loaderInvoices: readonly Invoice[]) {
             footer: props => props.column.id,
             cell: ({ getValue }) => (
               <span
-                className="text-left p-4 text-[#004D55]  text-sm"
+                className="text-left sm:p-4 text-[#004D55]  text-xs sm:text-sm"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
-                {getValue<Date>().toLocaleDateString('fr-FR')}
+                {isMobile ?
+                  new Intl.DateTimeFormat('fr-FR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: '2-digit'
+                  }).format(getValue<Date>()) :
+                  getValue<Date>().toLocaleDateString('fr-FR')}
               </span>
             )
           }),
           columnHelper.accessor('kind', {
             header: () => (
               <span
-                className="text-left p-4 text-[#004D55] font-semibold text-sm"
+                className="text-left sm:p-4 text-[#004D55] font-semibold text-xs sm:text-sm"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
                 Type
@@ -151,26 +159,26 @@ export function useInvoiceTable(loaderInvoices: readonly Invoice[]) {
           columnHelper.accessor('name', {
             header: () => (
               <span
-                className="text-left p-4 text-[#004D55] font-semibold text-sm"
+                className="text-left sm:p-4 text-[#004D55] font-semibold text-xs sm:text-sm "
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
                 Nom
               </span>
             ),
             cell: ({ getValue }) => (
-              <span
-                className="text-left p-4 text-[#004D55]  text-sm"
+              <div
+                className="text-left sm:p-4 text-[#004D55]  text-xs sm:text-sm truncate "
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
                 {getValue()}
-              </span>
+              </div>
             ),
             footer: props => props.column.id
           }),
           columnHelper.accessor('amount', {
             header: () => (
               <span
-                className="text-left p-4 text-[#004D55] font-semibold text-sm"
+                className="text-left sm:p-4 text-[#004D55] font-semibold text-xs sm:text-sm"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
                 Montant
@@ -178,7 +186,7 @@ export function useInvoiceTable(loaderInvoices: readonly Invoice[]) {
             ),
             cell: ({ getValue }) => (
               <span
-                className="text-left p-4 text-[#004D55] font-semibold text-sm"
+                className="text-left sm:p-4 text-[#004D55] font-semibold text-xs sm:text-sm"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
                 {getValue()} €
@@ -190,18 +198,18 @@ export function useInvoiceTable(loaderInvoices: readonly Invoice[]) {
           columnHelper.accessor('mileage', {
             header: () => (
               <span
-                className="text-left p-4 text-[#004D55] font-semibold text-sm"
+                className="text-left sm:p-4 text-[#004D55] font-semibold text-xs sm:text-sm"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
-                Kilométrage
+                {isMobile ? 'Km' : 'Kilométrage'}
               </span>
             ),
             cell: ({ getValue }) => (
               <span
-                className="text-left p-4 text-[#004D55] font-semibold text-sm"
+                className="text-left sm:p-4 text-[#004D55] font-semibold text-xs sm:text-sm"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
-                {getValue()} Km
+                {getValue()} {isMobile ? null : 'Km'}
               </span>
             ),
             footer: props => props.column.id
@@ -209,7 +217,7 @@ export function useInvoiceTable(loaderInvoices: readonly Invoice[]) {
           columnHelper.accessor('drivers', {
             header: () => (
               <span
-                className="text-left p-4 text-[#004D55] font-semibold text-sm"
+                className="text-left p-4 text-[#004D55] font-semibold text-xs sm:text-sm"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
                 Payé par
@@ -218,7 +226,11 @@ export function useInvoiceTable(loaderInvoices: readonly Invoice[]) {
             footer: props => props.column.id,
             cell: ({ getValue }) => {
               const drivers = getValue<string[]>()
-              return drivers.join(', ')
+              return (
+                <span className="text-left p-4 text-[#004D55] font-semibold text-xs sm:text-sm">
+                  {drivers.join(', ')}
+                </span>
+              )
             }
           })
         ]

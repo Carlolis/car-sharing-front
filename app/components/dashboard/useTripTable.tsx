@@ -81,7 +81,7 @@ export function useTripTable(
                 >
                   {isMobile ? null : <Calendar className="h-3 w-3 text-slate-500 flex-shrink-0" />}
                   <DatePicker
-                    dateFormat={'dd/M/yyyy'}
+                    dateFormat={isMobile ? 'dd/M/yy' : 'dd/MM/yyyy'}
                     className="sm:p-2 sm:w-full w-18"
                     selected={startDate}
                     onChange={date => {
@@ -120,7 +120,7 @@ export function useTripTable(
                 >
                   {isMobile ? null : <Calendar className="h-3 w-3 text-slate-500 flex-shrink-0" />}
                   <DatePicker
-                    dateFormat={'dd/M/yyyy'}
+                    dateFormat={isMobile ? 'dd/M/yy' : 'dd/MM/yyyy'}
                     className="sm:p-2 sm:w-full w-24 "
                     selected={startDate}
                     onChange={date => {
