@@ -62,6 +62,7 @@ export const action = Remix.action(
 
 export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps) {
   const isMobile = useIsMobile()
+
   const [showForm, setShowForm] = useState(false)
   const [startDate, setStartDate] = useState<Date | undefined>(undefined)
 
@@ -137,8 +138,8 @@ export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps
   }
 
   return (
-    <div className="relative z-10 p-6 lg:p-12 w-full">
-      <div className="space-y-6 lg:space-y-8 mx-auto px-10">
+    <div className="relative z-10 p-3 lg:p-12 w-full">
+      <div className="space-y-6 lg:space-y-8 mx-auto lg:px-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -186,7 +187,7 @@ export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps
                 <Minus className="h-4 w-4 lg:h-5 lg:w-5 mr-2" /> :
                 <Plus className="h-4 w-4 lg:h-5 lg:w-5 mr-2" />}
 
-              <span className="hidden  sm:inline">
+              <span className="inline">
                 {(showForm || updateTrip) ?
                   'Annuler' :
                   `${isMobile ? 'Nouveau' : 'Nouveau trajet'}`}

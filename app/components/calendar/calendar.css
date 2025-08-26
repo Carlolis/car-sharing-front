@@ -25,6 +25,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+@media (max-width: 767px) {
+  .rbc-event-content {
+    font-size: 14px;
+  }
+}
 
 .rbc-row-content {
   position: relative;
@@ -32,10 +37,17 @@
   cursor: pointer;
 }
 
+@media (max-width: 767px) {
+  .rbc-row-content {
+    height: 6rem;
+  }
+}
+
 /* Month header */
 .rbc-toolbar {
   display: flex;
   flex-direction: row-reverse;
+
   align-items: center;
   margin-bottom: 10px;
   font-size: 18px;
@@ -43,7 +55,14 @@
   padding: 1rem;
   border-bottom: solid 1px hsl(var(--border));
 }
+
+@media (max-width: 767px) {
+  .rbc-toolbar {
+    flex-direction: column-reverse; /* Change flex direction to column-reverse */
+  }
+}
 .rbc-toolbar .rbc-toolbar-label {
+  margin-bottom: 12px;
   flex-grow: 1;
   text-transform: capitalize;
   text-align: left;
@@ -74,6 +93,14 @@
   cursor: pointer;
 }
 
+@media (max-width: 767px) {
+  .rbc-event,
+  .rbc-slot-selection {
+    padding: 0.2rem;
+    margin: 0 0.2rem;
+  }
+}
+
 .rbc-event.rbc-selected {
   background-color: rgb(0, 76, 255) 176;
 }
@@ -91,6 +118,12 @@
   flex-direction: column;
   height: auto;
   padding: 1.2rem 1.2rem;
+}
+
+@media (max-width: 767px) {
+  .rbc-month-view {
+    padding: 0.4rem 0.4rem;
+  }
 }
 
 .rbc-month-row {
@@ -124,6 +157,19 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+@media (max-width: 767px) {
+  .rbc-btn-group {
+    padding: 2px 8px;
+    font-size: 12px;
+  }
+}
+@media (max-width: 767px) {
+  .rbc-toolbar button {
+    padding: 2px 6px;
+    font-size: 16px;
+  }
 }
 
 .rbc-toolbar button:hover:first-child {
@@ -172,11 +218,23 @@
 
 .rbc-date-cell {
   flex: 1 1 0;
-  min-width: 0;
   padding: 2px 4px;
   text-align: left;
   color: #004d55;
 }
+
+@media (max-width: 767px) {
+  .rbc-date-cell {
+    padding: 0; /* Change flex direction to column-reverse */
+  }
+}
+@media (max-width: 767px) {
+  .rbc-date-cell button {
+    margin: 0.6rem;
+    margin-bottom: 0.1rem; /* Change flex direction to column-reverse */
+  }
+}
+
 .rbc-date-cell.rbc-now {
   font-weight: bold;
   color: red;
