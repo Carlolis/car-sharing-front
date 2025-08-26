@@ -137,8 +137,8 @@ export function useInvoiceTable(loaderInvoices: readonly Invoice[]) {
               </span>
             ),
             cell: ({ getValue }) => {
-              const type = getValue()
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+              const type = getValue() as string
+
               const typeColors = getTypeColors(type)
 
               return (
@@ -150,7 +150,7 @@ export function useInvoiceTable(loaderInvoices: readonly Invoice[]) {
                     fontFamily: 'Montserrat, sans-serif'
                   }}
                 >
-                  {type}
+                  {isMobile ? type[0] : type}
                 </Badge>
               )
             },
