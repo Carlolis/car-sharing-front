@@ -15,6 +15,7 @@ import { Reimbursement } from '~/components/invoice/reimbursement'
 import { useInvoiceTable } from '~/components/invoice/useInvoiceTable'
 import { Button } from '~/components/ui/button'
 import { DataTable } from '~/components/ui/data-table'
+import { useIsMobile } from '~/components/ui/use-mobile'
 import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
 import { Remix } from '~/runtime/Remix'
 import { Redirect, Unexpected } from '~/runtime/ServerResponse'
@@ -109,6 +110,7 @@ export const action = Remix.action(
 )
 
 export default function InvoicesPage({ loaderData, actionData }: Route.ComponentProps) {
+  const isMobile = useIsMobile()
   const navigation = useNavigation()
 
   const [showForm, setShowForm] = useState<boolean>(false)
@@ -214,7 +216,7 @@ export default function InvoicesPage({ loaderData, actionData }: Route.Component
             style={{ fontFamily: 'Montserrat, sans-serif' }}
           >
             <Receipt className="h-4 w-4 mr-2" />
-            Voir toutes les factures sur Nextcloud
+            {isMobile ? 'Voir les factures' : 'Voir les factures sur Nextcloud'}
           </a>
         </motion.div>
         <DataTable table={table} />

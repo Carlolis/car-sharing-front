@@ -181,7 +181,7 @@ export function useInvoiceTable(loaderInvoices: readonly Invoice[]) {
                 className="text-left sm:p-4 text-[#004D55] font-semibold text-xs sm:text-sm"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
-                Montant
+                {isMobile ? '€' : 'Montant'}
               </span>
             ),
             cell: ({ getValue }) => (
@@ -189,7 +189,7 @@ export function useInvoiceTable(loaderInvoices: readonly Invoice[]) {
                 className="text-left sm:p-4 text-[#004D55] font-semibold text-xs sm:text-sm"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
-                {getValue()} €
+                {getValue()} {isMobile ? null : '€'}
               </span>
             ),
             footer: props => props.column.id
@@ -236,7 +236,7 @@ export function useInvoiceTable(loaderInvoices: readonly Invoice[]) {
         ]
       }
     ],
-    [invoices.length]
+    [invoices.length, isMobile]
   )
 
   const table = useReactTable({
