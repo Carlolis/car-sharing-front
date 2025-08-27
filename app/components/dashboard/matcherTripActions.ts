@@ -1,8 +1,6 @@
-import { type ClassValue, clsx } from 'clsx'
 import { Match, pipe } from 'effect'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
-import { twMerge } from 'tailwind-merge'
 import type { TripActions } from '~/components/dashboard/TripActions'
 import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
 
