@@ -4,7 +4,7 @@ import {
   getCoreRowModel,
   useReactTable
 } from '@tanstack/react-table'
-import { Receipt } from 'lucide-react'
+import { Download, Receipt } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -236,6 +236,42 @@ export function useInvoiceTable(
                 </span>
               )
             }
+          }),
+          columnHelper.accessor('downloadUrl', {
+            id: 'download',
+            header: () => (
+              <span
+                className="text-left sm:p-4 p-1 text-[#004D55] font-semibold text-xs sm:text-sm"
+                style={{ fontFamily: 'Montserrat, sans-serif' }}
+              >
+                {isMobile ? 'DL' : 'Fichier'}
+              </span>
+            ),
+            cell: ({ getValue, row }) => {
+              const downloadUrl = getValue() as string | undefined
+              const fileName = row.original.fileName
+              
+              if (!downloadUrl || !fileName) {
+                return (
+                  <span className="text-gray-400 text-xs sm:text-sm p-4">
+                    Aucun fichier
+                  </span>
+                )
+              }
+              
+              return (
+                <a
+                  href={downloadUrl}
+                  download={fileName}
+                  className="inline-flex items-center gap-1 text-[#004D55] hover:text-[#003640] transition-colors p-4"
+                  title={`Télécharger ${fileName}`}
+                >
+                  <Download className="h-4 w-4" />
+                  {!isMobile && <span className="text-xs sm:text-sm">PDF</span>}
+                </a>
+              )
+            },
+            footer: props => props.column.id
           }),
           columnHelper.accessor('id', {
             id: 'actions',

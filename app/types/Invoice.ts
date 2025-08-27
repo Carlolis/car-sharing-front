@@ -8,7 +8,9 @@ export const Invoice = Sc.Struct({
   date: LocalDate,
   mileage: Sc.optional(Sc.Union(Sc.Number, Sc.NumberFromString)),
   kind: Sc.String,
-  drivers: DriversArrayEnsure
+  drivers: DriversArrayEnsure,
+  fileName: Sc.optional(Sc.String),
+  downloadUrl: Sc.optional(Sc.String)
 })
 
 export type Invoice = Sc.Schema.Type<typeof Invoice>

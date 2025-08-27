@@ -6,7 +6,7 @@ import { Label } from '~/components/ui/label'
 import type { Invoice } from '~/types/Invoice'
 
 import { Loader } from 'components/ui/shadcn-io/ai/loader'
-import { Edit3, Plus, Receipt } from 'lucide-react'
+import { Download, Edit3, Plus, Receipt } from 'lucide-react'
 import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group'
 import { Button } from '../ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
@@ -37,7 +37,8 @@ interface InvoiceFormProps {
 }
 
 export default function InvoiceForm(
-  { actionData, showForm, updateInvoice, isLoading, setShowForm, setInvoiceUpdate }: InvoiceFormProps
+  { actionData, showForm, updateInvoice, isLoading, setShowForm, setInvoiceUpdate }:
+    InvoiceFormProps
 ) {
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
 
@@ -147,7 +148,9 @@ export default function InvoiceForm(
                       type="date"
                       name="date"
                       required
-                      defaultValue={updateInvoice ? updateInvoice.date.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
+                      defaultValue={updateInvoice ?
+                        updateInvoice.date.toISOString().split('T')[0] :
+                        new Date().toISOString().split('T')[0]}
                       className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
                       style={{ fontFamily: 'Montserrat, sans-serif' }}
                     />
@@ -245,7 +248,10 @@ export default function InvoiceForm(
                   >
                     Payé par <span className="text-red-500">*</span>
                   </Label>
-                  <RadioGroup className="flex flex-col gap-2 py-2" name="drivers" defaultValue={updateInvoice?.drivers[0]}>
+                  <RadioGroup
+                    className="flex flex-col gap-2 py-2"
+                    name="drivers"
+                  >
                     {personnes.map(personne => (
                       <div key={personne.id} className="flex items-center gap-3 ">
                         <RadioGroupItem
@@ -262,6 +268,32 @@ export default function InvoiceForm(
                   <Label className="text-[#004D55] text-sm lg:text-base font-body">
                     Un fichier pdf/image ?
                   </Label>
+
+                  {updateInvoice?.downloadUrl && updateInvoice?.fileName && (
+                    <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Receipt className="h-4 w-4 text-blue-600" />
+                          <span className="text-sm text-blue-800 font-medium">
+                            Fichier actuel : {updateInvoice.fileName}
+                          </span>
+                        </div>
+                        <a
+                          href={updateInvoice.downloadUrl}
+                          download={updateInvoice.fileName}
+                          className="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700 transition-colors"
+                          title={`Télécharger ${updateInvoice.fileName}`}
+                        >
+                          <Download className="h-3 w-3" />
+                          Télécharger
+                        </a>
+                      </div>
+                      <p className="text-xs text-blue-600 mt-1">
+                        Vous pouvez uploader un nouveau fichier pour le remplacer
+                      </p>
+                    </div>
+                  )}
+
                   <Input
                     type="file"
                     accept=".pdf, .png, .jpg, .jpeg"
