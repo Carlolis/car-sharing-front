@@ -49,15 +49,15 @@ export const loader = Remix.loader(
 
 export const action = Remix.action(
   T.gen(function* () {
-    yield* T.gen(function* () {
-      yield* T.logInfo(`Dashboard action trigged....`)
+    // yield* T.gen(function* () {
+    //   yield* T.logInfo(`Invoice actions trigged....`)
 
-      const request = yield* HttpServerRequest.schemaBodyJson(InvoiceActions)
-      return yield* matcherInvoiceActions(request)
-    }).pipe(
-      T.tapError(T.logError),
-      T.catchTag('RequestError', error => new Unexpected({ error: error.message }))
-    )
+    //   const request = yield* HttpServerRequest.schemaBodyJson(InvoiceActions)
+    //   return yield* matcherInvoiceActions(request)
+    // }).pipe(
+    //   T.tapError(T.logError),
+    //   T.catchTag('RequestError', error => new Unexpected({ error: error.message }))
+    // )
 
     yield* T.logInfo(`Creating Invoice....`)
 
@@ -118,7 +118,7 @@ export const action = Remix.action(
     //   HttpBodyError: error => T.succeed(SimpleTaggedError(stringify(error)))
     // }),
     T.tapError(T.logError),
-    T.catchAll(() => new Redirect({ location: '/invoice/new' }))
+    T.catchAll(() => new Redirect({ location: '/invoices' }))
   )
 )
 

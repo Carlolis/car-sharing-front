@@ -60,7 +60,7 @@ export const loader = Remix.loader(
 
 export const action = Remix.action(
   T.gen(function* () {
-    yield* T.logInfo(`Dashboard action trigged....`)
+    yield* T.logInfo(`Trip actions trigged....`)
 
     const request = yield* HttpServerRequest.schemaBodyJson(TripActions)
     return yield* matcherTripActions(request)
