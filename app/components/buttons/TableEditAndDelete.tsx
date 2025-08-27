@@ -19,10 +19,11 @@ interface TableEditAndDeleteProps<T,> {
   setDataUpdate: (data: T) => void
   data: T
   getValue: () => string | undefined
+  entityType: 'trip' | 'invoice'
 }
 
 export const TableEditAndDelete = <T,>(
-  { setDataUpdate, data, getValue }: TableEditAndDeleteProps<T>
+  { setDataUpdate, data, getValue, entityType }: TableEditAndDeleteProps<T>
 ) => {
   const submit = useSubmit()
   return (
@@ -68,7 +69,7 @@ export const TableEditAndDelete = <T,>(
                 className="text-[#6B7280] font-body"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
-                Est-ce que tu es sûr de supprimer ce trajet ?
+                Est-ce que tu es sûr de supprimer ?
               </AlertDialogDescription>
             </AlertDialogHeader>
 
@@ -84,8 +85,9 @@ export const TableEditAndDelete = <T,>(
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
                 <DeleteButton
-                  tripId={getValue()}
+                  id={getValue()}
                   submit={submit}
+                  entityType={entityType}
                 />
               </AlertDialogAction>
             </AlertDialogFooter>

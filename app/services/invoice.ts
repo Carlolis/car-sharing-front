@@ -108,7 +108,15 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
 
     const deleteInvoice = (invoiceId: string) =>
       T.gen(function* () {
-        const deleteUrl = pipe(deleteRequest, HttpClientRequest.appendUrl(`/invoices/${invoiceId}`))
+        const cookieSession = yield* CookieSessionStorage
+        yield* T.logDebug(`Getting token....`)
+        const token = yield* cookieSession.getUserToken()
+
+        const deleteUrl = pipe(
+          deleteRequest,
+          HttpClientRequest.setHeader('Authorization', `Bearer ${token}`),
+          HttpClientRequest.appendUrl(`/invoices/${invoiceId}`)
+        )
         const response = yield* defaultClient.execute(deleteUrl)
         yield* T.logInfo('InvoiceService deleteInvoice response :', response)
 

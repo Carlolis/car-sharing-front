@@ -2,29 +2,37 @@ import type { SubmitFunction } from 'react-router'
 
 import { Trash2 } from 'lucide-react'
 
-import type { RoutePaths } from '../../routes'
+import { TaggedDeleteInvoice } from '../invoice/InvoiceActions'
 import { Button } from '../ui/button'
 import { TaggedDeleteTrip } from './TripActions'
 
 type DeleteButtonProps = {
-  tripId?: string
+  id?: string
   submit?: SubmitFunction
-  route?: RoutePaths
+  entityType: 'trip' | 'invoice'
 }
 
-export const DeleteButton = ({ tripId, submit, route }: DeleteButtonProps): JSX.Element => {
+export const DeleteButton = ({ id, submit, entityType }: DeleteButtonProps): JSX.Element => {
   const handleClick = () => {
-    if (!tripId || !submit || !route) return
+    if (!id || !submit) return
 
-    const taggedDeletedTrip = TaggedDeleteTrip.make({
-      tripId
-    })
-
-    submit(taggedDeletedTrip, {
-      action: route,
-      method: 'post',
-      encType: 'application/json'
-    })
+    if (entityType === 'trip') {
+      const taggedDeletedTrip = TaggedDeleteTrip.make({
+        tripId: id
+      })
+      submit(taggedDeletedTrip, {
+        method: 'post',
+        encType: 'application/json'
+      })
+    } else if (entityType === 'invoice') {
+      const taggedDeletedInvoice = TaggedDeleteInvoice.make({
+        invoiceId: id
+      })
+      submit(taggedDeletedInvoice, {
+        method: 'post',
+        encType: 'multipart/form-data'
+      })
+    }
   }
 
   return (

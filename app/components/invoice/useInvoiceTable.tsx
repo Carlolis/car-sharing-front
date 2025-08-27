@@ -252,6 +252,7 @@ export function useInvoiceTable(
                 data={row.original}
                 getValue={getValue}
                 setDataUpdate={setInvoiceUpdate}
+                entityType="invoice"
               />
             )
           })

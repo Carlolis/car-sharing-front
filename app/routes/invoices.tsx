@@ -1,16 +1,11 @@
 import { HttpServerRequest } from '@effect/platform'
-import { FileSystem } from '@effect/platform/FileSystem'
-import { FilesSchema } from '@effect/platform/Multipart'
-import { pipe, Schema as Sc } from 'effect'
+import { Loader } from 'components/ui/shadcn-io/ai/loader'
 import * as T from 'effect/Effect'
-import { stringify } from 'effect/FastCheck'
-import * as O from 'effect/Option'
-import { TreeFormatter } from 'effect/ParseResult'
 import { Minus, Plus, Receipt } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useState } from 'react'
 import { useNavigation } from 'react-router'
-import { InvoiceActions } from '~/components/invoice/InvoiceActions'
+import { InvoiceActions, InvoiceCreateFormTagged } from '~/components/invoice/InvoiceActions'
 import InvoiceForm from '~/components/invoice/invoiceForm'
 import { matcherInvoiceActions } from '~/components/invoice/matcherInvoiceActions'
 import { Reimbursement } from '~/components/invoice/reimbursement'
@@ -18,23 +13,11 @@ import { useInvoiceTable } from '~/components/invoice/useInvoiceTable'
 import { Button } from '~/components/ui/button'
 import { DataTable } from '~/components/ui/data-table'
 import { useIsMobile } from '~/components/ui/use-mobile'
-import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
 import { Remix } from '~/runtime/Remix'
 import { Redirect, Unexpected } from '~/runtime/ServerResponse'
 import { InvoiceService } from '~/services/invoice'
-import { DriversArrayEnsure, LocalDate } from '~/types/api'
 import type { Invoice } from '~/types/Invoice'
 import type { Route } from './+types/invoices'
-
-const InvoiceCreateForm = Sc.Struct({
-  name: Sc.String,
-  date: LocalDate,
-  mileage: Sc.String,
-  drivers: DriversArrayEnsure,
-  fileBytes: Sc.optional(FilesSchema),
-  kind: Sc.String,
-  amount: Sc.NumberFromString
-})
 
 export const loader = Remix.loader(
   T.gen(function* () {
@@ -49,75 +32,13 @@ export const loader = Remix.loader(
 
 export const action = Remix.action(
   T.gen(function* () {
-    // yield* T.gen(function* () {
-    //   yield* T.logInfo(`Invoice actions trigged....`)
+    yield* T.logInfo(`Invoice actions trigged....`)
 
-    //   const request = yield* HttpServerRequest.schemaBodyJson(InvoiceActions)
-    //   return yield* matcherInvoiceActions(request)
-    // }).pipe(
-    //   T.tapError(T.logError),
-    //   T.catchTag('RequestError', error => new Unexpected({ error: error.message }))
-    // )
-
-    yield* T.logInfo(`Creating Invoice....`)
-
-    const api = yield* InvoiceService
-
-    const invoiceCreate = yield* HttpServerRequest.schemaBodyForm(
-      InvoiceCreateForm
-    )
-
-    const file = pipe(invoiceCreate.fileBytes, O.fromNullable, O.map(file => file[0].path))
-
-    const fs = yield* FileSystem
-
-    // Reading the content of the same file where this code is written
-
-    const content = yield* pipe(
-      file,
-      T.flatMap(fs.readFile),
-      T.tapError(T.logWarning),
-      T.catchAll(() => T.succeed(undefined))
-    )
-    const fileName = pipe(
-      invoiceCreate?.fileBytes,
-      O.fromNullable,
-      O.flatMapNullable(fileBytes => fileBytes[0]),
-      O.map(r => r.name),
-      O.getOrUndefined
-    )
-
-    // yield* T.logInfo(`Creating Invoice.... ${stringify(invoiceCreate)}`)
-    const tripId = yield* api.createInvoice({
-      ...invoiceCreate,
-      fileBytes: content,
-      fileName
-    }).pipe(
-      T.as({ invoiceName: invoiceCreate.name, _tag: 'InvoiceName' as const })
-    )
-    yield* T.logInfo(`Invoice created .... ${stringify(tripId)}`)
-    return tripId
+    const request = yield* HttpServerRequest.schemaBodyForm(InvoiceActions)
+    return yield* matcherInvoiceActions(request)
   }).pipe(
-    T.catchTags({
-      ResponseError: error =>
-        T.gen(function* () {
-          const text = yield* error.response.text
-          yield* T.logError('Status Code : ', error.response.status)
-          yield* T.logError('Error text : ', text)
-          yield* T.logError('Description :', error.description)
-
-          return yield* T.succeed(SimpleTaggedError(stringify(text)))
-        }),
-      ParseError: error =>
-        T.gen(function* () {
-          yield* T.logError('Invoice Action Parse error  : ', TreeFormatter.formatErrorSync(error))
-          return yield* T.succeed(SimpleTaggedError(TreeFormatter.formatErrorSync(error)))
-        })
-    }),
-    // T.catchTags({
-    //   HttpBodyError: error => T.succeed(SimpleTaggedError(stringify(error)))
-    // }),
     T.tapError(T.logError),
+    T.catchTag('RequestError', error => new Unexpected({ error: error.message })),
     T.catchAll(() => new Redirect({ location: '/invoices' }))
   )
 )
@@ -125,7 +46,7 @@ export const action = Remix.action(
 export default function InvoicesPage({ loaderData, actionData }: Route.ComponentProps) {
   const isMobile = useIsMobile()
   const navigation = useNavigation()
-
+  const isLoading = navigation.formAction == '/invoices'
   const [invoiceUpdate, setInvoiceUpdate] = useState<Invoice | undefined>(undefined)
 
   const [showForm, setShowForm] = useState<boolean>(false)
@@ -209,7 +130,7 @@ export default function InvoicesPage({ loaderData, actionData }: Route.Component
           actionData={actionData}
           showForm={showForm}
           updateInvoice={false}
-          isLoading={navigation.formAction == '/invoices'}
+          isLoading={isLoading}
           setShowForm={setShowForm}
         />
         <motion.div
@@ -222,7 +143,7 @@ export default function InvoicesPage({ loaderData, actionData }: Route.Component
             Vos Factures
           </h2>
           <a
-            href="https://nextcloud.ilieff.fr/s/ebnrizzA8oHcZ3r"
+            href="https://nextcloud.ilieff.fr/s/KwDE9wpDzQwiBTM"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center px-4 py-2 bg-gradient-factures text-[#004D55] rounded-lg shadow-md hover:shadow-lg transition-all duration-300 text-sm lg:text-base font-medium"
@@ -232,7 +153,7 @@ export default function InvoicesPage({ loaderData, actionData }: Route.Component
             {isMobile ? 'Voir les factures' : 'Voir les factures sur Nextcloud'}
           </a>
         </motion.div>
-        <DataTable table={table} />
+        {isLoading ? <Loader /> : <DataTable table={table} />}
         <Reimbursement />
       </div>
     </div>

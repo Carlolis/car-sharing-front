@@ -13,13 +13,21 @@ import { Input } from '../ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 
 interface InvoiceFormProps {
-  actionData: {
-    invoiceName: string
-    _tag: 'InvoiceName'
-  } | {
-    message: string
-    _tag: 'SimpleTaggedError'
-  } | undefined
+  actionData:
+    | {
+      invoiceName: string
+      _tag: 'InvoiceName'
+    }
+    | {
+      message: string
+      _tag: 'SimpleTaggedError'
+    }
+    | {
+      readonly _tag: 'InvoiceId'
+      readonly invoiceId: string
+    }
+    | undefined
+
   showForm: boolean
   updateInvoice: boolean
   isLoading: boolean
@@ -106,6 +114,17 @@ export default function InvoiceForm(
                 encType="multipart/form-data"
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="hidden">
+                    <Label>
+                      Hidden tag
+                    </Label>
+
+                    <Input
+                      type="_tag"
+                      name="_tag"
+                      defaultValue={updateInvoice ? 'update' : 'create'}
+                    />
+                  </div>
                   <div>
                     <Label
                       className="text-[#004D55] text-sm lg:text-base font-body"

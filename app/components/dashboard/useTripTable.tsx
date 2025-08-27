@@ -287,6 +287,7 @@ export function useTripTable(
                 data={row.original}
                 getValue={getValue}
                 setDataUpdate={setTripUpdate}
+                entityType="trip"
               />
             )
           })
