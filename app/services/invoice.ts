@@ -203,7 +203,7 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
       )
 
     const getInvoiceDownloadUrl = (fileName: string, id: string): string =>
-      `http://localhost:8093/api/invoices/download/${encodeURIComponent(fileName)}/${id}`
+      `http://192.168.1.101:8081/api/invoices/download/${encodeURIComponent(fileName)}/${id}`
 
     const downloadInvoiceFile = (
       fileName: string,
