@@ -1,4 +1,4 @@
-import { HttpBody, HttpClientRequest, HttpClientResponse } from '@effect/platform'
+import { HttpClientRequest, HttpClientResponse } from '@effect/platform'
 import { pipe, Schema as Sc } from 'effect'
 
 import type { HttpClientError } from '@effect/platform/HttpClientError'
@@ -10,7 +10,7 @@ import { NotAuthenticated } from '~/runtime/errors/NotAuthenticatedError'
 import type { Redirect } from '~/runtime/ServerResponse'
 import { Invoice } from '~/types/Invoice'
 import type { InvoiceCreate } from '~/types/InvoiceCreate'
-import { InvoiceUpdate } from '~/types/InvoiceUpdate'
+import type { InvoiceUpdate } from '~/types/InvoiceUpdate'
 
 import { TaggedInvoiceId } from '~/types/InvoiceId'
 import { HttpService } from './httpClient'
@@ -141,27 +141,45 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
         T.annotateLogs(InvoiceService.name, deleteInvoice.name)
       )
 
-    const updateInvoice = (trip: InvoiceUpdate) =>
+    const updateInvoice = (invoice: InvoiceUpdate) =>
       T.gen(function* () {
         const cookieSession = yield* CookieSessionStorage
         yield* T.logDebug(`Getting token....`)
         const token = yield* cookieSession.getUserToken()
 
-        const body = yield* HttpBody.jsonSchema(InvoiceUpdate)(trip)
-        const updateTrip = pipe(
-          putRequest,
-          HttpClientRequest.appendUrl(`/invoices`),
-          HttpClientRequest.setHeader('Authorization', `Bearer ${token}`),
-          HttpClientRequest.setBody(body)
-        )
-        yield* T.logDebug(`About to update a trip.... ${stringify(trip)}`)
-        const response = yield* defaultClient.execute(updateTrip)
-        yield* T.logDebug(`Response status : ${response.status}`)
-        if (response.status === 401 || response.status === 400) {
-          const error = yield* response.text
-          yield* T.logError('Unauthorized Error', error)
-          yield* T.logError('Error status :', response.status)
+        yield* T.logInfo(`About to update invoice...`, {
+          ...invoice,
+          fileBytes: invoice.fileBytes?.length
+        })
+        
+        const invoiceUrl = pipe(putRequest, HttpClientRequest.appendUrl('/invoices'))
+        const formData = new FormData()
+        
+        formData.append('id', invoice.id)
+        formData.append('name', invoice.name)
+        if (invoice.fileBytes) {
+          formData.append('fileBytes', new Blob([invoice.fileBytes]), 'invoice.pdf')
         }
+
+        formData.append('date', invoice.date.toISOString().split('T')[0])
+
+        if (invoice.mileage.length) formData.append('mileage', JSON.stringify(+invoice.mileage))
+
+        formData.append('amount', JSON.stringify(invoice.amount))
+
+        formData.append('fileName', JSON.stringify(invoice.fileName))
+        formData.append('kind', invoice.kind)
+        invoice.drivers.forEach(driver => formData.append('drivers', driver))
+
+        const updateInvoiceRequest = pipe(
+          invoiceUrl,
+          HttpClientRequest.setHeader('Authorization', `Bearer ${token}`),
+          HttpClientRequest.bodyFormData(formData)
+        )
+
+        const response = yield* defaultClient.execute(updateInvoiceRequest).pipe(
+          T.tapError(T.logError)
+        )
 
         return yield* pipe(
           response,

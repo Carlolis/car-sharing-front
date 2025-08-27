@@ -5,7 +5,7 @@ import { Minus, Plus, Receipt } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useState } from 'react'
 import { useNavigation } from 'react-router'
-import { InvoiceActions, InvoiceCreateFormTagged } from '~/components/invoice/InvoiceActions'
+import { InvoiceActions } from '~/components/invoice/InvoiceActions'
 import InvoiceForm from '~/components/invoice/invoiceForm'
 import { matcherInvoiceActions } from '~/components/invoice/matcherInvoiceActions'
 import { Reimbursement } from '~/components/invoice/reimbursement'
@@ -54,10 +54,10 @@ export default function InvoicesPage({ loaderData, actionData }: Route.Component
   const table = useInvoiceTable(invoices, setInvoiceUpdate)
 
   const handleToggleForm = () => {
-    // if (updateTrip) {
-    //   setUpdateTrip(undefined)
-    //   return
-    // }
+    if (invoiceUpdate) {
+      setInvoiceUpdate(undefined)
+      return
+    }
 
     setShowForm(!showForm)
   }
@@ -102,13 +102,13 @@ export default function InvoicesPage({ loaderData, actionData }: Route.Component
             <Button
               onClick={handleToggleForm}
               className={`shadow-lg hover:shadow-xl transition-all duration-300 text-sm lg:text-base px-4 lg:px-6 py-2 lg:py-3 min-h-[44px] whitespace-nowrap rounded-lg ${
-                showForm ?
+                showForm || invoiceUpdate ?
                   'bg-red-600 hover:bg-red-700 text-white' :
                   'bg-[#004D55] hover:bg-[#003640] text-white'
               }`}
               style={{ fontFamily: 'Montserrat, sans-serif' }}
             >
-              {showForm ?
+              {showForm || invoiceUpdate ?
                 (
                   <>
                     <Minus className="h-4 w-4 lg:h-5 lg:w-5 mr-2" />
@@ -129,9 +129,10 @@ export default function InvoicesPage({ loaderData, actionData }: Route.Component
         <InvoiceForm
           actionData={actionData}
           showForm={showForm}
-          updateInvoice={false}
+          updateInvoice={invoiceUpdate}
           isLoading={isLoading}
           setShowForm={setShowForm}
+          setInvoiceUpdate={setInvoiceUpdate}
         />
         <motion.div
           initial={{ opacity: 0, y: 20 }}

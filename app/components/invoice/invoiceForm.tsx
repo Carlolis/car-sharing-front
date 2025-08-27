@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { Form } from 'react-router'
 import { Label } from '~/components/ui/label'
+import type { Invoice } from '~/types/Invoice'
 
 import { Loader } from 'components/ui/shadcn-io/ai/loader'
 import { Edit3, Plus, Receipt } from 'lucide-react'
@@ -29,13 +30,14 @@ interface InvoiceFormProps {
     | undefined
 
   showForm: boolean
-  updateInvoice: boolean
+  updateInvoice?: Invoice
   isLoading: boolean
   setShowForm: (showForm: boolean) => void
+  setInvoiceUpdate?: (invoice: Invoice | undefined) => void
 }
 
 export default function InvoiceForm(
-  { actionData, showForm, updateInvoice, isLoading, setShowForm }: InvoiceFormProps
+  { actionData, showForm, updateInvoice, isLoading, setShowForm, setInvoiceUpdate }: InvoiceFormProps
 ) {
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
 
@@ -57,8 +59,9 @@ export default function InvoiceForm(
         undefined,
         identity
       ),
-      Match.tag('InvoiceName', ({ invoiceName }) => {
+      Match.tag('InvoiceName', () => {
         setShowForm(false)
+        if (setInvoiceUpdate) setInvoiceUpdate(undefined)
       }),
       Match.tag('SimpleTaggedError', ({ message }) => {
         setErrorMessage(message)
@@ -69,7 +72,7 @@ export default function InvoiceForm(
     )
 
     match(actionData)
-  }, [actionData, setShowForm])
+  }, [actionData, setShowForm, setInvoiceUpdate])
 
   const personnes = [
     { id: 'maé' as const, name: 'Maé' },
@@ -120,10 +123,17 @@ export default function InvoiceForm(
                     </Label>
 
                     <Input
-                      type="_tag"
+                      type="hidden"
                       name="_tag"
                       defaultValue={updateInvoice ? 'update' : 'create'}
                     />
+                    {updateInvoice && (
+                      <Input
+                        type="hidden"
+                        name="id"
+                        defaultValue={updateInvoice.id}
+                      />
+                    )}
                   </div>
                   <div>
                     <Label
@@ -137,7 +147,7 @@ export default function InvoiceForm(
                       type="date"
                       name="date"
                       required
-                      defaultValue={new Date().toISOString().split('T')[0]}
+                      defaultValue={updateInvoice ? updateInvoice.date.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
                       className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
                       style={{ fontFamily: 'Montserrat, sans-serif' }}
                     />
@@ -153,6 +163,7 @@ export default function InvoiceForm(
                     <Select
                       name="kind"
                       required
+                      defaultValue={updateInvoice?.kind}
                     >
                       <SelectTrigger
                         className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
@@ -186,6 +197,7 @@ export default function InvoiceForm(
                     type="text"
                     name="name"
                     required
+                    defaultValue={updateInvoice?.name}
                     className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
                     style={{ fontFamily: 'Montserrat, sans-serif' }}
                   />
@@ -202,6 +214,7 @@ export default function InvoiceForm(
                     name="mileage"
                     min="0"
                     step="1"
+                    defaultValue={updateInvoice?.mileage}
                     className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
                     style={{ fontFamily: 'Montserrat, sans-serif' }}
                   />
@@ -218,6 +231,8 @@ export default function InvoiceForm(
                     name="amount"
                     min="0"
                     step="0.1"
+                    required
+                    defaultValue={updateInvoice?.amount}
                     className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
                     style={{ fontFamily: 'Montserrat, sans-serif' }}
                   />
@@ -230,7 +245,7 @@ export default function InvoiceForm(
                   >
                     Payé par <span className="text-red-500">*</span>
                   </Label>
-                  <RadioGroup className="flex flex-col gap-2 py-2" name="drivers">
+                  <RadioGroup className="flex flex-col gap-2 py-2" name="drivers" defaultValue={updateInvoice?.drivers[0]}>
                     {personnes.map(personne => (
                       <div key={personne.id} className="flex items-center gap-3 ">
                         <RadioGroupItem

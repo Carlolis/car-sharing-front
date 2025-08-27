@@ -19,16 +19,41 @@ export const matcherInvoiceActions = (request: InvoiceActions) =>
           yield* T.logInfo('Deleting invoice...')
           return yield* api.deleteInvoice(invoiceId)
         })),
-      // Match.tag('update', ({ invoiceUpdate }) =>
-      //   T.gen(function* () {
-      //     yield* T.logInfo(`Invoice updating invoice action .... ${stringify(invoiceUpdate)}`)
+      Match.tag('update', invoiceUpdate =>
+        T.gen(function* () {
+          yield* T.logInfo(`Invoice updating invoice action .... ${stringify(invoiceUpdate)}`)
 
-      //     const invoiceId = yield* api.updateInvoice(invoiceUpdate)
+          const file = pipe(invoiceUpdate.fileBytes, O.fromNullable, O.map(file => file[0].path))
 
-      //     yield* T.logInfo(`Invoice updated .... ${stringify(invoiceId)}`)
+          const fs = yield* FileSystem
 
-      //     return invoiceId
-      //   })),
+          const content = yield* pipe(
+            file,
+            T.flatMap(fs.readFile),
+            T.tapError(T.logWarning),
+            T.catchAll(() => T.succeed(undefined))
+          )
+          const fileName = pipe(
+            invoiceUpdate?.fileBytes,
+            O.fromNullable,
+            O.flatMapNullable(fileBytes => fileBytes[0]),
+            O.map(r => r.name),
+            O.getOrUndefined
+          )
+
+          const invoiceId = yield* api.updateInvoice({
+            ...invoiceUpdate,
+            fileBytes: content,
+            fileName,
+            date: new Date(invoiceUpdate.date)
+          }).pipe(
+            T.as({ invoiceName: invoiceUpdate.name, _tag: 'InvoiceName' as const })
+          )
+
+          yield* T.logInfo(`Invoice updated .... ${stringify(invoiceId)}`)
+
+          return invoiceId
+        })),
       Match.tag('create', invoiceCreate =>
         T.gen(function* () {
           yield* T.logInfo(`Invoice creating invoice action .... ${stringify(invoiceCreate)}`)

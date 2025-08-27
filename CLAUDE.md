@@ -9,11 +9,13 @@ This is a car-sharing application built with React Router v7 (formerly Remix) us
 ## Development Commands
 
 ### Core Development
+
 - `pnpm dev` - Start development server
 - `pnpm build` - Build for production
 - `pnpm start` - Start production server
 
 ### Code Quality
+
 - `pnpm typecheck` - Run TypeScript compiler and generate types
 - `pnpm lint` - Run ESLint
 - `pnpm effectLint` - Run Effect-TS specific linting
@@ -21,11 +23,13 @@ This is a car-sharing application built with React Router v7 (formerly Remix) us
 - `pnpm knip` - Check for unused dependencies and exports
 
 ### Formatting
+
 - `dprint fmt` - Format code using dprint (configured for TypeScript, JSON, Markdown, TOML)
 
 ## Architecture
 
 ### Core Technologies
+
 - **React Router v7** (formerly Remix) for SSR framework
 - **Effect-TS** for functional programming and error handling
 - **TypeScript** with strict configuration
@@ -34,6 +38,7 @@ This is a car-sharing application built with React Router v7 (formerly Remix) us
 - **pnpm** for package management
 
 ### Project Structure
+
 - `app/routes/` - Route components (dashboard, calendar, invoices, ia, login)
 - `app/components/` - Reusable UI components organized by feature
 - `app/services/` - Business logic services (auth, trip, invoice, ia)
@@ -43,6 +48,7 @@ This is a car-sharing application built with React Router v7 (formerly Remix) us
 
 ### Effect-TS Architecture
 The application uses Effect-TS for:
+
 - **Dependency Injection** via Layers (see `app/runtime/Runtime.ts`)
 - **Error Handling** with structured error types
 - **HTTP Client** abstraction
@@ -50,6 +56,7 @@ The application uses Effect-TS for:
 - **Service Layer** pattern for business logic
 
 Key Effect layers:
+
 - `AuthLayer` - Authentication service
 - `TripLayer` - Trip management
 - `InvoiceLayer` - Invoice management  
@@ -57,11 +64,13 @@ Key Effect layers:
 - `HttpLayer` - HTTP client configuration
 
 ### Authentication
+
 - Cookie-based session storage via `CookieSessionStorage`
 - Authentication required for most routes except `/login` and `/health`
 - Logout functionality integrated in root layout
 
 ### Special Features
+
 - **Multi-domain support** - Different behavior for `ia.ilieff.fr` subdomain
 - **AI Chat Interface** - Integrated AI functionality with streaming responses
 - **Calendar Integration** - Trip booking and visualization
@@ -70,12 +79,14 @@ Key Effect layers:
 ## Code Style & Standards
 
 ### TypeScript Configuration
+
 - Strict mode enabled
 - Path aliases: `~/*` maps to `./app/*`
 - Effect-TS language service plugin enabled
 - Verbatim module syntax for better import/export handling
 
 ### ESLint Rules
+
 - Effect-TS specific rules enabled
 - Consistent type imports required (`@typescript-eslint/consistent-type-imports`)
 - No console statements allowed in production code
@@ -83,6 +94,7 @@ Key Effect layers:
 - Object shorthand syntax enforced
 
 ### Formatting Standards (dprint)
+
 - Single quotes for TypeScript, double quotes for JSX
 - No semicolons (ASI)
 - 2-space indentation
@@ -90,6 +102,7 @@ Key Effect layers:
 - Trailing commas for type parameters only
 
 ### Effect-TS Conventions
+
 - Use generators (`T.gen`) for Effect composition
 - Structured error handling with tagged unions
 - Layer-based dependency injection
@@ -97,12 +110,14 @@ Key Effect layers:
 - Log operations use structured logging levels
 
 ## Testing & Quality Assurance
-- Run `pnpm check` before commits to ensure code quality
+
+- ALWAYS ALWAYS Run `pnpm check` before commits to ensure code quality
 - Effect linting catches Effect-TS specific issues
 - TypeScript strict mode prevents runtime errors
 - Husky pre-commit hooks ensure code standards
 
 ## Environment Requirements
+
 - Node.js >= 22
 - pnpm 10.13.1
 - Volta configuration available for version management
