@@ -178,13 +178,13 @@ export default function Dashboard(
               className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-24"
             >
               <StatsCard
-                title="Ta distance totale (km)"
-                value={loaderData.userStats.totalKilometers}
+                title={'Total des kilomètres que tu as fait'}
+                value={`${loaderData.userStats.totalKilometers} km`}
                 icon={Car}
                 bgColor="distance"
               />
               <StatsCard
-                title="Prochain entretien (km)"
+                title="Prochain entretien"
                 value={'PAS ENCORE FAIT'}
                 icon={Wrench}
                 bgColor="entretien"

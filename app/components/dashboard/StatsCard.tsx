@@ -4,7 +4,7 @@ import { Card, CardContent } from '../ui/card'
 
 export function StatsCard(
   { title, value, icon, bgColor }: {
-    title: string
+    title: string | React.ReactNode
     value: string | number
     bgColor: string
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -15,7 +15,7 @@ export function StatsCard(
 
   return (
     <React.Fragment
-      key={title}
+      key={value}
     >
       <Card
         className={`bg-gradient-${bgColor} border-0 shadow-sm hover:shadow-md transition-all duration-300`}
@@ -24,7 +24,7 @@ export function StatsCard(
           <div className="flex items-center justify-between">
             <div>
               <p
-                className="text-sm text-[#004D55]/70 mb-2 font-body"
+                className="text-sm lg:text-lg text-[#004D55]/70 mb-2 font-body"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
                 {title}
@@ -33,7 +33,7 @@ export function StatsCard(
                 className="text-2xl lg:text-3xl font-bold text-[#004D55] font-heading"
                 style={{ fontFamily: 'Montserrat Alternates, sans-serif' }}
               >
-                {value} km
+                {value}
               </p>
             </div>
             <motion.div
