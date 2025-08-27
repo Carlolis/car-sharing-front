@@ -171,7 +171,7 @@ export function useInvoiceTable(
             ),
             cell: ({ getValue }) => (
               <div
-                className="text-left sm:p-4 text-[#004D55]  text-xs sm:text-sm truncate "
+                className=" sm:p-4 text-[#004D55]  text-xs sm:text-sm truncate w-full"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
                 {getValue()}
@@ -190,7 +190,7 @@ export function useInvoiceTable(
             ),
             cell: ({ getValue }) => (
               <span
-                className="text-left sm:p-4 text-[#004D55] font-semibold text-xs sm:text-sm"
+                className=" sm:p-4 text-[#004D55] font-semibold text-xs sm:text-sm"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
                 {getValue()} {isMobile ? null : '€'}
