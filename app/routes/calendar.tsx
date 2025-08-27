@@ -7,8 +7,8 @@ import { DateTime } from 'luxon'
 import { motion } from 'motion/react'
 import { useMemo, useState } from 'react'
 import { Calendar, type Event, luxonLocalizer } from 'react-big-calendar'
-import { DashboardArguments } from '~/components/dashboard/DashboardArguments'
-import { matchTripArgs } from '~/lib/utils'
+import { matcherTripActions } from '~/components/dashboard/matcherTripActions'
+import { TripActions } from '~/components/dashboard/TripActions'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import { Remix } from '~/runtime/Remix'
 import { NotFound, Redirect } from '~/runtime/ServerResponse'
@@ -52,8 +52,8 @@ export const action = Remix.action(
   T.gen(function* () {
     yield* T.logInfo(`Dashboard action trigged....`)
 
-    const request = yield* HttpServerRequest.schemaBodyJson(DashboardArguments)
-    return yield* matchTripArgs(request)
+    const request = yield* HttpServerRequest.schemaBodyJson(TripActions)
+    return yield* matcherTripActions(request)
   }).pipe(
     T.tapError(T.logError),
     T.catchAll(() => new Redirect({ location: '/calendar' }))

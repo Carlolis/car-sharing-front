@@ -4,7 +4,7 @@ import { Trash2 } from 'lucide-react'
 
 import type { RoutePaths } from '../../routes'
 import { Button } from '../ui/button'
-import { TaggedDeleteTrip } from './DashboardArguments'
+import { TaggedDeleteTrip } from './TripActions'
 
 type DeleteButtonProps = {
   tripId?: string

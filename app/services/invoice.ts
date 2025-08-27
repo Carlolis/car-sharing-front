@@ -1,4 +1,4 @@
-import { HttpClientRequest, HttpClientResponse } from '@effect/platform'
+import { HttpBody, HttpClientRequest, HttpClientResponse } from '@effect/platform'
 import { pipe, Schema as Sc } from 'effect'
 
 import type { HttpClientError } from '@effect/platform/HttpClientError'
@@ -10,13 +10,15 @@ import { NotAuthenticated } from '~/runtime/errors/NotAuthenticatedError'
 import type { Redirect } from '~/runtime/ServerResponse'
 import { Invoice } from '~/types/Invoice'
 import type { InvoiceCreate } from '~/types/InvoiceCreate'
+import { InvoiceUpdate } from '~/types/InvoiceUpdate'
+
 import { TaggedInvoiceId } from '~/types/InvoiceId'
 import { HttpService } from './httpClient'
 
 // @effect-diagnostics-next-line leakingRequirements:off
 export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService', {
   effect: T.gen(function* () {
-    const { defaultClient, postRequest, getRequest, deleteRequest } = yield* HttpService
+    const { defaultClient, postRequest, getRequest, deleteRequest, putRequest } = yield* HttpService
 
     const createInvoice: (
       invoice: InvoiceCreate
@@ -131,7 +133,51 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
         T.annotateLogs(InvoiceService.name, deleteInvoice.name)
       )
 
+    const updateInvoice = (trip: InvoiceUpdate) =>
+      T.gen(function* () {
+        const cookieSession = yield* CookieSessionStorage
+        yield* T.logDebug(`Getting token....`)
+        const token = yield* cookieSession.getUserToken()
+
+        const body = yield* HttpBody.jsonSchema(InvoiceUpdate)(trip)
+        const updateTrip = pipe(
+          putRequest,
+          HttpClientRequest.appendUrl(`/invoices`),
+          HttpClientRequest.setHeader('Authorization', `Bearer ${token}`),
+          HttpClientRequest.setBody(body)
+        )
+        yield* T.logDebug(`About to update a trip.... ${stringify(trip)}`)
+        const response = yield* defaultClient.execute(updateTrip)
+        yield* T.logDebug(`Response status : ${response.status}`)
+        if (response.status === 401 || response.status === 400) {
+          const error = yield* response.text
+          yield* T.logError('Unauthorized Error', error)
+          yield* T.logError('Error status :', response.status)
+        }
+
+        return yield* pipe(
+          response,
+          HttpClientResponse.schemaBodyJson(Sc.String),
+          T.map(invoiceId => TaggedInvoiceId.make({ invoiceId }))
+        )
+      }).pipe(
+        T.catchTag('ResponseError', error =>
+          T.gen(function* () {
+            if (error.response.status === 401 || error.response.status === 400) {
+              return yield* pipe(
+                error.response.text,
+                T.tap(T.logError),
+                T.flatMap(error => T.fail(NotAuthenticated.of(error)))
+              )
+            }
+            return yield* T.fail(error)
+          })),
+        T.tapError(T.logError),
+        T.annotateLogs(InvoiceService.name, updateInvoice.name)
+      )
+
     return ({
+      updateInvoice,
       deleteInvoice,
       createInvoice,
       getAllInvoices

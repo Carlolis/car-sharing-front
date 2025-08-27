@@ -9,6 +9,7 @@ import { motion } from 'motion/react'
 import { useEffect, useMemo, useState } from 'react'
 
 import type { Invoice } from '~/types/Invoice'
+import { TableEditAndDelete } from '../buttons/TableEditAndDelete'
 import { Badge } from '../ui/badge'
 import { useIsMobile } from '../ui/use-mobile'
 
@@ -64,7 +65,10 @@ const getTypeColors = (type: string) => {
   }
   return colorMap[type] || { bg: '#374151', text: '#FFFFFF', border: '#1F2937' }
 }
-export function useInvoiceTable(loaderInvoices: readonly Invoice[]) {
+export function useInvoiceTable(
+  loaderInvoices: readonly Invoice[],
+  setInvoiceUpdate: (tripUpdate: Invoice | undefined) => void
+) {
   const isMobile = useIsMobile()
   const [invoices, setInvoices] = useState<Invoice[]>([])
   useEffect(() => {
@@ -220,7 +224,7 @@ export function useInvoiceTable(loaderInvoices: readonly Invoice[]) {
                 className="text-left p-4 text-[#004D55] font-semibold text-xs sm:text-sm"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
-                Payé par
+                {isMobile ? 'Par' : 'Payé par'}
               </span>
             ),
             footer: props => props.column.id,
@@ -232,11 +236,29 @@ export function useInvoiceTable(loaderInvoices: readonly Invoice[]) {
                 </span>
               )
             }
+          }),
+          columnHelper.accessor('id', {
+            id: 'actions',
+            header: () => (
+              <span
+                className="text-left sm:p-4 p-1 text-[#004D55] font-semibold text-xs sm:text-sm"
+                style={{ fontFamily: 'Montserrat, sans-serif' }}
+              >
+                Actions
+              </span>
+            ),
+            cell: ({ getValue, row }) => (
+              <TableEditAndDelete
+                data={row.original}
+                getValue={getValue}
+                setDataUpdate={setInvoiceUpdate}
+              />
+            )
           })
         ]
       }
     ],
-    [invoices.length, isMobile]
+    [invoices.length, isMobile, setInvoiceUpdate]
   )
 
   const table = useReactTable({

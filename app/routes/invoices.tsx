@@ -10,7 +10,9 @@ import { Minus, Plus, Receipt } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useState } from 'react'
 import { useNavigation } from 'react-router'
+import { InvoiceActions } from '~/components/invoice/InvoiceActions'
 import InvoiceForm from '~/components/invoice/invoiceForm'
+import { matcherInvoiceActions } from '~/components/invoice/matcherInvoiceActions'
 import { Reimbursement } from '~/components/invoice/reimbursement'
 import { useInvoiceTable } from '~/components/invoice/useInvoiceTable'
 import { Button } from '~/components/ui/button'
@@ -21,6 +23,7 @@ import { Remix } from '~/runtime/Remix'
 import { Redirect, Unexpected } from '~/runtime/ServerResponse'
 import { InvoiceService } from '~/services/invoice'
 import { DriversArrayEnsure, LocalDate } from '~/types/api'
+import type { Invoice } from '~/types/Invoice'
 import type { Route } from './+types/invoices'
 
 const InvoiceCreateForm = Sc.Struct({
@@ -46,6 +49,16 @@ export const loader = Remix.loader(
 
 export const action = Remix.action(
   T.gen(function* () {
+    yield* T.gen(function* () {
+      yield* T.logInfo(`Dashboard action trigged....`)
+
+      const request = yield* HttpServerRequest.schemaBodyJson(InvoiceActions)
+      return yield* matcherInvoiceActions(request)
+    }).pipe(
+      T.tapError(T.logError),
+      T.catchTag('RequestError', error => new Unexpected({ error: error.message }))
+    )
+
     yield* T.logInfo(`Creating Invoice....`)
 
     const api = yield* InvoiceService
@@ -113,12 +126,12 @@ export default function InvoicesPage({ loaderData, actionData }: Route.Component
   const isMobile = useIsMobile()
   const navigation = useNavigation()
 
+  const [invoiceUpdate, setInvoiceUpdate] = useState<Invoice | undefined>(undefined)
+
   const [showForm, setShowForm] = useState<boolean>(false)
   const { invoices } = loaderData
-  const table = useInvoiceTable(invoices)
+  const table = useInvoiceTable(invoices, setInvoiceUpdate)
 
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
-  const [tripInfos, setTripInfos] = useState<string | undefined>(undefined)
   const handleToggleForm = () => {
     // if (updateTrip) {
     //   setUpdateTrip(undefined)
@@ -209,7 +222,7 @@ export default function InvoicesPage({ loaderData, actionData }: Route.Component
             Vos Factures
           </h2>
           <a
-            href="https://nextcloud.ilieff.fr/s/xWDqt7PjWN6S8ok"
+            href="https://nextcloud.ilieff.fr/s/ebnrizzA8oHcZ3r"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center px-4 py-2 bg-gradient-factures text-[#004D55] rounded-lg shadow-md hover:shadow-lg transition-all duration-300 text-sm lg:text-base font-medium"

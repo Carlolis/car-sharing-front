@@ -16,14 +16,14 @@ import { HttpServerRequest } from '@effect/platform'
 
 import { Bug, Car, Gauge, MapPin, Minus, Plus, Wrench } from 'lucide-react'
 import { useState } from 'react'
-import { DashboardArguments } from '~/components/dashboard/DashboardArguments'
+import { matcherTripActions } from '~/components/dashboard/matcherTripActions'
 import { StatsCard } from '~/components/dashboard/StatsCard'
+import { TripActions } from '~/components/dashboard/TripActions'
 import { NewTripForm } from '~/components/dashboard/tripForm'
 import { useTripTable } from '~/components/dashboard/useTripTable'
 import { Button } from '~/components/ui/button'
 import { DataTable } from '~/components/ui/data-table'
 import { useIsMobile } from '~/components/ui/use-mobile'
-import { matchTripArgs } from '~/lib/utils'
 import type { TripUpdate } from '~/types/api'
 import type { Route } from './+types/dashboard'
 
@@ -58,17 +58,15 @@ export const loader = Remix.loader(
   )
 )
 
-export const action = Remix.unwrapAction(
-  T.succeed(
-    T.gen(function* () {
-      yield* T.logInfo(`Dashboard action trigged....`)
+export const action = Remix.action(
+  T.gen(function* () {
+    yield* T.logInfo(`Dashboard action trigged....`)
 
-      const request = yield* HttpServerRequest.schemaBodyJson(DashboardArguments)
-      return yield* matchTripArgs(request)
-    }).pipe(
-      T.tapError(T.logError),
-      T.catchTag('RequestError', error => new Unexpected({ error: error.message }))
-    )
+    const request = yield* HttpServerRequest.schemaBodyJson(TripActions)
+    return yield* matcherTripActions(request)
+  }).pipe(
+    T.tapError(T.logError),
+    T.catchTag('RequestError', error => new Unexpected({ error: error.message }))
   )
 )
 

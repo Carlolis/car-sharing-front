@@ -9,30 +9,16 @@ import {
 import { pipe } from 'effect'
 import * as A from 'effect/Array'
 import * as O from 'effect/Option'
-import { Calendar, Edit3, MapPin, Trash2, User } from 'lucide-react'
-import { motion } from 'motion/react'
+import { Calendar, MapPin, User } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { useSubmit } from 'react-router'
 import type { Drivers } from '~/lib/models/Drivers'
 import type { TripUpdate } from '~/types/api'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger
-} from '../ui/alert-dialog'
+import { TableEditAndDelete } from '../buttons/TableEditAndDelete'
 import { Badge } from '../ui/badge'
-import { Button } from '../ui/button'
 import { Checkbox } from '../ui/checkbox'
 import { Label } from '../ui/label'
 import { useIsMobile } from '../ui/use-mobile'
-import { TaggedUpdateTrip } from './DashboardArguments'
-import { DeleteButton } from './DeleteButton'
+import { TaggedUpdateTrip } from './TripActions'
 
 const columnHelper = createColumnHelper<TripUpdate>()
 
@@ -45,8 +31,6 @@ export function useTripTable(
   useEffect(() => {
     setTrips([...loaderTrips])
   }, [loaderTrips])
-
-  const submit = useSubmit()
 
   const columns = useMemo<ColumnDef<TripUpdate>[]>(
     () => [
@@ -299,80 +283,17 @@ export function useTripTable(
               </span>
             ),
             cell: ({ getValue, row }) => (
-              <div className="   ">
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setTripUpdate(row.original)
-                    }}
-                    className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 hover:text-blue-700"
-                  >
-                    <Edit3 className="h-3 w-3 lg:h-4 lg:w-4" />
-                  </Button>
-                </motion.div>
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <AlertDialog>
-                    <AlertDialogTrigger>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent className="bg-white border-gray-200 shadow-lg">
-                      <AlertDialogHeader>
-                        <AlertDialogTitle
-                          className="text-lg text-[#004D55] font-heading"
-                          style={{ fontFamily: 'Montserrat Alternates, sans-serif' }}
-                        >
-                          Confirmer la suppression
-                        </AlertDialogTitle>
-                        <AlertDialogDescription
-                          className="text-[#6B7280] font-body"
-                          style={{ fontFamily: 'Montserrat, sans-serif' }}
-                        >
-                          Est-ce que tu es sûr de supprimer ce trajet ?
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-
-                      <AlertDialogFooter className="gap-3 flex flex-row justify-around px-4">
-                        <AlertDialogCancel
-                          className="border-gray-300 text-[#004D55] hover:bg-gray-50 font-body max-w-20"
-                          style={{ fontFamily: 'Montserrat, sans-serif' }}
-                        >
-                          Non
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                          className="max-w-60"
-                          style={{ fontFamily: 'Montserrat, sans-serif' }}
-                        >
-                          <DeleteButton
-                            tripId={getValue()}
-                            submit={submit}
-                            route={'/dashboard'}
-                          />
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </motion.div>
-              </div>
+              <TableEditAndDelete
+                data={row.original}
+                getValue={getValue}
+                setDataUpdate={setTripUpdate}
+              />
             )
           })
         ]
       }
     ],
-    [submit, isMobile, setTripUpdate]
+    [isMobile, setTripUpdate]
   )
 
   const table = useReactTable({

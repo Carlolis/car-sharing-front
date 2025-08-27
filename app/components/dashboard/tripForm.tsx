@@ -13,10 +13,10 @@ import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Textarea } from '../ui/textarea'
 import {
-  DashboardArguments,
   TaggedCreateTrip,
-  TaggedUpdateTrip
-} from './DashboardArguments'
+  TaggedUpdateTrip,
+  TripActions
+} from './TripActions'
 interface NewTripFormProps {
   showForm: boolean
   setShowForm: (showForm: boolean) => void
@@ -91,7 +91,7 @@ export const NewTripForm = (
               tripCreate: { ...trip }
             })
 
-          submit(Sc.encodeUnknownSync(DashboardArguments)(submissionData), {
+          submit(Sc.encodeUnknownSync(TripActions)(submissionData), {
             // action: '/dashboard',
             method: 'post',
             encType: 'application/json'

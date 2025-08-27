@@ -15,10 +15,10 @@ export const TaggedDeleteTrip = Sc.TaggedStruct('delete', {
 })
 export type TaggedDeleteTrip = Sc.Schema.Type<typeof TaggedDeleteTrip>
 
-export const DashboardArguments = Sc.Union(
+export const TripActions = Sc.Union(
   TaggedDeleteTrip,
   TaggedUpdateTrip,
   TaggedCreateTrip
 )
 
-export type DashboardArguments = typeof DashboardArguments.Type
+export type TripActions = typeof TripActions.Type

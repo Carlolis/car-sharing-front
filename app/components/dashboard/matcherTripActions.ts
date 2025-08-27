@@ -3,7 +3,7 @@ import { Match, pipe } from 'effect'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import { twMerge } from 'tailwind-merge'
-import type { DashboardArguments } from '~/components/dashboard/DashboardArguments'
+import type { TripActions } from '~/components/dashboard/TripActions'
 import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
 
 import { TripService } from '~/services/trip'
@@ -11,11 +11,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const matchTripArgs = (request: DashboardArguments) =>
+export const matcherTripActions = (request: TripActions) =>
   T.gen(function* () {
     yield* T.logDebug(`Trip action request: ${stringify(request)}`)
     const api = yield* TripService
-    return yield* Match.type<DashboardArguments>().pipe(
+    return yield* Match.type<TripActions>().pipe(
       Match.tag('delete', ({ tripId }) =>
         T.gen(function* () {
           yield* T.logInfo('Deleting trip...')
