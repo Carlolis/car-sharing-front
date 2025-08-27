@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'react'
-import { cn } from '~/lib/utils'
+import { cn } from '~/components/ui/util'
 
 type LoaderIconProps = {
   size?: number
