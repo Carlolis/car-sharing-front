@@ -1,7 +1,7 @@
 import { identity, Match } from 'effect'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
-import { Form } from 'react-router'
+import { Form, Link } from 'react-router'
 import { Label } from '~/components/ui/label'
 import type { Invoice } from '~/types/Invoice'
 
@@ -269,7 +269,7 @@ export default function InvoiceForm(
                     Un fichier pdf/image ?
                   </Label>
 
-                  {updateInvoice?.downloadUrl && updateInvoice?.fileName && (
+                  {updateInvoice?.fileName && (
                     <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -278,15 +278,17 @@ export default function InvoiceForm(
                             Fichier actuel : {updateInvoice.fileName}
                           </span>
                         </div>
-                        <a
-                          href={updateInvoice.downloadUrl}
-                          download={updateInvoice.fileName}
-                          className="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700 transition-colors"
-                          title={`Télécharger ${updateInvoice.fileName}`}
+                        <Link
+                          to={{
+                            pathname: '/invoices/download',
+                            search: `?fileName=${updateInvoice.fileName}&id=${updateInvoice.id}`
+                          }}
+                          download
+                          reloadDocument
                         >
                           <Download className="h-3 w-3" />
                           Télécharger
-                        </a>
+                        </Link>
                       </div>
                       <p className="text-xs text-blue-600 mt-1">
                         Vous pouvez uploader un nouveau fichier pour le remplacer

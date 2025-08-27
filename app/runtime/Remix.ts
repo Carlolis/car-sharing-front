@@ -2,7 +2,8 @@ import type { Path } from '@effect/platform'
 import { HttpServerRequest } from '@effect/platform'
 import { Response } from '@effect/platform-node/Undici'
 import type * as FileSystem from '@effect/platform/FileSystem'
-import { fromWeb } from '@effect/platform/HttpServerRequest'
+import type { ParsedSearchParams } from '@effect/platform/HttpServerRequest'
+import { fromWeb, searchParamsFromURL } from '@effect/platform/HttpServerRequest'
 import type { Scope } from 'effect'
 import { Cause, Context, Exit, Layer, ManagedRuntime, Match, pipe } from 'effect'
 import type { NoSuchElementException } from 'effect/Cause'
@@ -55,6 +56,7 @@ type RequestEnv =
   | ResponseHeaders
   | CookieSessionStorage
   | SessionStorage
+  | ParsedSearchParams
 
 type ActionError =
   | Redirect
@@ -92,9 +94,17 @@ const matchLoaderError = Match.typeTags<LoaderError>()
 const matchActionError = Match.typeTags<ActionError>()
 const makeRequestContext = (
   args: LoaderArgs | ActionArgs
-): Layer.Layer<HttpServerRequest.HttpServerRequest | ResponseHeaders | Params, never, never> => {
+): Layer.Layer<
+  HttpServerRequest.HttpServerRequest | ResponseHeaders | Params | ParsedSearchParams,
+  never,
+  never
+> => {
   const context = Context.empty().pipe(
     Context.add(HttpServerRequest.HttpServerRequest, fromWeb(args.request)),
+    Context.add(
+      HttpServerRequest.ParsedSearchParams,
+      searchParamsFromURL(new URL(args.request.url))
+    ),
     Context.add(Params, args.params),
     Context.add(ResponseHeaders, args.request.headers),
     Layer.succeedContext

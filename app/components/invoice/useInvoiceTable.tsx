@@ -8,6 +8,7 @@ import { Download, Receipt } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useEffect, useMemo, useState } from 'react'
 
+import { Link } from 'react-router'
 import type { Invoice } from '~/types/Invoice'
 import { TableEditAndDelete } from '../buttons/TableEditAndDelete'
 import { Badge } from '../ui/badge'
@@ -237,7 +238,7 @@ export function useInvoiceTable(
               )
             }
           }),
-          columnHelper.accessor('downloadUrl', {
+          columnHelper.accessor('fileName', {
             id: 'download',
             header: () => (
               <span
@@ -248,27 +249,27 @@ export function useInvoiceTable(
               </span>
             ),
             cell: ({ getValue, row }) => {
-              const downloadUrl = getValue() as string | undefined
-              const fileName = row.original.fileName
-              
-              if (!downloadUrl || !fileName) {
+              const fileName = getValue() as string | undefined
+
+              if (!fileName) {
                 return (
                   <span className="text-gray-400 text-xs sm:text-sm p-4">
                     Aucun fichier
                   </span>
                 )
               }
-              
+
               return (
-                <a
-                  href={downloadUrl}
-                  download={fileName}
-                  className="inline-flex items-center gap-1 text-[#004D55] hover:text-[#003640] transition-colors p-4"
-                  title={`Télécharger ${fileName}`}
+                <Link
+                  to={{
+                    pathname: '/invoices/download',
+                    search: `?fileName=${getValue()}&id=${row.original.id}`
+                  }}
+                  download
+                  reloadDocument
                 >
                   <Download className="h-4 w-4" />
-                  {!isMobile && <span className="text-xs sm:text-sm">PDF</span>}
-                </a>
+                </Link>
               )
             },
             footer: props => props.column.id

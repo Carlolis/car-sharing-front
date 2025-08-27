@@ -7,7 +7,8 @@ const routeDefs = [
   ['/ia', './routes/ia.tsx'],
   ['/health', './routes/health.tsx'],
   ['/calendar', './routes/calendar.tsx'],
-  ['/invoices', './routes/invoices.tsx']
+  ['/invoices', './routes/invoices.tsx'],
+  ['/invoices/download', './routes/downloadInvoice.ts']
 ] as const
 
 export type RoutePaths = typeof routeDefs[number][0]

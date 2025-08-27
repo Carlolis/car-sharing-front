@@ -28,6 +28,7 @@ export const InvoiceUpdateFormTagged = Sc.Struct({
 export const TaggedDeleteInvoice = Sc.TaggedStruct('delete', {
   invoiceId: Sc.UUID
 })
+
 export type TaggedDeleteTrip = Sc.Schema.Type<typeof TaggedDeleteInvoice>
 
 export const InvoiceActions = Sc.Union(

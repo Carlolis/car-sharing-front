@@ -151,10 +151,10 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
           ...invoice,
           fileBytes: invoice.fileBytes?.length
         })
-        
+
         const invoiceUrl = pipe(putRequest, HttpClientRequest.appendUrl('/invoices'))
         const formData = new FormData()
-        
+
         formData.append('id', invoice.id)
         formData.append('name', invoice.name)
         if (invoice.fileBytes) {
@@ -202,11 +202,43 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
         T.annotateLogs(InvoiceService.name, updateInvoice.name)
       )
 
+    const getInvoiceDownloadUrl = (fileName: string, id: string): string =>
+      `http://localhost:8093/api/invoices/download/${encodeURIComponent(fileName)}/${id}`
+
+    const downloadInvoiceFile = (
+      fileName: string,
+      id: string
+    ): T.Effect<Uint8Array<ArrayBuffer>, Redirect, CookieSessionStorage> =>
+      T.gen(function* () {
+        const cookieSession = yield* CookieSessionStorage
+        yield* T.logInfo(`Getting token....`)
+        const token = yield* cookieSession.getUserToken()
+        yield* T.logInfo(token)
+        const response = yield* T.promise(() =>
+          fetch(getInvoiceDownloadUrl(fileName, id), {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/pdf,application/octet-stream,*/*',
+              'Authorization': `Bearer ${token}`
+            }
+          })
+        )
+
+        if (!response.ok) {
+          throw new Error(`Erreur ${response.status}: ${response.statusText}`)
+        }
+
+        const blob = yield* T.promise(() => response.blob())
+        const arrayBuffer = yield* T.promise(() => blob.arrayBuffer())
+        return new Uint8Array(arrayBuffer)
+      })
+
     return ({
       updateInvoice,
       deleteInvoice,
       createInvoice,
-      getAllInvoices
+      getAllInvoices,
+      downloadInvoiceFile
     })
   })
 }) {}
