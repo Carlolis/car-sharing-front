@@ -64,7 +64,7 @@ export default function InvoiceForm(
         setErrorMessage(message)
       }),
       Match.orElse(() => {
-        setErrorMessage('Une erreur inconnue est survenue lors de la création du trajet')
+        setErrorMessage('Une erreur inconnue est survenue lors de la création de la facture.')
       })
     )
 
