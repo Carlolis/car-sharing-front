@@ -295,12 +295,14 @@ export default function InvoiceForm(
                           Télécharger
                         </Link>
                       </div>
-                      <p className="text-xs text-blue-600 mt-1">
-                        Vous ne pouvez pas uploader un nouveau fichier pour le remplacer
-                      </p>
                     </div>
                   )}
-
+                  {updateInvoice && (
+                    <p className="text-xs text-blue-600 mt-1">
+                      Vous ne pouvez PAS uploader un nouveau fichier pour une facture existante. PAS
+                      ENCORE FAIT
+                    </p>
+                  )}
                   <Input
                     type="file"
                     accept=".pdf, .png, .jpg, .jpeg"
