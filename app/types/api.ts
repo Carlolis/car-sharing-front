@@ -52,11 +52,13 @@ export const DriversArrayEnsure = Sc.transform(
   override: true
 })
 
+export const OptionalNumberFromString = Sc.optional(Sc.NumberFromString)
+
 export const TripCreate = Sc.Struct({
   name: Sc.String,
   startDate: LocalDate,
   endDate: LocalDate,
-  distance: Sc.NumberFromString,
+  distance: OptionalNumberFromString,
   drivers: DriversArrayEnsure,
   comments: Sc.optional(Sc.String)
 })
@@ -74,7 +76,7 @@ export const TripUpdate = Sc.Struct({
   name: Sc.String,
   startDate: LocalDate,
   endDate: LocalDate,
-  distance: Sc.Number,
+  distance: Sc.optional(Sc.Number),
   drivers: DriversArrayEnsure,
   comments: Sc.optional(Sc.String)
 })

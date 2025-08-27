@@ -34,7 +34,7 @@ const ValidatedTripCreate = pipe(
     if (new Date(trip.startDate) > new Date(trip.endDate)) {
       return 'La date de début ne peut pas être après la date de fin.'
     }
-    if (trip.distance < 0) {
+    if (trip.distance !== undefined && trip.distance < 0) {
       return 'La distance ne peut pas être négative.'
     }
 
@@ -62,9 +62,12 @@ export const NewTripForm = (
     event.preventDefault()
 
     const formData = new FormData(event.currentTarget)
+    const entries = Object.fromEntries(formData.entries())
     const tripData = {
-      ...Object.fromEntries(formData.entries()),
-      drivers: formData.getAll('drivers')
+      ...entries,
+      drivers: formData.getAll('drivers'),
+      // Convertir les chaînes vides en undefined pour les champs optionnels
+      distance: entries.distance === '' ? undefined : entries.distance
     }
 
     pipe(
@@ -232,7 +235,7 @@ export const NewTripForm = (
                         className="text-[#004D55] text-sm lg:text-base font-body"
                         style={{ fontFamily: 'Montserrat, sans-serif' }}
                       >
-                        Distance (km) <span className="text-red-500">*</span>
+                        Distance (km) <span className="text-gray-600">(optionnel)</span>
                       </Label>
                       <Input
                         name="distance"
@@ -241,7 +244,6 @@ export const NewTripForm = (
                         defaultValue={updateTrip?.distance}
                         className="bg-white/80 border-slate-300/60 focus:border-[#2fd1d1] focus:ring-[#2fd1d1]/20 text-sm lg:text-base min-h-[44px]"
                         style={{ fontFamily: 'Lato, sans-serif' }}
-                        required
                       />
                     </div>
                   </div>
@@ -279,7 +281,7 @@ export const NewTripForm = (
                     className="text-[#004D55] text-sm lg:text-base font-body"
                     style={{ fontFamily: 'Montserrat, sans-serif' }}
                   >
-                    Commentaires (optionnel)
+                    Commentaires <span className="text-gray-600">(optionnel)</span>
                   </Label>
 
                   <Textarea
