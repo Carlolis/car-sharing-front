@@ -1,6 +1,6 @@
 import type * as React from 'react'
 
-import { cn } from '~/components/dashboard/matcherTripActions'
+import { cn } from './util'
 
 function Textarea({ className, ...props }: React.ComponentProps<'textarea'>) {
   return (

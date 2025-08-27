@@ -7,9 +7,6 @@ import type { TripActions } from '~/components/dashboard/TripActions'
 import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
 
 import { TripService } from '~/services/trip'
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
 
 export const matcherTripActions = (request: TripActions) =>
   T.gen(function* () {

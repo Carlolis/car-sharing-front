@@ -1,6 +1,6 @@
 import type * as React from 'react'
 
-import { cn } from '~/components/dashboard/matcherTripActions'
+import { cn } from './util'
 
 function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
   return (

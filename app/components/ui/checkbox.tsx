@@ -2,7 +2,7 @@ import * as CheckboxPrimitive from '@radix-ui/react-checkbox'
 import { CheckIcon } from 'lucide-react'
 import type * as React from 'react'
 
-import { cn } from '~/components/dashboard/matcherTripActions'
+import { cn } from './util'
 
 function Checkbox({
   className,

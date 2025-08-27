@@ -3,7 +3,7 @@
 import * as SeparatorPrimitive from '@radix-ui/react-separator'
 import type * as React from 'react'
 
-import { cn } from '~/components/dashboard/matcherTripActions'
+import { cn } from './util'
 
 function Separator({
   className,

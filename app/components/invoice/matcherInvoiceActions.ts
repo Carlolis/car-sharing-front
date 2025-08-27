@@ -8,9 +8,6 @@ import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
 
 import { InvoiceService } from '~/services/invoice'
 import type { InvoiceActions } from './InvoiceActions'
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
 
 export const matcherInvoiceActions = (request: InvoiceActions) =>
   T.gen(function* () {

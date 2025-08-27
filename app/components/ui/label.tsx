@@ -1,7 +1,7 @@
 import * as LabelPrimitive from '@radix-ui/react-label'
 import type * as React from 'react'
 
-import { cn } from '~/components/dashboard/matcherTripActions'
+import { cn } from './util'
 
 function Label({
   className,
