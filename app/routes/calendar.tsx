@@ -70,7 +70,11 @@ export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps
   const myEvents = pipe(
     trips,
     A.map(trip => ({
-      title: trip.name,
+      title: trip.drivers.length > 0 ? (
+        <span>
+          <strong>{trip.drivers.join(', ')}</strong> : {trip.name}
+        </span>
+      ) : trip.name,
       start: new Date(trip.startDate),
       end: new Date(trip.endDate),
       resource: trip
