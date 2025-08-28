@@ -1,5 +1,5 @@
 import { HttpClientRequest, HttpClientResponse } from '@effect/platform'
-import { Chunk as Ch, pipe, Schema as Sc, Stream as St } from 'effect'
+import { pipe, Schema as Sc } from 'effect'
 
 import type { HttpClientError } from '@effect/platform/HttpClientError'
 import * as T from 'effect/Effect'
@@ -12,7 +12,6 @@ import { Invoice } from '~/types/Invoice'
 import type { InvoiceCreate } from '~/types/InvoiceCreate'
 import type { InvoiceUpdate } from '~/types/InvoiceUpdate'
 
-import type { Chunk } from 'effect/Chunk'
 import { TaggedInvoiceId } from '~/types/InvoiceId'
 import { HttpService } from './httpClient'
 
@@ -209,77 +208,49 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
     ) =>
       T.gen(function* () {
         const cookieSession = yield* CookieSessionStorage
-        yield* T.logInfo(`Getting token....`)
+        yield* T.logInfo(`Downloading invoice file: ${fileName} (id: ${id})`)
         const token = yield* cookieSession.getUserToken()
 
-        const downloadUrl = pipe(
+        const downloadRequest = pipe(
           getRequest,
           HttpClientRequest.appendUrl(`/invoices/download/${encodeURIComponent(fileName)}/${id}`),
           HttpClientRequest.setHeader('Accept', 'application/pdf,application/octet-stream,*/*'),
           HttpClientRequest.setHeader('Authorization', `Bearer ${token}`)
         )
 
-        const response = defaultClient.execute(downloadUrl)
-        const uint8Array: St.Stream<Uint8Array<ArrayBufferLike>, HttpClientError, never> = pipe(
-          response,
-          HttpClientResponse.stream
-        )
+        const response = yield* defaultClient.execute(downloadRequest)
 
-        // const arrayBufferLike: St.Stream<ArrayBufferLike, HttpClientError, never> = pipe(
-        //   uint8Array,
-        //   St.map(u => u.buffer)
-        // )
+        yield* T.logInfo(`Invoice download response received, converting to buffer...`)
 
-        const collectChunks: T.Effect<Chunk<ArrayBufferLike>, HttpClientError, never> = pipe(
-          uint8Array,
-          St.runCollect
-        )
+        const arrayBuffer = yield* response.arrayBuffer
+        const result = new Uint8Array(arrayBuffer)
 
-        yield* T.logInfo(`Downloaded stream....`)
-        // ancien code
-        // const blob = yield* T.promise(() => response.blob())
-        // const arrayBuffer = yield* T.promise(() => blob.arrayBuffer())
-        // return new Uint8Array(arrayBuffer)
-
-        const chunks = yield* collectChunks
-
-        const totalLength = pipe(
-          chunks,
-          Ch.reduce(0, (acc, c) => acc + (c.byteLength))
-        )
-        const result = new Uint8Array(totalLength)
-        pipe(
-          chunks,
-          Ch.reduce(0, (offset, c) => {
-            const u = ArrayBuffer.isView(c) ?
-              (c as unknown as Uint8Array) :
-              new Uint8Array(c as ArrayBuffer)
-            result.set(u, offset)
-            return offset + u.length
-          })
-        )
+        yield* T.logInfo(`Invoice file downloaded successfully, size: ${result.length} bytes`)
 
         return result
       }).pipe(
         T.catchTag('ResponseError', error =>
           T.gen(function* () {
+            yield* T.logError(`Download failed with HTTP ${error.response.status}`)
+
             if (error.response.status === 401 || error.response.status === 400) {
-              return yield* pipe(
-                error.response.text,
-                T.tap(T.logError),
-                T.flatMap(error => T.fail(NotAuthenticated.of(error)))
-              )
+              const errorText = yield* error.response.text
+              yield* T.logError(`Authentication error: ${errorText}`)
+              return yield* T.fail(NotAuthenticated.of(errorText))
             }
+
+            if (error.response.status === 404) {
+              yield* T.logError(`Invoice file not found: ${fileName}`)
+            }
+
             return yield* T.fail(error)
           })),
         T.catchTag('RequestError', error =>
           T.gen(function* () {
-            // eslint-disable-next-line no-console
-            console.error(error.message)
-
+            yield* T.logError(`Network error during download: ${error.message}`)
             return yield* T.fail(error)
           })),
-        T.tapError(T.logError),
+        T.tapError(error => T.logError(`Invoice download failed`, error)),
         T.annotateLogs(InvoiceService.name, downloadInvoiceFile.name)
       )
 
