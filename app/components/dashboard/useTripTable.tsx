@@ -33,12 +33,9 @@ export function useTripTable(
   }, [loaderTrips])
 
   const columns = useMemo<ColumnDef<TripUpdate>[]>(
-    () => [
-      {
-        id: 'header',
-        footer: props => props.column.id,
-        columns: [
-          columnHelper.accessor('startDate', {
+    () => {
+      const baseColumns = [
+        columnHelper.accessor('startDate', {
             id: 'startDate',
             header: () => (
               <span
@@ -292,8 +289,15 @@ export function useTripTable(
             )
           })
         ]
-      }
-    ],
+      
+      return [
+        {
+          id: 'header',
+          footer: props => props.column.id,
+          columns: isMobile ? baseColumns.filter(col => col.id !== 'name') : baseColumns
+        }
+      ]
+    },
     [isMobile, setTripUpdate]
   )
 
