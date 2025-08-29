@@ -116,6 +116,7 @@ export default function InvoiceForm(
                 method="post"
                 className="space-y-4"
                 encType="multipart/form-data"
+                key={updateInvoice?.id || 'new-invoice'}
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="hidden">
@@ -251,6 +252,7 @@ export default function InvoiceForm(
                   <RadioGroup
                     className="flex flex-col gap-2 py-2"
                     name="drivers"
+                    defaultValue={updateInvoice ? updateInvoice.drivers[0] : undefined}
                   >
                     {personnes.map(personne => (
                       <div key={personne.id} className="flex items-center gap-3 ">
@@ -307,7 +309,6 @@ export default function InvoiceForm(
                     type="file"
                     accept=".pdf, .png, .jpg, .jpeg"
                     name="fileBytes"
-                    disabled={updateInvoice !== undefined}
                     className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
                     style={{ fontFamily: 'Montserrat, sans-serif' }}
                   />
