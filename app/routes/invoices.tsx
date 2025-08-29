@@ -23,7 +23,8 @@ export const loader = Remix.loader(
   T.gen(function* () {
     const invoiceService = yield* InvoiceService
     const invoices = yield* invoiceService.getAllInvoices()
-    return { invoices }
+    const reimbursements = yield* invoiceService.getReimbursementProposals()
+    return { invoices, reimbursements }
   }).pipe(
     T.catchTag('RequestError', error => new Unexpected({ error: error.message })),
     T.catchTag('ResponseError', error => new Unexpected({ error: error.message }))
@@ -155,7 +156,7 @@ export default function InvoicesPage({ loaderData, actionData }: Route.Component
           </a>
         </motion.div>
         {isLoading ? <Loader /> : <DataTable table={table} />}
-        <Reimbursement />
+        <Reimbursement reimbursements={loaderData.reimbursements} />
       </div>
     </div>
   )

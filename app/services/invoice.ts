@@ -13,6 +13,7 @@ import type { InvoiceCreate } from '~/types/InvoiceCreate'
 import type { InvoiceUpdate } from '~/types/InvoiceUpdate'
 
 import { TaggedInvoiceId } from '~/types/InvoiceId'
+import { Reimbursement } from '~/types/Reimbursement'
 import { HttpService } from './httpClient'
 
 // @effect-diagnostics-next-line leakingRequirements:off
@@ -254,12 +255,53 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
         T.annotateLogs(InvoiceService.name, downloadInvoiceFile.name)
       )
 
+    const getReimbursementProposals = () =>
+      T.gen(function* () {
+        const cookieSession = yield* CookieSessionStorage
+        yield* T.logDebug(`Getting token....`)
+        const token = yield* cookieSession.getUserToken()
+        yield* T.logDebug(`Found token....`, token)
+
+        const getAllInvoicesRequest = pipe(
+          getRequest,
+          HttpClientRequest.appendUrl('/invoices/reimbursements'),
+          HttpClientRequest.setHeader('Content-Type', 'application/json'),
+          HttpClientRequest.setHeader('Authorization', `Bearer ${token}`)
+        )
+        const response = yield* defaultClient.execute(getAllInvoicesRequest)
+
+        const responseJson = yield* pipe(
+          HttpClientResponse.schemaBodyJson(Sc.Array(Reimbursement))(response),
+          T.tapError(T.logError),
+          T.catchAll(() => T.succeed<readonly Reimbursement[]>([]))
+        )
+
+        yield* T.logInfo(`Found ${stringify(responseJson.length)} invoices`)
+
+        return responseJson
+      }).pipe(
+        T.catchTag('ResponseError', error =>
+          T.gen(function* () {
+            if (error.response.status === 401 || error.response.status === 400) {
+              return yield* pipe(
+                error.response.text,
+                T.tap(T.logError),
+                T.flatMap(error => T.fail(NotAuthenticated.of(error)))
+              )
+            }
+            return yield* T.fail(error)
+          })),
+        T.tapError(T.logError),
+        T.annotateLogs(InvoiceService.name, getReimbursementProposals.name)
+      )
+
     return ({
       updateInvoice,
       deleteInvoice,
       createInvoice,
       getAllInvoices,
-      downloadInvoiceFile
+      downloadInvoiceFile,
+      getReimbursementProposals
     })
   })
 }) {}

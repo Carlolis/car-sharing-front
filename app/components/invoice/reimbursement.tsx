@@ -2,19 +2,25 @@ import { ArrowRight, Badge, Check, CreditCard, DollarSign, User } from 'lucide-r
 import { AnimatePresence, motion } from 'motion/react'
 import { Button } from '../ui/button'
 import { Card, CardHeader } from '../ui/card'
-export const Reimbursement = () => {
-  const suggestionsNonPayees = ['ss']
-  const suggestionsRemboursements = {
-    paiements: [{ name: 'name', color: 'red', solde: 1000, montantPaye: 30, partEquitable: 10 }],
-    suggestions: [{
-      de: 'maé',
-      vers: 'brigitte',
-      colorDe: 'blue',
-      colorVers: 'pink',
-      montant: 1000
-    }]
-  }
+import type { Reimbursement as ReimbursementType } from '~/types/Reimbursement'
+
+interface ReimbursementProps {
+  reimbursements: readonly ReimbursementType[]
+}
+
+export const Reimbursement = ({ reimbursements }: ReimbursementProps) => {
   const remboursementsPayes = new Set()
+  
+  const suggestions = reimbursements.map(reimbursement => {
+    const toEntries = Object.entries(reimbursement.to)
+    return toEntries.map(([toDriver, amount]) => ({
+      de: reimbursement.driverName,
+      vers: toDriver,
+      colorDe: '#004D55',
+      colorVers: '#6B7280', 
+      montant: amount
+    }))
+  }).flat()
 
   return (
     <Card className="bg-white border-gray-200 shadow-lg overflow-hidden p-2">
@@ -32,24 +38,24 @@ export const Reimbursement = () => {
         >
           Suggestions de remboursements
         </span>
-        {suggestionsNonPayees.length > 0 && (
+        {suggestions.length > 0 && (
           <Badge
             className="bg-gradient-to-r from-[#004D55] to-[#003640] text-white border-0 shadow-sm text-xs lg:text-sm px-2 py-1 ml-auto font-body"
             style={{ fontFamily: 'Montserrat, sans-serif' }}
           >
-            {suggestionsNonPayees.length} suggestion{suggestionsNonPayees.length > 1 ? 's' : ''}
+            {suggestions.length} suggestion{suggestions.length > 1 ? 's' : ''}
           </Badge>
         )}
       </CardHeader>
 
-      {suggestionsNonPayees.length > 0 ?
+      {suggestions.length > 0 ?
         (
           <div className="space-y-4">
             {/* Résumé des parts */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              {suggestionsRemboursements.paiements.map((paiement, index) => (
+              {reimbursements.map((reimbursement, index) => (
                 <motion.div
-                  key={paiement.name}
+                  key={`${reimbursement.driverName}-${index}`}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
@@ -58,7 +64,7 @@ export const Reimbursement = () => {
                   <div className="flex items-center gap-3 mb-3">
                     <div
                       className="w-8 h-8 lg:w-10 lg:h-10 rounded-lg flex items-center justify-center text-white shadow-sm min-w-[32px] min-h-[32px]"
-                      style={{ backgroundColor: paiement.color }}
+                      style={{ backgroundColor: '#004D55' }}
                     >
                       <DollarSign className="h-4 w-4 lg:h-5 lg:w-5" />
                     </div>
@@ -67,60 +73,32 @@ export const Reimbursement = () => {
                         className="font-semibold text-[#004D55] text-sm lg:text-base font-body"
                         style={{ fontFamily: 'Montserrat, sans-serif' }}
                       >
-                        {paiement.name}
+                        {reimbursement.driverName}
                       </h4>
                       <p
                         className="text-xs text-[#6B7280] font-body"
                         style={{ fontFamily: 'Montserrat, sans-serif' }}
                       >
-                        {paiement.solde >= 0 ? 'Créditeur' : 'Débiteur'}
+                        {reimbursement.totalAmount >= 0 ? 'Créditeur' : 'Débiteur'}
                       </p>
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span
-                        className="text-xs lg:text-sm text-[#6B7280] font-body"
-                        style={{ fontFamily: 'Montserrat, sans-serif' }}
-                      >
-                        Payé:
-                      </span>
-                      <span
-                        className="font-semibold text-[#004D55] text-sm lg:text-base font-body"
-                        style={{ fontFamily: 'Montserrat, sans-serif' }}
-                      >
-                        {paiement.montantPaye.toFixed(2)} €
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span
-                        className="text-xs lg:text-sm text-[#6B7280] font-body"
-                        style={{ fontFamily: 'Montserrat, sans-serif' }}
-                      >
-                        Part équitable:
-                      </span>
-                      <span
-                        className="font-semibold text-[#004D55] text-sm lg:text-base font-body"
-                        style={{ fontFamily: 'Montserrat, sans-serif' }}
-                      >
-                        {paiement.partEquitable.toFixed(2)} €
-                      </span>
-                    </div>
                     <div className="flex justify-between border-t border-gray-200 pt-2">
                       <span
                         className="text-xs lg:text-sm text-[#6B7280] font-body"
                         style={{ fontFamily: 'Montserrat, sans-serif' }}
                       >
-                        Solde:
+                        Montant total:
                       </span>
                       <span
                         className={`font-bold text-sm lg:text-base font-body ${
-                          paiement.solde >= 0 ? 'text-green-600' : 'text-red-600'
+                          reimbursement.totalAmount >= 0 ? 'text-green-600' : 'text-red-600'
                         }`}
                         style={{ fontFamily: 'Montserrat, sans-serif' }}
                       >
-                        {paiement.solde >= 0 ? '+' : ''}
-                        {paiement.solde.toFixed(2)} €
+                        {reimbursement.totalAmount >= 0 ? '+' : ''}
+                        {reimbursement.totalAmount.toFixed(2)} €
                       </span>
                     </div>
                   </div>
@@ -137,7 +115,7 @@ export const Reimbursement = () => {
                 Remboursements suggérés pour équilibrer les comptes :
               </h4>
               <AnimatePresence mode="popLayout">
-                {suggestionsRemboursements.suggestions.map((suggestion, index) => {
+                {suggestions.map((suggestion, index) => {
                   const suggestionId = `${suggestion.de}-${suggestion.vers}-${index}`
                   const estPaye = remboursementsPayes.has(suggestionId)
 
@@ -203,7 +181,6 @@ export const Reimbursement = () => {
                           </span>
 
                           <Button
-                            // onClick={() => marquerCommePaye(suggestionId)}
                             className="bg-gradient-to-r from-[#004D55] to-[#003640] hover:from-[#003640] hover:to-[#002a30] text-white border-0 shadow-lg min-w-[44px] min-h-[44px] px-3 py-2 text-sm font-semibold font-body transition-all duration-300 hover:scale-105"
                             style={{ fontFamily: 'Montserrat, sans-serif' }}
                           >
@@ -224,7 +201,6 @@ export const Reimbursement = () => {
                             {suggestion.montant.toFixed(2)} €
                           </span>
                           <Button
-                            // onClick={() => marquerCommePaye(suggestionId)}
                             className="bg-gradient-to-r from-[#004D55] to-[#003640] hover:from-[#003640] hover:to-[#002a30] text-white border-0 shadow-lg min-w-[44px] min-h-[44px] px-3 py-2 text-sm font-semibold font-body transition-all duration-300 hover:scale-105"
                             style={{ fontFamily: 'Montserrat, sans-serif' }}
                           >
