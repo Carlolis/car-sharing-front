@@ -276,35 +276,39 @@ export default function InvoiceForm(
                     
                      border border-blue-200 rounded-md">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Receipt className="h-4 w-4 text-blue-600" />
-                          <div className="font-bold">
-                            Uniquement le téléchargement pour l&apos;instant
+                        <div className="flex items-center gap-2  flex-row justify-between w-full">
+                          <div className="flex  flex-row gap-2 items-center">
+                            <Receipt className="h-4 w-4 text-blue-600 " />
+                            <div className="font-bold">
+                              Télécharger la facture actuelle :
+                            </div>
                           </div>
-                          <span className="text-sm text-blue-800 font-medium">
-                            Fichier actuel : {updateInvoice.fileName}
-                          </span>
+                          <Link
+                            to={{
+                              pathname: '/invoices/download',
+                              search: `?fileName=${updateInvoice.fileName}&id=${updateInvoice.id}`
+                            }}
+                            download
+                            reloadDocument
+                          >
+                            <div className="flex flex-row gap-8 items-center hover:underline">
+                              <span className="text-sm text-blue-800 font-medium">
+                                {updateInvoice.fileName}
+                              </span>
+
+                              <Download className="h-6 w-6" />
+                            </div>
+                          </Link>
                         </div>
-                        <Link
-                          to={{
-                            pathname: '/invoices/download',
-                            search: `?fileName=${updateInvoice.fileName}&id=${updateInvoice.id}`
-                          }}
-                          download
-                          reloadDocument
-                        >
-                          <Download className="h-3 w-3" />
-                          Télécharger
-                        </Link>
                       </div>
+                      {updateInvoice && (
+                        <p className="text-xs text-blue-600 mt-1">
+                          Vous pouvez uploader un nouveau fichier pour une facture existante.
+                        </p>
+                      )}
                     </div>
                   )}
-                  {updateInvoice && (
-                    <p className="text-xs text-blue-600 mt-1">
-                      Vous ne pouvez PAS uploader un nouveau fichier pour une facture existante. PAS
-                      ENCORE FAIT
-                    </p>
-                  )}
+
                   <Input
                     type="file"
                     accept=".pdf, .png, .jpg, .jpeg"
