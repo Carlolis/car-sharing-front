@@ -1,8 +1,8 @@
 import { ArrowRight, Badge, Check, CreditCard, DollarSign, User } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
+import type { Reimbursement as ReimbursementType } from '~/types/Reimbursement'
 import { Button } from '../ui/button'
 import { Card, CardHeader } from '../ui/card'
-import type { Reimbursement as ReimbursementType } from '~/types/Reimbursement'
 
 interface ReimbursementProps {
   reimbursements: readonly ReimbursementType[]
@@ -10,17 +10,16 @@ interface ReimbursementProps {
 
 export const Reimbursement = ({ reimbursements }: ReimbursementProps) => {
   const remboursementsPayes = new Set()
-  
   const suggestions = reimbursements.map(reimbursement => {
     const toEntries = Object.entries(reimbursement.to)
     return toEntries.map(([toDriver, amount]) => ({
       de: reimbursement.driverName,
       vers: toDriver,
       colorDe: '#004D55',
-      colorVers: '#6B7280', 
+      colorVers: '#6B7280',
       montant: amount
     }))
-  }).flat()
+  }).flat().filter(suggestion => suggestion.montant > 0)
 
   return (
     <Card className="bg-white border-gray-200 shadow-lg overflow-hidden p-2">
@@ -79,7 +78,7 @@ export const Reimbursement = ({ reimbursements }: ReimbursementProps) => {
                         className="text-xs text-[#6B7280] font-body"
                         style={{ fontFamily: 'Montserrat, sans-serif' }}
                       >
-                        {reimbursement.totalAmount >= 0 ? 'Créditeur' : 'Débiteur'}
+                        {reimbursement.totalAmount === 0 ? 'Comptes équilibrés' : reimbursement.totalAmount < 0 ? 'Doit de l\'argent' : 'Recevra de l\'argent'}
                       </p>
                     </div>
                   </div>
@@ -89,16 +88,15 @@ export const Reimbursement = ({ reimbursements }: ReimbursementProps) => {
                         className="text-xs lg:text-sm text-[#6B7280] font-body"
                         style={{ fontFamily: 'Montserrat, sans-serif' }}
                       >
-                        Montant total:
+                        {reimbursement.totalAmount === 0 ? 'Équilibré:' : 'Doit au total:'}
                       </span>
                       <span
                         className={`font-bold text-sm lg:text-base font-body ${
-                          reimbursement.totalAmount >= 0 ? 'text-green-600' : 'text-red-600'
+                          reimbursement.totalAmount === 0 ? 'text-green-600' : 'text-red-600'
                         }`}
                         style={{ fontFamily: 'Montserrat, sans-serif' }}
                       >
-                        {reimbursement.totalAmount >= 0 ? '+' : ''}
-                        {reimbursement.totalAmount.toFixed(2)} €
+                        {Math.abs(reimbursement.totalAmount).toFixed(2)} €
                       </span>
                     </div>
                   </div>
