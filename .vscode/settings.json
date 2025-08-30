@@ -1,4 +1,11 @@
 {
+  "comments.lineComment": "#",
+  "[plaintext]": {
+    "editor.comments.insertSpace": true
+  },
+  "files.associations": {
+    "*.txt": "shellscript"
+  },
   "cSpell.words": [
     "Benque",
     "clsx",

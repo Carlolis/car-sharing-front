@@ -78,7 +78,11 @@ export const Reimbursement = ({ reimbursements }: ReimbursementProps) => {
                         className="text-xs text-[#6B7280] font-body"
                         style={{ fontFamily: 'Montserrat, sans-serif' }}
                       >
-                        {reimbursement.totalAmount === 0 ? 'Comptes équilibrés' : reimbursement.totalAmount < 0 ? 'Doit de l\'argent' : 'Recevra de l\'argent'}
+                        {reimbursement.totalAmount === 0 ?
+                          'Comptes équilibrés' :
+                          reimbursement.totalAmount < 0 ?
+                          "Doit de l'argent" :
+                          "Donnera de l'argent"}
                       </p>
                     </div>
                   </div>
