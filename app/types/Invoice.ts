@@ -1,5 +1,5 @@
 import { Schema as Sc } from 'effect'
-import { DriversArrayEnsure, LocalDate } from './api'
+import { LocalDate } from './api'
 
 export const Invoice = Sc.Struct({
   id: Sc.String,
@@ -8,8 +8,9 @@ export const Invoice = Sc.Struct({
   date: LocalDate,
   mileage: Sc.optional(Sc.Union(Sc.Number, Sc.NumberFromString)),
   kind: Sc.String,
-  drivers: DriversArrayEnsure,
-  fileName: Sc.optional(Sc.String)
+  driver: Sc.String,
+  fileName: Sc.optional(Sc.String),
+  isReimbursement: Sc.Boolean
 })
 
 export type Invoice = Sc.Schema.Type<typeof Invoice>

@@ -7,9 +7,9 @@ import type { Invoice } from '~/types/Invoice'
 
 import { Loader } from 'components/ui/shadcn-io/ai/loader'
 import { Download, Edit3, Plus, Receipt } from 'lucide-react'
-import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group'
 import { Button } from '../ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { Checkbox } from '../ui/checkbox'
 import { Input } from '../ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 
@@ -249,21 +249,54 @@ export default function InvoiceForm(
                   >
                     Payé par <span className="text-red-500">*</span>
                   </Label>
-                  <RadioGroup
-                    className="flex flex-col gap-2 py-2"
-                    name="drivers"
-                    defaultValue={updateInvoice ? updateInvoice.drivers[0] : undefined}
+                  <Select
+                    name="driver"
+                    required
+                    defaultValue={updateInvoice?.driver}
                   >
-                    {personnes.map(personne => (
-                      <div key={personne.id} className="flex items-center gap-3 ">
-                        <RadioGroupItem
-                          id={personne.id}
-                          value={personne.id}
-                        />
-                        <Label>{personne.name}</Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
+                    <SelectTrigger
+                      className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
+                      style={{ fontFamily: 'Montserrat, sans-serif' }}
+                    >
+                      <SelectValue placeholder="Sélectionner un conducteur" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      {personnes.map(personne => (
+                        <SelectItem key={personne.id} value={personne.id}>
+                          <span
+                            className="text-sm lg:text-base font-body"
+                            style={{ fontFamily: 'Montserrat, sans-serif' }}
+                          >
+                            {personne.name}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    name="isReimbursement"
+                    id="isReimbursement"
+                    // checked={updateInvoice?.isReimbursement === undefined ?
+                    //   false :
+                    //   updateInvoice?.isReimbursement}
+                    value="true"
+                    defaultValue={updateInvoice?.isReimbursement === undefined ?
+                      'false' :
+                      updateInvoice?.isReimbursement.toString()}
+                    defaultChecked={updateInvoice?.isReimbursement === undefined ?
+                      false :
+                      updateInvoice?.isReimbursement}
+                    className="cursor-pointer "
+                  />
+                  <Label
+                    htmlFor="isReimbursement"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Remboursement
+                  </Label>
                 </div>
 
                 <div>

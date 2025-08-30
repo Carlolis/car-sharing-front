@@ -45,7 +45,8 @@ export const matcherInvoiceActions = (request: InvoiceActions) =>
             ...invoiceUpdate,
             fileBytes: content,
             fileName,
-            date: new Date(invoiceUpdate.date)
+            date: new Date(invoiceUpdate.date),
+            isReimbursement: invoiceUpdate.isReimbursement == 'false' || undefined ? false : true
           }).pipe(
             T.as({ invoiceName: invoiceUpdate.name, _tag: 'InvoiceName' as const })
           )
@@ -86,7 +87,8 @@ export const matcherInvoiceActions = (request: InvoiceActions) =>
           const invoiceId = yield* api.createInvoice({
             ...invoiceCreate,
             fileBytes: content,
-            fileName
+            fileName,
+            isReimbursement: invoiceCreate.isReimbursement == 'false' || undefined ? false : true
           }).pipe(
             T.as({ invoiceName: invoiceCreate.name, _tag: 'InvoiceName' as const })
           )

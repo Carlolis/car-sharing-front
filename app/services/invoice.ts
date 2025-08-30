@@ -34,6 +34,7 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
           ...invoice,
           fileBytes: invoice.fileBytes?.length
         })
+
         const invoiceUrl = pipe(postRequest, HttpClientRequest.appendUrl('/invoices'))
         const formData = new FormData()
         formData.append('name', invoice.name)
@@ -49,7 +50,8 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
 
         formData.append('fileName', JSON.stringify(invoice.fileName))
         formData.append('kind', invoice.kind)
-        invoice.drivers.forEach(driver => formData.append('drivers', driver))
+        formData.append('driver', invoice.driver)
+        formData.append('isReimbursement', invoice.isReimbursement === true ? 'true' : 'false')
 
         const createInvoiceRequest = pipe(
           invoiceUrl,
@@ -170,7 +172,7 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
 
         formData.append('fileName', JSON.stringify(invoice.fileName))
         formData.append('kind', invoice.kind)
-        invoice.drivers.forEach(driver => formData.append('drivers', driver))
+        formData.append('driver', invoice.driver)
 
         const updateInvoiceRequest = pipe(
           invoiceUrl,

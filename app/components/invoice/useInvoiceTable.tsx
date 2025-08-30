@@ -219,7 +219,7 @@ export function useInvoiceTable(
             ),
             footer: props => props.column.id
           }),
-          columnHelper.accessor('drivers', {
+          columnHelper.accessor('driver', {
             header: () => (
               <span
                 className="text-left p-4 text-[#004D55] font-semibold text-xs sm:text-sm"
@@ -230,10 +230,29 @@ export function useInvoiceTable(
             ),
             footer: props => props.column.id,
             cell: ({ getValue }) => {
-              const drivers = getValue<string[]>()
+              const driver = getValue<string>()
               return (
                 <span className="text-left p-4 text-[#004D55] font-semibold text-xs sm:text-sm">
-                  {drivers.join(', ')}
+                  {driver}
+                </span>
+              )
+            }
+          }),
+          columnHelper.accessor('isReimbursement', {
+            header: () => (
+              <span
+                className="text-left p-4 text-[#004D55] font-semibold text-xs sm:text-sm"
+                style={{ fontFamily: 'Montserrat, sans-serif' }}
+              >
+                Remboursement
+              </span>
+            ),
+            footer: props => props.column.id,
+            cell: ({ getValue }) => {
+              const isReimbursement = getValue<boolean>()
+              return (
+                <span className="text-left p-4 text-[#004D55] font-semibold text-xs sm:text-sm">
+                  {isReimbursement ? 'Oui' : 'Non'}
                 </span>
               )
             }

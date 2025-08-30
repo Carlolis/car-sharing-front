@@ -1,16 +1,17 @@
 import { FilesSchema } from '@effect/platform/Multipart'
 import { Schema as Sc } from 'effect'
-import { DriversArrayEnsure, LocalDate } from '~/types/api'
+import { LocalDate } from '~/types/api'
 
 export const InvoiceCreateFormTagged = Sc.Struct({
   _tag: Sc.Literal('create'),
   name: Sc.String,
   date: LocalDate,
   mileage: Sc.String,
-  drivers: DriversArrayEnsure,
+  driver: Sc.String,
   fileBytes: Sc.optional(FilesSchema),
   kind: Sc.String,
-  amount: Sc.NumberFromString
+  amount: Sc.NumberFromString,
+  isReimbursement: Sc.optional(Sc.Literal('true', 'false'))
 })
 
 export const InvoiceUpdateFormTagged = Sc.Struct({
@@ -19,10 +20,11 @@ export const InvoiceUpdateFormTagged = Sc.Struct({
   name: Sc.String,
   date: LocalDate,
   mileage: Sc.String,
-  drivers: DriversArrayEnsure,
+  driver: Sc.String,
   fileBytes: Sc.optional(FilesSchema),
   kind: Sc.String,
-  amount: Sc.NumberFromString
+  amount: Sc.NumberFromString,
+  isReimbursement: Sc.optional(Sc.Literal('true', 'false'))
 })
 
 export const TaggedDeleteInvoice = Sc.TaggedStruct('delete', {
