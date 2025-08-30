@@ -12,7 +12,8 @@ export const InvoiceUpdate = Sc.Struct({
   fileBytes: Sc.optional(Uint8Array),
   fileName: Sc.optional(Sc.String),
   kind: Sc.String,
-  isReimbursement: Sc.Boolean
+  isReimbursement: Sc.Boolean,
+  toDriver: Sc.optional(Sc.String)
 })
 
 export type InvoiceUpdate = Sc.Schema.Type<typeof InvoiceUpdate>

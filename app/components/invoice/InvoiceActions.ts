@@ -10,8 +10,8 @@ export const InvoiceCreateFormTagged = Sc.Struct({
   driver: Sc.String,
   fileBytes: Sc.optional(FilesSchema),
   kind: Sc.String,
-  amount: Sc.NumberFromString,
-  isReimbursement: Sc.optional(Sc.Literal('true', 'false'))
+  amount: Sc.NumberFromString
+  // isReimbursement: Sc.optional(Sc.Literal('true', 'false'))
 })
 
 export const InvoiceUpdateFormTagged = Sc.Struct({
@@ -23,8 +23,8 @@ export const InvoiceUpdateFormTagged = Sc.Struct({
   driver: Sc.String,
   fileBytes: Sc.optional(FilesSchema),
   kind: Sc.String,
-  amount: Sc.NumberFromString,
-  isReimbursement: Sc.optional(Sc.Literal('true', 'false'))
+  amount: Sc.NumberFromString
+  // isReimbursement: Sc.optional(Sc.Literal('true', 'false'))
 })
 
 export const TaggedDeleteInvoice = Sc.TaggedStruct('delete', {

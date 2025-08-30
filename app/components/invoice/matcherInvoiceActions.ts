@@ -46,7 +46,7 @@ export const matcherInvoiceActions = (request: InvoiceActions) =>
             fileBytes: content,
             fileName,
             date: new Date(invoiceUpdate.date),
-            isReimbursement: invoiceUpdate.isReimbursement == 'false' || undefined ? false : true
+            isReimbursement: invoiceUpdate.kind === 'Remboursement' ? true : false
           }).pipe(
             T.as({ invoiceName: invoiceUpdate.name, _tag: 'InvoiceName' as const })
           )
@@ -88,7 +88,7 @@ export const matcherInvoiceActions = (request: InvoiceActions) =>
             ...invoiceCreate,
             fileBytes: content,
             fileName,
-            isReimbursement: invoiceCreate.isReimbursement == 'false' || undefined ? false : true
+            isReimbursement: invoiceCreate.kind === 'Remboursement' ? true : false
           }).pipe(
             T.as({ invoiceName: invoiceCreate.name, _tag: 'InvoiceName' as const })
           )

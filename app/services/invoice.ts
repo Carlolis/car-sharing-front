@@ -173,6 +173,8 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
         formData.append('fileName', JSON.stringify(invoice.fileName))
         formData.append('kind', invoice.kind)
         formData.append('driver', invoice.driver)
+        formData.append('isReimbursement', invoice.isReimbursement === true ? 'true' : 'false')
+        formData.append('toDriver', invoice.toDriver ?? '')
 
         const updateInvoiceRequest = pipe(
           invoiceUrl,

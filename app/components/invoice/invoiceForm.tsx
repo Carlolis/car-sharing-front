@@ -41,6 +41,7 @@ export default function InvoiceForm(
     InvoiceFormProps
 ) {
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
+  const [selectedKind, setSelectedKind] = useState<string | undefined>(updateInvoice?.kind)
 
   const typesFactures = [
     'Carburant',
@@ -54,6 +55,10 @@ export default function InvoiceForm(
     'Autre',
     'Remboursement'
   ]
+
+  useEffect(() => {
+    setSelectedKind(updateInvoice?.kind)
+  }, [updateInvoice?.kind])
   useEffect(() => {
     const match = Match.type<typeof actionData>().pipe(
       Match.when(
@@ -168,6 +173,7 @@ export default function InvoiceForm(
                       name="kind"
                       required
                       defaultValue={updateInvoice?.kind}
+                      onValueChange={setSelectedKind}
                     >
                       <SelectTrigger
                         className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
@@ -275,32 +281,46 @@ export default function InvoiceForm(
                   </Select>
                 </div>
 
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    name="isReimbursement"
-                    id="isReimbursement"
-                    // checked={updateInvoice?.isReimbursement === undefined ?
-                    //   false :
-                    //   updateInvoice?.isReimbursement}
-                    value="true"
-                    defaultValue={updateInvoice?.isReimbursement === undefined ?
-                      'false' :
-                      updateInvoice?.isReimbursement.toString()}
-                    defaultChecked={updateInvoice?.isReimbursement === undefined ?
-                      false :
-                      updateInvoice?.isReimbursement}
-                    className="cursor-pointer "
-                  />
-                  <Label
-                    htmlFor="isReimbursement"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Remboursement
-                  </Label>
-                </div>
+                {selectedKind === 'Remboursement' && (
+                  <div>
+                    <Label
+                      className="text-[#004D55] text-sm lg:text-base font-body"
+                      style={{ fontFamily: 'Montserrat, sans-serif' }}
+                    >
+                      Remboursement à <span className="text-red-500">*</span>
+                    </Label>
+                    <Select
+                      name="toDriver"
+                      required
+                      defaultValue={updateInvoice?.toDriver}
+                    >
+                      <SelectTrigger
+                        className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
+                        style={{ fontFamily: 'Montserrat, sans-serif' }}
+                      >
+                        <SelectValue placeholder="Sélectionner un conducteur" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white">
+                        {personnes.map(personne => (
+                          <SelectItem key={personne.id} value={personne.id}>
+                            <span
+                              className="text-sm lg:text-base font-body"
+                              style={{ fontFamily: 'Montserrat, sans-serif' }}
+                            >
+                              {personne.name}
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
 
                 <div>
-                  <Label className="text-[#004D55] text-sm lg:text-base font-body">
+                  <Label
+                    className="text-[#004D55] text-sm lg:text-base font-body"
+                    style={{ fontFamily: 'Montserrat, sans-serif' }}
+                  >
                     Un fichier pdf/image ?
                   </Label>
 
