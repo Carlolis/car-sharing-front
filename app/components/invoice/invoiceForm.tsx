@@ -240,7 +240,7 @@ export default function InvoiceForm(
                     type="number"
                     name="amount"
                     min="0"
-                    step="0.1"
+                    step="0.01"
                     required
                     defaultValue={updateInvoice?.amount}
                     className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
