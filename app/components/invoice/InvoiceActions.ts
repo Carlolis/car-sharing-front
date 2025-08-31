@@ -23,7 +23,8 @@ export const InvoiceUpdateFormTagged = Sc.Struct({
   driver: Sc.String,
   fileBytes: Sc.optional(FilesSchema),
   kind: Sc.String,
-  amount: Sc.NumberFromString
+  amount: Sc.NumberFromString,
+  toDriver: Sc.optional(Sc.String)
   // isReimbursement: Sc.optional(Sc.Literal('true', 'false'))
 })
 

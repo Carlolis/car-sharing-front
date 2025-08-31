@@ -24,39 +24,24 @@ const getTypeColors = (type: string) => {
       border: '#003640'
     },
     'Entretien': {
-      bg: '#D91A5B',
-      text: '#FFFFFF',
-      border: '#B91450'
-    },
-    'Assurance': {
-      bg: '#EA6100',
-      text: '#FFFFFF',
-      border: '#D15500'
-    },
-    'Réparation': {
-      bg: '#DC2626',
-      text: '#FFFFFF',
-      border: '#B91C1C'
-    },
-    'Contrôle technique': {
-      bg: '#0891B2',
-      text: '#FFFFFF',
-      border: '#0E7490'
-    },
-    'Péage': {
       bg: '#059669',
       text: '#FFFFFF',
       border: '#047857'
     },
-    'Parking': {
+    'Assurance': {
       bg: '#7C3AED',
       text: '#FFFFFF',
       border: '#6D28D9'
     },
-    'Lavage': {
-      bg: '#C2410C',
+    'Réparation': {
+      bg: '#0891B2',
       text: '#FFFFFF',
-      border: '#9A3412'
+      border: '#0E7490'
+    },
+    'Remboursement': {
+      bg: '#D91A5B',
+      text: '#FFFFFF',
+      border: '#B91450'
     },
     'Autre': {
       bg: '#374151',
@@ -225,34 +210,16 @@ export function useInvoiceTable(
                 className="text-left p-4 text-[#004D55] font-semibold text-xs sm:text-sm"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
-                {isMobile ? 'Par' : 'Payé par'}
+                {isMobile ? 'Par / Pour' : 'Payé par / Pour'}
               </span>
             ),
             footer: props => props.column.id,
-            cell: ({ getValue }) => {
+            cell: ({ getValue, cell }) => {
               const driver = getValue<string>()
               return (
                 <span className="text-left p-4 text-[#004D55] font-semibold text-xs sm:text-sm">
                   {driver}
-                </span>
-              )
-            }
-          }),
-          columnHelper.accessor('isReimbursement', {
-            header: () => (
-              <span
-                className="text-left p-4 text-[#004D55] font-semibold text-xs sm:text-sm"
-                style={{ fontFamily: 'Montserrat, sans-serif' }}
-              >
-                Remboursement
-              </span>
-            ),
-            footer: props => props.column.id,
-            cell: ({ getValue }) => {
-              const isReimbursement = getValue<boolean>()
-              return (
-                <span className="text-left p-4 text-[#004D55] font-semibold text-xs sm:text-sm">
-                  {isReimbursement ? 'Oui' : 'Non'}
+                  {cell.row.original.toDriver ? ` / ${cell.row.original.toDriver}` : ''}
                 </span>
               )
             }
