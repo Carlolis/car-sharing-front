@@ -194,14 +194,17 @@ export function useInvoiceTable(
                 {isMobile ? 'Km' : 'Kilométrage'}
               </span>
             ),
-            cell: ({ getValue }) => (
-              <span
-                className="text-left sm:p-4 text-[#004D55] font-semibold text-xs sm:text-sm"
-                style={{ fontFamily: 'Montserrat, sans-serif' }}
-              >
-                {getValue()} {isMobile ? null : 'Km'}
-              </span>
-            ),
+            cell: ({ getValue }) => {
+              const mileage = getValue() as string
+              return (
+                <span
+                  className="text-left sm:p-4 text-[#004D55] font-semibold text-xs sm:text-sm"
+                  style={{ fontFamily: 'Montserrat, sans-serif' }}
+                >
+                  {mileage} {isMobile || mileage === undefined ? null : 'Km'}
+                </span>
+              )
+            },
             footer: props => props.column.id
           }),
           columnHelper.accessor('driver', {

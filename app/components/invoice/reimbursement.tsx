@@ -1,5 +1,7 @@
 import { ArrowRight, Badge, Check, CreditCard, DollarSign, User } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
+import { useEffect, useState } from 'react'
+import { useFetcher } from 'react-router'
 import type { Reimbursement as ReimbursementType } from '~/types/Reimbursement'
 import { Button } from '../ui/button'
 import { Card, CardHeader } from '../ui/card'
@@ -9,7 +11,35 @@ interface ReimbursementProps {
 }
 
 export const Reimbursement = ({ reimbursements }: ReimbursementProps) => {
-  const remboursementsPayes = new Set()
+  const [loadingIds, setLoadingIds] = useState(new Set<string>())
+  const fetcher = useFetcher()
+
+  const createInvoiceReimbursement = (
+    suggestion: { de: string; vers: string; montant: number }
+  ) => {
+    const suggestionId = `${suggestion.de}-${suggestion.vers}`
+    setLoadingIds(prev => new Set(prev).add(suggestionId))
+
+    const formData = new FormData()
+    formData.append('_tag', 'create')
+    formData.append('name', `De ${suggestion.de} à ${suggestion.vers}`)
+    formData.append('date', new Date().toISOString().split('T')[0])
+    formData.append('mileage', '')
+    formData.append('amount', suggestion.montant.toString())
+    formData.append('driver', suggestion.de)
+    formData.append('kind', 'Remboursement')
+
+    formData.append('toDriver', suggestion.vers)
+
+    fetcher.submit(formData, { method: 'post' })
+  }
+
+  useEffect(() => {
+    if (fetcher.state === 'idle') {
+      setLoadingIds(new Set())
+    }
+  }, [fetcher.state])
+
   const suggestions = reimbursements.map(reimbursement => {
     const toEntries = Object.entries(reimbursement.to)
     return toEntries.map(([toDriver, amount]) => ({
@@ -119,9 +149,7 @@ export const Reimbursement = ({ reimbursements }: ReimbursementProps) => {
               <AnimatePresence mode="popLayout">
                 {suggestions.map((suggestion, index) => {
                   const suggestionId = `${suggestion.de}-${suggestion.vers}-${index}`
-                  const estPaye = remboursementsPayes.has(suggestionId)
-
-                  if (estPaye) return null
+                  const isLoading = loadingIds.has(`${suggestion.de}-${suggestion.vers}`)
 
                   return (
                     <motion.div
@@ -183,11 +211,13 @@ export const Reimbursement = ({ reimbursements }: ReimbursementProps) => {
                           </span>
 
                           <Button
-                            className="bg-gradient-to-r from-[#004D55] to-[#003640] hover:from-[#003640] hover:to-[#002a30] text-white border-0 shadow-lg min-w-[44px] min-h-[44px] px-3 py-2 text-sm font-semibold font-body transition-all duration-300 hover:scale-105"
+                            onClick={() => createInvoiceReimbursement(suggestion)}
+                            disabled={isLoading}
+                            className="bg-gradient-to-r from-[#004D55] to-[#003640] hover:from-[#003640] hover:to-[#002a30] text-white border-0 shadow-lg min-w-[44px] min-h-[44px] px-3 py-2 text-sm font-semibold font-body transition-all duration-300 hover:scale-105 disabled:opacity-50"
                             style={{ fontFamily: 'Montserrat, sans-serif' }}
                           >
                             <Check className="h-4 w-4 mr-2" />
-                            Marquer comme payé
+                            {isLoading ? 'Création...' : 'Marquer comme payé'}
                           </Button>
                         </div>
                       </div>
@@ -203,11 +233,13 @@ export const Reimbursement = ({ reimbursements }: ReimbursementProps) => {
                             {suggestion.montant.toFixed(2)} €
                           </span>
                           <Button
-                            className="bg-gradient-to-r from-[#004D55] to-[#003640] hover:from-[#003640] hover:to-[#002a30] text-white border-0 shadow-lg min-w-[44px] min-h-[44px] px-3 py-2 text-sm font-semibold font-body transition-all duration-300 hover:scale-105"
+                            onClick={() => createInvoiceReimbursement(suggestion)}
+                            disabled={isLoading}
+                            className="bg-gradient-to-r from-[#004D55] to-[#003640] hover:from-[#003640] hover:to-[#002a30] text-white border-0 shadow-lg min-w-[44px] min-h-[44px] px-3 py-2 text-sm font-semibold font-body transition-all duration-300 hover:scale-105 disabled:opacity-50"
                             style={{ fontFamily: 'Montserrat, sans-serif' }}
                           >
                             <Check className="h-4 w-4 mr-2" />
-                            Payé
+                            {isLoading ? 'Création...' : 'Payé'}
                           </Button>
                         </div>
 
