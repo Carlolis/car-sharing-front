@@ -30,7 +30,7 @@ export const SideBar = ({ menuItems, isAuthenticated }: SideBarProps) => {
     <SidebarProvider>
       <div className="flex lg:min-h-screen border-r-0 w-full">
         {/* Navigation Mobile */}
-        <div className="lg:hidden flex justify-around border-r-0 bg-[#004D55] text-white w-full px-4 p-2 lg:w-50">
+        <div className="lg:hidden flex justify-between border-r-0 bg-[#004D55] text-white w-full px-4 p-2 lg:w-50">
           <Button
             onClick={() => setIsMobileMenuOpen(true)}
             className="flex items-center justify-center text-[rgba(86,252,255,1)] hover:text-[#004D55]/80 w-12 h-12"

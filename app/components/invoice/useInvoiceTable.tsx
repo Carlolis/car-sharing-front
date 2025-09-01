@@ -249,16 +249,18 @@ export function useInvoiceTable(
               }
 
               return (
-                <Link
-                  to={{
-                    pathname: '/invoices/download',
-                    search: `?fileName=${getValue()}&id=${row.original.id}`
-                  }}
-                  download
-                  reloadDocument
-                >
-                  <Download className="h-4 w-4" />
-                </Link>
+                <div className="p-4">
+                  <Link
+                    to={{
+                      pathname: '/invoices/download',
+                      search: `?fileName=${getValue()}&id=${row.original.id}`
+                    }}
+                    download
+                    reloadDocument
+                  >
+                    <Download className="h-4 w-4" />
+                  </Link>
+                </div>
               )
             },
             footer: props => props.column.id
