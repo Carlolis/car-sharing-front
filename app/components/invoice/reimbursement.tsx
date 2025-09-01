@@ -67,14 +67,6 @@ export const Reimbursement = ({ reimbursements }: ReimbursementProps) => {
         >
           Suggestions de remboursements
         </span>
-        {suggestions.length > 0 && (
-          <Badge
-            className="bg-gradient-to-r from-[#004D55] to-[#003640] text-white border-0 shadow-sm text-xs lg:text-sm px-2 py-1 ml-auto font-body"
-            style={{ fontFamily: 'Montserrat, sans-serif' }}
-          >
-            {suggestions.length} suggestion{suggestions.length > 1 ? 's' : ''}
-          </Badge>
-        )}
       </CardHeader>
 
       {suggestions.length > 0 ?
