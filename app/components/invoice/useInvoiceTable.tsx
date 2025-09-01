@@ -220,7 +220,7 @@ export function useInvoiceTable(
             cell: ({ getValue, cell }) => {
               const driver = getValue<string>()
               return (
-                <span className="text-left p-4 text-[#004D55] font-semibold text-xs sm:text-sm">
+                <span className="text-left sm:p-4 text-[#004D55] font-semibold text-xs sm:text-sm">
                   {driver}
                   {cell.row.original.toDriver ? ` / ${cell.row.original.toDriver}` : ''}
                 </span>
