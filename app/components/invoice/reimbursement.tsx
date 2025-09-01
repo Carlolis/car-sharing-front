@@ -1,4 +1,4 @@
-import { ArrowRight, Badge, Check, CreditCard, DollarSign, User } from 'lucide-react'
+import { ArrowRight, Check, CreditCard, DollarSign, User } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { useFetcher } from 'react-router'
@@ -8,9 +8,10 @@ import { Card, CardHeader } from '../ui/card'
 
 interface ReimbursementProps {
   reimbursements: readonly ReimbursementType[]
+  fairPart: number
 }
 
-export const Reimbursement = ({ reimbursements }: ReimbursementProps) => {
+export const Reimbursement = ({ reimbursements, fairPart }: ReimbursementProps) => {
   const [loadingIds, setLoadingIds] = useState(new Set<string>())
   const fetcher = useFetcher()
 
@@ -96,6 +97,7 @@ export const Reimbursement = ({ reimbursements }: ReimbursementProps) => {
                       >
                         {reimbursement.driverName}
                       </h4>
+
                       <p
                         className="text-xs text-[#6B7280] font-body"
                         style={{ fontFamily: 'Montserrat, sans-serif' }}
@@ -103,26 +105,57 @@ export const Reimbursement = ({ reimbursements }: ReimbursementProps) => {
                         {reimbursement.totalAmount === 0 ?
                           'Comptes équilibrés' :
                           reimbursement.totalAmount < 0 ?
-                          "Doit de l'argent" :
-                          "Donnera de l'argent"}
+                          "Recevra de l'argent" :
+                          "Doit de l'argent"}
                       </p>
                     </div>
                   </div>
                   <div className="space-y-2">
+                    <div className="flex justify-between border-gray-200 ">
+                      <span
+                        className="text-xs lg:text-sm text-[#6B7280] font-body"
+                        style={{ fontFamily: 'Montserrat, sans-serif' }}
+                      >
+                        A payé :
+                      </span>
+
+                      <span
+                        className={`font-bold text-sm lg:text-base font-body `}
+                        style={{ fontFamily: 'Montserrat, sans-serif' }}
+                      >
+                        {Math.abs(fairPart - reimbursement.totalAmount).toFixed(2)} €
+                      </span>
+                    </div>
+                    <div className="flex justify-between  border-gray-200 ">
+                      <span
+                        className="text-xs lg:text-sm text-[#6B7280] font-body"
+                        style={{ fontFamily: 'Montserrat, sans-serif' }}
+                      >
+                        Part équitable
+                      </span>
+
+                      <span
+                        className={`font-bold text-sm lg:text-base font-body`}
+                        style={{ fontFamily: 'Montserrat, sans-serif' }}
+                      >
+                        {Math.abs(fairPart).toFixed(2)} €
+                      </span>
+                    </div>
                     <div className="flex justify-between border-t border-gray-200 pt-2">
                       <span
                         className="text-xs lg:text-sm text-[#6B7280] font-body"
                         style={{ fontFamily: 'Montserrat, sans-serif' }}
                       >
-                        {reimbursement.totalAmount === 0 ? 'Équilibré:' : 'Doit au total:'}
+                        Solde :
                       </span>
+
                       <span
                         className={`font-bold text-sm lg:text-base font-body ${
-                          reimbursement.totalAmount === 0 ? 'text-green-600' : 'text-red-600'
+                          reimbursement.totalAmount <= 0 ? 'text-green-600' : 'text-red-600'
                         }`}
                         style={{ fontFamily: 'Montserrat, sans-serif' }}
                       >
-                        {Math.abs(reimbursement.totalAmount).toFixed(2)} €
+                        {-reimbursement.totalAmount.toFixed(2)} €
                       </span>
                     </div>
                   </div>
