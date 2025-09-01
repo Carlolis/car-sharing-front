@@ -10,7 +10,6 @@ export const Invoice = Sc.Struct({
   kind: Sc.String,
   driver: Sc.String,
   fileName: Sc.optional(Sc.String),
-  isReimbursement: Sc.Boolean,
   toDriver: Sc.optional(Sc.String)
 })
 

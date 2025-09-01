@@ -12,7 +12,6 @@ export const InvoiceCreateFormTagged = Sc.Struct({
   kind: Sc.String,
   amount: Sc.NumberFromString,
   toDriver: Sc.optional(Sc.String)
-  // isReimbursement: Sc.optional(Sc.Literal('true', 'false'))
 })
 
 export const InvoiceUpdateFormTagged = Sc.Struct({
@@ -26,7 +25,6 @@ export const InvoiceUpdateFormTagged = Sc.Struct({
   kind: Sc.String,
   amount: Sc.NumberFromString,
   toDriver: Sc.optional(Sc.String)
-  // isReimbursement: Sc.optional(Sc.Literal('true', 'false'))
 })
 
 export const TaggedDeleteInvoice = Sc.TaggedStruct('delete', {
