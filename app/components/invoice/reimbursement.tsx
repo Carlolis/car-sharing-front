@@ -131,7 +131,7 @@ export const Reimbursement = ({ reimbursements, fairPart }: ReimbursementProps) 
                         className="text-xs lg:text-sm text-[#6B7280] font-body"
                         style={{ fontFamily: 'Montserrat, sans-serif' }}
                       >
-                        Part équitable
+                        Part équitable :
                       </span>
 
                       <span
