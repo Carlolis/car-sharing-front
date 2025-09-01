@@ -42,6 +42,8 @@ export default function InvoiceForm(
 ) {
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
   const [selectedKind, setSelectedKind] = useState<string | undefined>(updateInvoice?.kind)
+  const [selectedDriver, setSelectedDriver] = useState<string | undefined>(updateInvoice?.driver)
+  const [selectedToDriver, setSelectedToDriver] = useState<string | undefined>(updateInvoice?.toDriver)
 
   const typesFactures = [
     'Carburant',
@@ -55,7 +57,9 @@ export default function InvoiceForm(
 
   useEffect(() => {
     setSelectedKind(updateInvoice?.kind)
-  }, [updateInvoice?.kind])
+    setSelectedDriver(updateInvoice?.driver)
+    setSelectedToDriver(updateInvoice?.toDriver)
+  }, [updateInvoice?.kind, updateInvoice?.driver, updateInvoice?.toDriver])
   useEffect(() => {
     const match = Match.type<typeof actionData>().pipe(
       Match.when(
@@ -82,6 +86,15 @@ export default function InvoiceForm(
     { id: 'charles' as const, name: 'Charles' },
     { id: 'brigitte' as const, name: 'Brigitte' }
   ]
+
+  // Filtrer les personnes disponibles pour les remboursements
+  const availableDrivers = selectedKind === 'Remboursement' && selectedToDriver
+    ? personnes.filter(p => p.id !== selectedToDriver)
+    : personnes
+
+  const availableToDrivers = selectedKind === 'Remboursement' && selectedDriver
+    ? personnes.filter(p => p.id !== selectedDriver)
+    : personnes
 
   return (
     <AnimatePresence>
@@ -256,6 +269,7 @@ export default function InvoiceForm(
                     name="driver"
                     required
                     defaultValue={updateInvoice?.driver}
+                    onValueChange={setSelectedDriver}
                   >
                     <SelectTrigger
                       className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
@@ -264,7 +278,7 @@ export default function InvoiceForm(
                       <SelectValue placeholder="Sélectionner un conducteur" />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
-                      {personnes.map(personne => (
+                      {availableDrivers.map(personne => (
                         <SelectItem key={personne.id} value={personne.id}>
                           <span
                             className="text-sm lg:text-base font-body"
@@ -290,6 +304,7 @@ export default function InvoiceForm(
                       name="toDriver"
                       required
                       defaultValue={updateInvoice?.toDriver}
+                      onValueChange={setSelectedToDriver}
                     >
                       <SelectTrigger
                         className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
@@ -298,7 +313,7 @@ export default function InvoiceForm(
                         <SelectValue placeholder="Sélectionner un conducteur" />
                       </SelectTrigger>
                       <SelectContent className="bg-white">
-                        {personnes.map(personne => (
+                        {availableToDrivers.map(personne => (
                           <SelectItem key={personne.id} value={personne.id}>
                             <span
                               className="text-sm lg:text-base font-body"
