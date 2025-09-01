@@ -1,6 +1,6 @@
-import { Edit3, Trash2 } from 'lucide-react'
+import { Download, Edit3, FileText, Trash2 } from 'lucide-react'
 import { motion } from 'motion/react'
-import { useSubmit } from 'react-router'
+import { Link, useSubmit } from 'react-router'
 import { DeleteButton } from '../dashboard/DeleteButton'
 import {
   AlertDialog,
@@ -15,26 +15,56 @@ import {
 } from '../ui/alert-dialog'
 import { Button } from '../ui/button'
 
-interface TableEditAndDeleteProps<T,> {
+interface TableEditAndDeleteProps<
+  T extends {
+    fileName?: string
+    id: string
+  },
+> {
   setDataUpdate: (data: T) => void
   data: T
   getValue: () => string | undefined
   entityType: 'trip' | 'invoice'
 }
 
-export const TableEditAndDelete = <T,>(
+export const TableEditAndDelete = <
+  T extends {
+    fileName?: string
+    id: string
+  },
+>(
   { setDataUpdate, data, getValue, entityType }: TableEditAndDeleteProps<T>
 ) => {
   const submit = useSubmit()
+
   return (
-    <div className="   ">
+    <div className="flex sm:flex-row flex-col  items-center  ">
+      {data.fileName && data.id && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-8 p-0 hover:bg-[#004D55]/10 text-[#6B7280] hover:text-[#004D55]"
+        >
+          <Link
+            to={{
+              pathname: '/invoices/download',
+              search: `?fileName=${data.fileName}&id=${data.id}`
+            }}
+            download
+            reloadDocument
+            title={data.fileName ? 'Voir le PDF' : 'Aucun PDF disponible'}
+          >
+            <FileText className="h-4 w-4" />
+          </Link>
+        </Button>
+      )}
       <Button
         variant="ghost"
         size="sm"
         onClick={() => {
           setDataUpdate(data)
         }}
-        className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 hover:text-blue-700"
+        className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 hover:text-blue-700 cursor-pointer"
       >
         <Edit3 className="h-3 w-3 lg:h-4 lg:w-4" />
       </Button>
@@ -44,7 +74,7 @@ export const TableEditAndDelete = <T,>(
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 hover:text-red-700"
+            className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 hover:text-red-700  cursor-pointer"
           >
             <Trash2 className="h-4 w-4" />
           </Button>

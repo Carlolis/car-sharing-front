@@ -227,44 +227,6 @@ export function useInvoiceTable(
               )
             }
           }),
-          columnHelper.accessor('fileName', {
-            id: 'download',
-            header: () => (
-              <span
-                className="text-left sm:p-4 p-1 text-[#004D55] font-semibold text-xs sm:text-sm"
-                style={{ fontFamily: 'Montserrat, sans-serif' }}
-              >
-                {isMobile ? 'DL' : 'Fichier'}
-              </span>
-            ),
-            cell: ({ getValue, row }) => {
-              const fileName = getValue() as string | undefined
-
-              if (!fileName) {
-                return (
-                  <span className="text-gray-400 text-xs sm:text-sm p-4">
-                    Aucun fichier
-                  </span>
-                )
-              }
-
-              return (
-                <div className="p-4">
-                  <Link
-                    to={{
-                      pathname: '/invoices/download',
-                      search: `?fileName=${getValue()}&id=${row.original.id}`
-                    }}
-                    download
-                    reloadDocument
-                  >
-                    <Download className="h-4 w-4" />
-                  </Link>
-                </div>
-              )
-            },
-            footer: props => props.column.id
-          }),
           columnHelper.accessor('id', {
             id: 'actions',
             header: () => (
