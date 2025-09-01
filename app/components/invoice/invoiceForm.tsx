@@ -49,9 +49,6 @@ export default function InvoiceForm(
     'Assurance',
     'Réparation',
     'Contrôle technique',
-    'Péage',
-    'Parking',
-    'Lavage',
     'Autre',
     'Remboursement'
   ]

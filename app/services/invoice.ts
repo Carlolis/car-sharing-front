@@ -47,8 +47,8 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
         if (invoice.mileage.length) formData.append('mileage', JSON.stringify(+invoice.mileage))
 
         formData.append('amount', JSON.stringify(invoice.amount))
+        if (invoice.fileName) formData.append('fileName', JSON.stringify(invoice.fileName))
 
-        formData.append('fileName', JSON.stringify(invoice.fileName))
         formData.append('kind', invoice.kind)
         formData.append('driver', invoice.driver)
         formData.append('isReimbursement', invoice.isReimbursement === true ? 'true' : 'false')
