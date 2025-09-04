@@ -110,7 +110,7 @@ export default function MaintenancePage({ loaderData, actionData }: MaintenanceP
                 className="text-2xl lg:text-3xl font-semibold text-[#004D55] font-heading"
                 style={{ fontFamily: 'Montserrat Alternates, sans-serif' }}
               >
-                Maintenance
+                Maintenance (pas encore finis)
               </h1>
               <p
                 className="text-[#6B7280] text-sm lg:text-base font-body"
