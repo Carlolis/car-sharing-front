@@ -1,11 +1,11 @@
 import { FilesSchema } from '@effect/platform/Multipart'
 import { Schema as Sc } from 'effect'
-import { LocalDate } from '~/types/api'
+import { FormattedLocalDate } from '../../types/FormattedLocalDate'
 
 export const InvoiceCreateFormTagged = Sc.Struct({
   _tag: Sc.Literal('create'),
   name: Sc.String,
-  date: LocalDate,
+  date: FormattedLocalDate,
   mileage: Sc.String,
   driver: Sc.String,
   fileBytes: Sc.optional(FilesSchema),
@@ -18,7 +18,7 @@ export const InvoiceUpdateFormTagged = Sc.Struct({
   _tag: Sc.Literal('update'),
   id: Sc.UUID,
   name: Sc.String,
-  date: LocalDate,
+  date: FormattedLocalDate,
   mileage: Sc.String,
   driver: Sc.String,
   fileBytes: Sc.optional(FilesSchema),

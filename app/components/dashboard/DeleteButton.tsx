@@ -2,14 +2,12 @@ import type { SubmitFunction } from 'react-router'
 
 import { Trash2 } from 'lucide-react'
 
-import { TaggedDeleteInvoice } from '../invoice/InvoiceActions'
 import { Button } from '../ui/button'
-import { TaggedDeleteTrip } from './TripActions'
 
 type DeleteButtonProps = {
   id?: string
   submit?: SubmitFunction
-  entityType: 'trip' | 'invoice'
+  entityType: 'trip' | 'invoice' | 'maintenance'
 }
 
 export const DeleteButton = ({ id, submit, entityType }: DeleteButtonProps): JSX.Element => {
@@ -17,20 +15,19 @@ export const DeleteButton = ({ id, submit, entityType }: DeleteButtonProps): JSX
     if (!id || !submit) return
 
     if (entityType === 'trip') {
-      const taggedDeletedTrip = TaggedDeleteTrip.make({
-        tripId: id
-      })
-      submit(taggedDeletedTrip, {
+      submit({ _tag: 'delete', tripId: id }, {
         method: 'post',
         encType: 'application/json'
       })
     } else if (entityType === 'invoice') {
-      const taggedDeletedInvoice = TaggedDeleteInvoice.make({
-        invoiceId: id
-      })
-      submit(taggedDeletedInvoice, {
+      submit({ _tag: 'delete', invoiceId: id }, {
         method: 'post',
         encType: 'multipart/form-data'
+      })
+    } else if (entityType === 'maintenance') {
+      submit({ _tag: 'delete', maintenanceId: id }, {
+        method: 'post',
+        encType: 'application/x-www-form-urlencoded'
       })
     }
   }

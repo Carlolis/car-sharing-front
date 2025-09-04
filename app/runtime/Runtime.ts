@@ -13,6 +13,7 @@ import { AuthLayer } from '~/services/auth'
 import { HttpLayer } from '~/services/httpClient'
 import { IALayer } from '~/services/ia'
 import { InvoiceLayer } from '~/services/invoice'
+import { MaintenanceLayer } from '~/services/maintenance'
 import { TripLayer } from '~/services/trip'
 
 import { Config, ConfigLive } from './Config'
@@ -36,6 +37,7 @@ export const AppLayer = pipe(
   L.provideMerge(AuthLayer),
   L.provideMerge(TripLayer),
   L.provideMerge(InvoiceLayer),
+  L.provideMerge(MaintenanceLayer),
   L.provideMerge(IALayer),
   L.provide(HttpLayer),
   L.provide(ConfigLive),

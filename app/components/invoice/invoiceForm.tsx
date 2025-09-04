@@ -9,7 +9,7 @@ import { Loader } from 'components/ui/shadcn-io/ai/loader'
 import { Download, Edit3, Plus, Receipt } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
-import { Checkbox } from '../ui/checkbox'
+
 import { Input } from '../ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 
@@ -43,7 +43,9 @@ export default function InvoiceForm(
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
   const [selectedKind, setSelectedKind] = useState<string | undefined>(updateInvoice?.kind)
   const [selectedDriver, setSelectedDriver] = useState<string | undefined>(updateInvoice?.driver)
-  const [selectedToDriver, setSelectedToDriver] = useState<string | undefined>(updateInvoice?.toDriver)
+  const [selectedToDriver, setSelectedToDriver] = useState<string | undefined>(
+    updateInvoice?.toDriver
+  )
 
   const typesFactures = [
     'Carburant',
@@ -88,13 +90,13 @@ export default function InvoiceForm(
   ]
 
   // Filtrer les personnes disponibles pour les remboursements
-  const availableDrivers = selectedKind === 'Remboursement' && selectedToDriver
-    ? personnes.filter(p => p.id !== selectedToDriver)
-    : personnes
+  const availableDrivers = selectedKind === 'Remboursement' && selectedToDriver ?
+    personnes.filter(p => p.id !== selectedToDriver) :
+    personnes
 
-  const availableToDrivers = selectedKind === 'Remboursement' && selectedDriver
-    ? personnes.filter(p => p.id !== selectedDriver)
-    : personnes
+  const availableToDrivers = selectedKind === 'Remboursement' && selectedDriver ?
+    personnes.filter(p => p.id !== selectedDriver) :
+    personnes
 
   return (
     <AnimatePresence>

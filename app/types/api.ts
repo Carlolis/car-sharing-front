@@ -1,43 +1,7 @@
-import { DateTime, identity, pipe, Schema as Sc } from 'effect'
+import { identity, Schema as Sc } from 'effect'
 import { ensure } from 'effect/Array'
-import { formatIsoDateUtc } from 'effect/DateTime'
 import { Drivers } from '~/lib/models/Drivers'
-
-export const LocalDate = Sc.transform(
-  // Source schema: "on" or "off"
-
-  Sc.String,
-  // Target schema: boolean
-
-  Sc.DateFromSelf,
-  {
-    // optional but you get better error messages from TypeScript
-
-    strict: true,
-
-    // Transformation to convert the output of the
-
-    // source schema ("on" | "off") into the input of the
-
-    // target schema (boolean)
-
-    decode: x => Sc.decodeSync(Sc.DateFromString)(x), // Always succeeds here
-
-    // Reverse transformation
-
-    encode: date =>
-      pipe(
-        date,
-        DateTime.unsafeFromDate,
-        formatIsoDateUtc
-        // formatIso({
-        //   year: 'numeric',
-        //   day: '2-digit',
-        //   month: '2-digit'
-        // })
-      )
-  }
-)
+import { FormattedLocalDate } from './FormattedLocalDate'
 
 export const DriversArrayEnsure = Sc.transform(
   Sc.Union(Sc.String, Drivers),
@@ -56,8 +20,8 @@ export const OptionalNumberFromString = Sc.optional(Sc.NumberFromString)
 
 export const TripCreate = Sc.Struct({
   name: Sc.String,
-  startDate: LocalDate,
-  endDate: LocalDate,
+  startDate: FormattedLocalDate,
+  endDate: FormattedLocalDate,
   distance: OptionalNumberFromString,
   drivers: DriversArrayEnsure,
   comments: Sc.optional(Sc.String)
@@ -74,8 +38,8 @@ export type Username = Sc.Schema.Type<typeof Username>
 export const TripUpdate = Sc.Struct({
   id: Sc.String,
   name: Sc.String,
-  startDate: LocalDate,
-  endDate: LocalDate,
+  startDate: FormattedLocalDate,
+  endDate: FormattedLocalDate,
   distance: Sc.optional(Sc.Number),
   drivers: DriversArrayEnsure,
   comments: Sc.optional(Sc.String)

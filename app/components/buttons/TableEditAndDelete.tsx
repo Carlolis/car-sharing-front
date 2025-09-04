@@ -1,5 +1,4 @@
-import { Download, Edit3, FileText, Trash2 } from 'lucide-react'
-import { motion } from 'motion/react'
+import { Edit3, FileText, Trash2 } from 'lucide-react'
 import { Link, useSubmit } from 'react-router'
 import { DeleteButton } from '../dashboard/DeleteButton'
 import {
@@ -24,7 +23,7 @@ interface TableEditAndDeleteProps<
   setDataUpdate: (data: T) => void
   data: T
   getValue: () => string | undefined
-  entityType: 'trip' | 'invoice'
+  entityType: 'trip' | 'invoice' | 'maintenance'
 }
 
 export const TableEditAndDelete = <

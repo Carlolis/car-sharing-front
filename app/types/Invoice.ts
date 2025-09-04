@@ -1,11 +1,11 @@
 import { Schema as Sc } from 'effect'
-import { LocalDate } from './api'
+import { FormattedLocalDate } from './FormattedLocalDate'
 
 export const Invoice = Sc.Struct({
   id: Sc.String,
   name: Sc.String,
   amount: Sc.Number,
-  date: LocalDate,
+  date: FormattedLocalDate,
   mileage: Sc.optional(Sc.Union(Sc.Number, Sc.NumberFromString)),
   kind: Sc.String,
   driver: Sc.String,
