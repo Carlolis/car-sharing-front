@@ -117,7 +117,7 @@ export const NewTripForm = (
           <Card className="bg-white border-gray-200 shadow-lg">
             <CardHeader>
               <CardTitle
-                className="text-lg lg:text-xl text-[#004D55] flex items-center gap-2 font-heading"
+                className="text-lg lg:text-xl text-[#004D55] flex items-center gap-2 font-heading py-2"
                 style={{ fontFamily: 'Montserrat Alternates, sans-serif' }}
               >
                 <motion.div

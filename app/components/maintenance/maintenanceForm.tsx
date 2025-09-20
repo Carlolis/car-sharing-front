@@ -93,7 +93,7 @@ export default function MaintenanceForm(
         >
           <Card className="w-full border border-[#E5E7EB] shadow-md">
             <CardHeader className="bg-gradient-to-r from-[#059669] to-[#047857] text-white rounded-t-lg">
-              <CardTitle className="flex items-center gap-3">
+              <CardTitle className="flex items-center gap-3 py-2">
                 {updateMaintenance ? <Edit3 className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
                 <span style={{ fontFamily: 'Montserrat, sans-serif' }}>
                   {updateMaintenance ? "Modifier l'entretien" : 'Nouvel entretien'}
