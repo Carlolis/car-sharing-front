@@ -1,6 +1,9 @@
 import { HttpServerRequest } from '@effect/platform'
 import { Loader } from 'components/ui/shadcn-io/ai/loader'
+import { pipe } from 'effect'
+import * as A from 'effect/Array'
 import * as T from 'effect/Effect'
+import * as O from 'effect/Option'
 import { Minus, Plus, Wrench } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useState } from 'react'
@@ -22,9 +25,9 @@ export const loader = Remix.loader(
   T.gen(function* () {
     const maintenanceService = yield* MaintenanceService
     const invoiceService = yield* InvoiceService
-    const maintenance = yield* maintenanceService.getAllMaintenance()
+    const maintenances = yield* maintenanceService.getAllMaintenance()
     const invoicesWithoutMaintenance = yield* invoiceService.getInvoicesWithoutMaintenance()
-    return { maintenance, invoicesWithoutMaintenance }
+    return { maintenances, invoicesWithoutMaintenance }
   }).pipe(
     T.catchTag('RequestError', error => new Unexpected({ error: error.message })),
     T.catchTag('ResponseError', error => new Unexpected({ error: error.message }))
@@ -46,7 +49,7 @@ export const action = Remix.action(
 
 interface MaintenancePageProps {
   loaderData: {
-    maintenance: readonly Maintenance[]
+    maintenances: readonly Maintenance[]
     invoicesWithoutMaintenance: readonly Invoice[]
   }
   actionData?:
@@ -71,8 +74,8 @@ export default function MaintenancePage({ loaderData, actionData }: MaintenanceP
   const [maintenanceUpdate, setMaintenanceUpdate] = useState<Maintenance | undefined>(undefined)
 
   const [showForm, setShowForm] = useState<boolean>(false)
-  const { maintenance, invoicesWithoutMaintenance } = loaderData
-  const table = useMaintenanceTable(maintenance, setMaintenanceUpdate)
+  const { maintenances, invoicesWithoutMaintenance } = loaderData
+  const table = useMaintenanceTable(maintenances, setMaintenanceUpdate)
 
   const handleToggleForm = () => {
     if (maintenanceUpdate) {
@@ -84,20 +87,39 @@ export default function MaintenancePage({ loaderData, actionData }: MaintenanceP
   }
 
   // Calculate next maintenance due
-  const nextMaintenance = maintenance.find(m => !m.isCompleted && (m.dueDate || m.dueMileage))
-  const getNextMaintenanceText = () => {
-    if (!nextMaintenance) return 'Aucun entretien prévu'
 
-    if (nextMaintenance.dueDate) {
-      const date = new Date(nextMaintenance.dueDate)
-      return `${nextMaintenance.type} - ${date.toLocaleDateString('fr-FR')}`
+  const getNextMaintenanceText = (maintenances: readonly Maintenance[]) => {
+    const nextMaintenance = pipe(
+      maintenances,
+      A.filter(m => m.dueDate !== undefined),
+      A.sortBy((m1, m2) =>
+        m1.dueDate !== undefined && m2.dueDate !== undefined
+          && m1?.dueDate.getTime() < m2?.dueDate.getTime() ?
+          -1 :
+          1
+      ),
+      A.findFirst(m => (!m.isCompleted) && (m.dueDate !== undefined || m.dueMileage !== undefined))
+    )
+
+    if (O.isNone(nextMaintenance)) return 'Aucun entretien prévu'
+
+    if (nextMaintenance.value.dueDate && nextMaintenance.value.dueMileage) {
+      const date = new Date(nextMaintenance.value.dueDate)
+      return `${nextMaintenance.value.type} - ${
+        date.toLocaleDateString('fr-FR')
+      } - ${nextMaintenance.value.dueMileage} km`
     }
 
-    if (nextMaintenance.dueMileage) {
-      return `${nextMaintenance.type} - ${nextMaintenance.dueMileage} km`
+    if (nextMaintenance.value.dueDate) {
+      const date = new Date(nextMaintenance.value.dueDate)
+      return `${nextMaintenance.value.type} - ${date.toLocaleDateString('fr-FR')}`
     }
 
-    return nextMaintenance.type
+    if (nextMaintenance.value.dueMileage) {
+      return `${nextMaintenance.value.type} - ${nextMaintenance.value.dueMileage} km`
+    }
+
+    return nextMaintenance.value.type
   }
 
   return (
@@ -179,7 +201,7 @@ export default function MaintenancePage({ loaderData, actionData }: MaintenanceP
             </div>
             <div>
               <h3 className="text-lg font-semibold">Prochain entretien</h3>
-              <p className="text-white/90">{getNextMaintenanceText()}</p>
+              <p className="text-white/90">{getNextMaintenanceText(maintenances)}</p>
             </div>
           </div>
         </motion.div>
