@@ -1,10 +1,9 @@
 import { Schema as Sc } from 'effect'
 
 import { BooleanFromString } from './BooleanFromString'
-import { Invoice } from './Invoice'
 import { NotANumberToOptionalLocalDate } from './NotANumberLocalDate'
 
-export const Maintenance = Sc.Struct({
+export const MaintenanceUpdate = Sc.Struct({
   id: Sc.String,
   type: Sc.String,
   isCompleted: BooleanFromString,
@@ -13,7 +12,7 @@ export const Maintenance = Sc.Struct({
   completedDate: Sc.optional(NotANumberToOptionalLocalDate),
   completedMileage: Sc.optional(Sc.Number),
   description: Sc.optional(Sc.String),
-  invoice: Sc.optional(Invoice)
+  invoiceId: Sc.optional(Sc.String)
 })
 
-export type Maintenance = Sc.Schema.Type<typeof Maintenance>
+export type MaintenanceUpdate = Sc.Schema.Type<typeof MaintenanceUpdate>

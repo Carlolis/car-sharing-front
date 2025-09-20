@@ -1,11 +1,13 @@
+import { Loader } from 'components/ui/shadcn-io/ai/loader'
+import { pipe } from 'effect'
+import * as A from 'effect/Array'
+import { Edit3, Plus, Wrench } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { Form } from 'react-router'
 import { Label } from '~/components/ui/label'
+import type { Invoice } from '~/types/Invoice'
 import type { Maintenance } from '~/types/Maintenance'
-
-import { Loader } from 'components/ui/shadcn-io/ai/loader'
-import { Edit3, Plus, Wrench } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Checkbox } from '../ui/checkbox'
@@ -34,11 +36,19 @@ interface MaintenanceFormProps {
   isLoading: boolean
   setShowForm: (showForm: boolean) => void
   setMaintenanceUpdate?: (maintenance: Maintenance | undefined) => void
+  invoicesWithoutMaintenance: readonly Invoice[]
 }
 
 export default function MaintenanceForm(
-  { actionData, showForm, updateMaintenance, isLoading, setShowForm, setMaintenanceUpdate }:
-    MaintenanceFormProps
+  {
+    actionData,
+    showForm,
+    updateMaintenance,
+    isLoading,
+    setShowForm,
+    setMaintenanceUpdate,
+    invoicesWithoutMaintenance
+  }: MaintenanceFormProps
 ) {
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
   const [selectedType, setSelectedType] = useState<string | undefined>(updateMaintenance?.type)
@@ -56,6 +66,9 @@ export default function MaintenanceForm(
     'Climatisation',
     'Autre'
   ]
+  const maintenances: readonly Invoice[] = updateMaintenance?.invoice ?
+    A.append(invoicesWithoutMaintenance, updateMaintenance.invoice) :
+    invoicesWithoutMaintenance
 
   useEffect(() => {
     setSelectedType(updateMaintenance?.type)
@@ -265,15 +278,29 @@ export default function MaintenanceForm(
                     className="text-sm font-semibold text-[#004D55]"
                     style={{ fontFamily: 'Montserrat, sans-serif' }}
                   >
-                    ID Facture associée (optionnel) (pas fait)
+                    Facture associée (optionnel)
                   </Label>
-                  <Input
-                    id="invoiceId"
+                  <Select
                     name="invoiceId"
-                    placeholder="ID de la facture"
-                    defaultValue={''}
-                    className="bg-white border-[#E5E7EB] focus:border-[#004D55] transition-colors"
-                  />
+                    defaultValue={updateMaintenance?.invoice?.id || undefined}
+                  >
+                    <SelectTrigger className="bg-white border-[#E5E7EB] focus:border-[#004D55] transition-colors">
+                      <SelectValue placeholder="Sélectionner une facture" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="null">Aucune</SelectItem>
+                      {pipe(
+                        maintenances,
+                        A.map(invoice => (
+                          <SelectItem key={invoice.id} value={invoice.id}>
+                            {invoice.name} - {new Date(invoice.date).toLocaleDateString('fr-FR')} -
+                            {' '}
+                            {invoice.amount}€
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 pt-4">

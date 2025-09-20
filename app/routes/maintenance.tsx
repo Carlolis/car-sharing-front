@@ -13,13 +13,18 @@ import { Button } from '~/components/ui/button'
 import { DataTable } from '~/components/ui/data-table'
 import { Remix } from '~/runtime/Remix'
 import { Redirect, Unexpected } from '~/runtime/ServerResponse'
+import { InvoiceService } from '~/services/invoice'
 import { MaintenanceService } from '~/services/maintenance'
+import type { Invoice } from '~/types/Invoice'
 import type { Maintenance } from '~/types/Maintenance'
+
 export const loader = Remix.loader(
   T.gen(function* () {
     const maintenanceService = yield* MaintenanceService
+    const invoiceService = yield* InvoiceService
     const maintenance = yield* maintenanceService.getAllMaintenance()
-    return { maintenance }
+    const invoicesWithoutMaintenance = yield* invoiceService.getInvoicesWithoutMaintenance()
+    return { maintenance, invoicesWithoutMaintenance }
   }).pipe(
     T.catchTag('RequestError', error => new Unexpected({ error: error.message })),
     T.catchTag('ResponseError', error => new Unexpected({ error: error.message }))
@@ -40,17 +45,24 @@ export const action = Remix.action(
 )
 
 interface MaintenancePageProps {
-  loaderData: { maintenance: readonly Maintenance[] }
-  actionData?: {
-    maintenanceName: string
-    _tag: 'MaintenanceName'
-  } | {
-    message: string
-    _tag: 'SimpleTaggedError'
-  } | {
-    readonly _tag: 'MaintenanceId'
-    readonly maintenanceId: string
-  } | undefined
+  loaderData: {
+    maintenance: readonly Maintenance[]
+    invoicesWithoutMaintenance: readonly Invoice[]
+  }
+  actionData?:
+    | {
+      maintenanceName: string
+      _tag: 'MaintenanceName'
+    }
+    | {
+      message: string
+      _tag: 'SimpleTaggedError'
+    }
+    | {
+      readonly _tag: 'MaintenanceId'
+      readonly maintenanceId: string
+    }
+    | undefined
 }
 
 export default function MaintenancePage({ loaderData, actionData }: MaintenancePageProps) {
@@ -59,7 +71,7 @@ export default function MaintenancePage({ loaderData, actionData }: MaintenanceP
   const [maintenanceUpdate, setMaintenanceUpdate] = useState<Maintenance | undefined>(undefined)
 
   const [showForm, setShowForm] = useState<boolean>(false)
-  const { maintenance } = loaderData
+  const { maintenance, invoicesWithoutMaintenance } = loaderData
   const table = useMaintenanceTable(maintenance, setMaintenanceUpdate)
 
   const handleToggleForm = () => {
@@ -179,6 +191,7 @@ export default function MaintenancePage({ loaderData, actionData }: MaintenanceP
           isLoading={isLoading}
           setShowForm={setShowForm}
           setMaintenanceUpdate={setMaintenanceUpdate}
+          invoicesWithoutMaintenance={invoicesWithoutMaintenance}
         />
         <motion.div
           initial={{ opacity: 0, y: 20 }}

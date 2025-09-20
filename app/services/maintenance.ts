@@ -11,6 +11,7 @@ import { NotAuthenticated } from '~/runtime/errors/NotAuthenticatedError'
 import type { Redirect } from '~/runtime/ServerResponse'
 import { Maintenance } from '~/types/Maintenance'
 import { MaintenanceCreate } from '~/types/MaintenanceCreate'
+import { MaintenanceUpdate } from '~/types/MaintenanceUpdate'
 import { HttpService } from './httpClient'
 
 // @effect-diagnostics-next-line leakingRequirements:off
@@ -127,7 +128,7 @@ export class MaintenanceService extends T.Service<MaintenanceService>()('Mainten
         T.annotateLogs(MaintenanceService.name, deleteMaintenance.name)
       )
 
-    const updateMaintenance = (maintenance: Maintenance) =>
+    const updateMaintenance = (maintenance: MaintenanceUpdate) =>
       T.gen(function* () {
         const cookieSession = yield* CookieSessionStorage
         yield* T.logDebug(`Getting token....`)
@@ -137,7 +138,7 @@ export class MaintenanceService extends T.Service<MaintenanceService>()('Mainten
 
         const maintenanceUrl = pipe(putRequest, HttpClientRequest.appendUrl('/maintenance'))
 
-        const body = yield* HttpBody.jsonSchema(Maintenance)({
+        const body = yield* HttpBody.jsonSchema(MaintenanceUpdate)({
           ...maintenance,
           dueDate: maintenance.dueDate,
           completedDate: maintenance.completedDate !== null ? maintenance.completedDate : undefined

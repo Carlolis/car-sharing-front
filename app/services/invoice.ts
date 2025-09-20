@@ -300,14 +300,53 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
         T.annotateLogs(InvoiceService.name, getReimbursementProposals.name)
       )
 
-    return ({
+    const getInvoicesWithoutMaintenance = () =>
+      T.gen(function* () {
+        const cookieSession = yield* CookieSessionStorage
+        const token = yield* cookieSession.getUserToken()
+
+        const request = pipe(
+          getRequest,
+          HttpClientRequest.appendUrl('/invoices-without-maintenance'),
+          HttpClientRequest.setHeader('Content-Type', 'application/json'),
+          HttpClientRequest.setHeader('Authorization', `Bearer ${token}`)
+        )
+        const response = yield* defaultClient.execute(request)
+
+        const responseJson = yield* pipe(
+          HttpClientResponse.schemaBodyJson(Sc.Array(Invoice))(response),
+          T.tapError(T.logError),
+          T.catchAll(() => T.succeed<readonly Invoice[]>([]))
+        )
+
+        yield* T.logInfo(`Found ${stringify(responseJson.length)} invoices without maintenance`)
+
+        return responseJson
+      }).pipe(
+        T.catchTag('ResponseError', error =>
+          T.gen(function* () {
+            if (error.response.status === 401 || error.response.status === 400) {
+              return yield* pipe(
+                error.response.text,
+                T.tap(T.logError),
+                T.flatMap(error => T.fail(NotAuthenticated.of(error)))
+              )
+            }
+            return yield* T.fail(error)
+          })),
+        T.tapError(T.logError),
+        T.annotateLogs(InvoiceService.name, 'getInvoicesWithoutMaintenance')
+      )
+
+    return {
       updateInvoice,
       deleteInvoice,
       createInvoice,
       getAllInvoices,
       downloadInvoiceFile,
-      getReimbursementProposals
-    })
+      getReimbursementProposals,
+      getInvoicesWithoutMaintenance
+    }
   })
 }) {}
 
