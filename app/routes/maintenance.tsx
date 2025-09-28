@@ -6,7 +6,7 @@ import * as T from 'effect/Effect'
 import * as O from 'effect/Option'
 import { Minus, Plus, Wrench } from 'lucide-react'
 import { motion } from 'motion/react'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useNavigation } from 'react-router'
 import { MaintenanceActions } from '~/components/maintenance/MaintenanceActions'
 import MaintenanceForm from '~/components/maintenance/maintenanceForm'
@@ -88,7 +88,7 @@ export default function MaintenancePage({ loaderData, actionData }: MaintenanceP
 
   // Calculate next maintenance due
 
-  const getNextMaintenanceText = (maintenances: readonly Maintenance[]) => {
+  const getNextMaintenanceText = useCallback((maintenances: readonly Maintenance[]) => {
     const nextMaintenance = pipe(
       maintenances,
       A.filter(m => m.dueDate !== undefined),
@@ -120,7 +120,7 @@ export default function MaintenancePage({ loaderData, actionData }: MaintenanceP
     }
 
     return nextMaintenance.value.type
-  }
+  }, [])
 
   return (
     <div className="relative z-10 p-3 lg:p-12 w-full">
