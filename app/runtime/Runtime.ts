@@ -10,6 +10,7 @@ import * as T from 'effect/Effect'
 import * as L from 'effect/Layer'
 import { IaServiceLayer } from '~/contexts/ia.util'
 import { AuthLayer } from '~/services/auth'
+import { CarLayer } from '~/services/car'
 import { HttpLayer } from '~/services/httpClient'
 import { IALayer } from '~/services/ia'
 import { InvoiceLayer } from '~/services/invoice'
@@ -38,6 +39,7 @@ export const AppLayer = pipe(
   L.provideMerge(TripLayer),
   L.provideMerge(InvoiceLayer),
   L.provideMerge(MaintenanceLayer),
+  L.provideMerge(CarLayer),
   L.provideMerge(IALayer),
   L.provide(HttpLayer),
   L.provide(ConfigLive),

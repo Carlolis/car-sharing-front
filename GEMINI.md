@@ -40,6 +40,7 @@ This is a car-sharing application built with React Router v7 (formerly Remix) us
 ### Project Structure
 
 - `app/routes/` - Route components (dashboard, calendar, invoices, ia, login)
+- `app/routes.ts` - Route definitions. **IMPORTANT**: When adding a new route, you must add it to this file.
 - `app/components/` - Reusable UI components organized by feature
 - `app/services/` - Business logic services (auth, trip, invoice, ia)
 - `app/runtime/` - Effect-TS runtime configuration and server setup
@@ -104,10 +105,25 @@ Key Effect layers:
 ### Effect-TS Conventions
 
 - Use generators (`T.gen`) for Effect composition
+- When creating Remix loaders, use `Remix.loader(T.gen(function* () { ... }))` and import `Remix` from `~/runtime/Remix`.
 - Structured error handling with tagged unions
 - Layer-based dependency injection
 - Prefer `pipe` for transformation chains
 - Log operations use structured logging levels
+
+### VS Code Snippets
+
+This project includes a set of useful VS Code snippets to speed up development, especially when working with Effect-TS.
+The snippets are defined in `.vscode/common-imports.code-snippets`.
+
+To use them, type the prefix and press Tab.
+
+Here are some examples:
+- `+T`: `import * as T from 'effect/Effect'`
+- `+O`: `import * as O from 'effect/Option'`
+- `+SC`: `import {Schema as Sc}  from 'effect'`
+- `+L`: `import * as L from 'effect/Layer'`
+
 
 ## Testing & Quality Assurance
 

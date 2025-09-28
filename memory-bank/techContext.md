@@ -9,9 +9,9 @@
 ## Core Technologies
 - **Framework**: Remix
 - **Language**: TypeScript
+- **Effect-TS** for functional programming and error handling
 - **Styling**: Tailwind CSS
 - **Build Tool**: Vite
-- **Testing**: (Not explicitly listed in files)
 
 ## Key Dependencies
 - React

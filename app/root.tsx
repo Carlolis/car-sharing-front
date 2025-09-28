@@ -27,7 +27,7 @@ import { pipe } from 'effect'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 
-import { BarChart3, Brain, Calendar, Receipt, Wrench } from 'lucide-react'
+import { BarChart3, Brain, Calendar, Car, Receipt, Wrench } from 'lucide-react'
 import { useEffect } from 'react'
 import { SideBar } from './components/sideBar'
 import { CookieSessionStorage } from './runtime/CookieSessionStorage'
@@ -76,6 +76,7 @@ const menuItems = [
     icon: Calendar
   },
   { id: 'invoices', label: 'Factures', icon: Receipt },
+  { id: 'car', label: 'Voiture', icon: Car },
   { id: 'maintenance', label: 'Maintenance', icon: Wrench },
   { id: 'ia', label: 'IA', icon: Brain }
 ]
