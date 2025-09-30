@@ -112,7 +112,15 @@ export default function Dashboard(
 
     if (firstMaintenance && firstMaintenance.dueMileage) {
       const remainingMileage = firstMaintenance.dueMileage - car.mileage
-      return `Dans ${remainingMileage} km`
+      const mileageText = remainingMileage <= 0 ?
+        `Maintenance dépassée de ${Math.abs(remainingMileage)} km` :
+        `Dans ${remainingMileage} km`
+
+      const dueDate = firstMaintenance.dueDate ?? secondMaintenance?.dueDate
+      if (dueDate) {
+        return `${mileageText} ou le ${dueDate.toLocaleDateString('fr-FR')}`
+      }
+      return mileageText
     }
 
     if (secondMaintenance && secondMaintenance.dueDate) {
