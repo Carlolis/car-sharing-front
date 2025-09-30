@@ -11,6 +11,7 @@ import { NotAuthenticated } from '~/runtime/errors/NotAuthenticatedError'
 import type { Redirect } from '~/runtime/ServerResponse'
 import { Maintenance } from '~/types/Maintenance'
 import { MaintenanceCreate } from '~/types/MaintenanceCreate'
+import { NextMaintenances } from '~/types/NextMaintenance'
 import { MaintenanceUpdate } from '~/types/MaintenanceUpdate'
 import { HttpService } from './httpClient'
 
@@ -91,6 +92,46 @@ export class MaintenanceService extends T.Service<MaintenanceService>()('Mainten
           })),
         T.tapError(T.logError),
         T.annotateLogs(MaintenanceService.name, getAllMaintenance.name)
+      )
+
+    const getNextMaintenances = () =>
+      T.gen(function* () {
+        const cookieSession = yield* CookieSessionStorage
+        yield* T.logDebug(`Getting token....`)
+        const token = yield* cookieSession.getUserToken()
+        yield* T.logDebug(`Found token....`, token)
+
+        const getNextMaintenancesRequest = pipe(
+          getRequest,
+          HttpClientRequest.appendUrl('/next/maintenances'),
+          HttpClientRequest.setHeader('Content-Type', 'application/json'),
+          HttpClientRequest.setHeader('Authorization', `Bearer ${token}`)
+        )
+        const response = yield* defaultClient.execute(getNextMaintenancesRequest)
+
+        const responseJson: NextMaintenances = yield* pipe(
+          HttpClientResponse.schemaBodyJson(NextMaintenances)(response),
+          T.tapError(e => T.logError('Error parsing maintenance response', stringify(e))),
+          T.catchAll(() => T.succeed([null, null] as const))
+        )
+
+        yield* T.logInfo(`Found ${stringify(responseJson.length)} maintenance records`)
+
+        return responseJson
+      }).pipe(
+        T.catchTag('ResponseError', error =>
+          T.gen(function* () {
+            if (error.response.status === 401 || error.response.status === 400) {
+              return yield* pipe(
+                error.response.text,
+                T.tap(T.logError),
+                T.flatMap(error => T.fail(NotAuthenticated.of(error)))
+              )
+            }
+            return yield* T.fail(error)
+          })),
+        T.tapError(T.logError),
+        T.annotateLogs(MaintenanceService.name, getNextMaintenances.name)
       )
 
     const deleteMaintenance = (maintenanceId: string) =>
@@ -174,9 +215,10 @@ export class MaintenanceService extends T.Service<MaintenanceService>()('Mainten
 
     return ({
       updateMaintenance,
-      deleteMaintenance,
       createMaintenance,
-      getAllMaintenance
+      getAllMaintenance,
+      getNextMaintenances,
+      deleteMaintenance
     })
   })
 }) {}

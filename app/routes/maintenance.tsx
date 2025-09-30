@@ -42,8 +42,8 @@ export const action = Remix.action(
     return yield* matcherMaintenanceActions(request)
   }).pipe(
     T.tapError(T.logError),
-    T.catchTag('RequestError', error => new Unexpected({ error: error.message })),
-    T.catchAll(() => new Redirect({ location: '/maintenance' }))
+    T.catchTag('RequestError', error => T.fail(new Unexpected({ error: error.message }))),
+    T.catchAll(() => T.fail(new Redirect({ location: '/maintenance' })))
   )
 )
 

@@ -3,9 +3,10 @@ import React from 'react'
 import { Card, CardContent } from '../ui/card'
 
 export function StatsCard(
-  { title, value, icon, bgColor }: {
+  { title, value, subtitle, icon, bgColor }: {
     title: string | React.ReactNode
     value: string | number
+    subtitle?: string | React.ReactNode
     bgColor: string
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     icon: React.ComponentType<any>
@@ -35,6 +36,14 @@ export function StatsCard(
               >
                 {value}
               </p>
+              {subtitle && (
+                <p
+                  className="text-xs lg:text-sm text-[#004D55]/70 mt-1 font-body"
+                  style={{ fontFamily: 'Montserrat, sans-serif' }}
+                >
+                  {subtitle}
+                </p>
+              )}
             </div>
             <motion.div
               animate={{ scale: [1, 1.1, 1] }}

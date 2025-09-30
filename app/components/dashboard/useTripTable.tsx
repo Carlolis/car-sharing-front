@@ -307,7 +307,7 @@ export function useTripTable(
     columns,
     getCoreRowModel: getCoreRowModel(),
     meta: {
-      updateData: async (rowIndex, columnId, value) => {
+      updateData: async (rowIndex: number, columnId: string, value: unknown) => {
         const updatedTrip = { ...trips[rowIndex], [columnId]: value }
 
         setTrips(old => old.map((row, index) => (index === rowIndex ? updatedTrip : row)))

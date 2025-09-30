@@ -1,6 +1,8 @@
 import * as T from 'effect/Effect'
 
 import { Remix } from '~/runtime/Remix'
+import { CarService } from '../services/car'
+import { MaintenanceService } from '../services/maintenance'
 import { TripService } from '../services/trip'
 
 import { stringify } from 'effect/FastCheck'
@@ -15,7 +17,7 @@ import {
 import { HttpServerRequest } from '@effect/platform'
 
 import { Bug, Car, Gauge, MapPin, Minus, Plus, Wrench } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { matcherTripActions } from '~/components/dashboard/matcherTripActions'
 import { StatsCard } from '~/components/dashboard/StatsCard'
 import { TripActions } from '~/components/dashboard/TripActions'
@@ -28,6 +30,7 @@ import type { TripUpdate } from '~/types/api'
 import type { Route } from './+types/dashboard'
 
 declare module '@tanstack/react-table' {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface TableMeta<TData extends RowData,> {
     updateData: (rowIndex: number, columnId: string, value: unknown) => void
   }
@@ -42,19 +45,30 @@ export const loader = Remix.loader(
 
     const user = yield* cookieSession.getUserName()
     const api = yield* TripService
+    const carService = yield* CarService
+    const maintenanceService = yield* MaintenanceService
 
     const userStats = yield* api.getTripStatsByUser()
 
     const trips = yield* api.getAllTrips()
+    const car = yield* carService.getCar()
+    const nextMaintenances = yield* maintenanceService.getNextMaintenances()
 
     yield* T.logDebug(
-      `Trips and stats fetched: ${stringify(trips)}, stringify(userStats)}`
+      `Trips and stats fetched: ${stringify(trips)}, ${stringify(userStats)}`
     )
 
-    return { user, trips, userStats, _tag: 'data' as const }
+    return {
+      user,
+      trips,
+      userStats,
+      car,
+      nextMaintenances,
+      _tag: 'data' as const
+    }
   }).pipe(
-    T.catchTag('RequestError', error => new Unexpected({ error: error.message })),
-    T.catchTag('ResponseError', error => new Unexpected({ error: error.message }))
+    T.catchTag('RequestError', error => T.fail(new Unexpected({ error: error.message }))),
+    T.catchTag('ResponseError', error => T.fail(new Unexpected({ error: error.message })))
   )
 )
 
@@ -77,12 +91,44 @@ export default function Dashboard(
   const [updateTrip, setUpdateTrip] = useState<TripUpdate | undefined>(undefined)
   const [showForm, setShowForm] = useState<boolean>(false)
 
-  const trips = loaderData.trips || []
+  const trips = loaderData._tag === 'data' ? loaderData.trips || [] : []
 
   const table = useTripTable(
     trips,
     setUpdateTrip
   )
+
+  const maintenanceInfo = useMemo(() => {
+    if (loaderData._tag !== 'data') {
+      return 'Données non disponibles'
+    }
+
+    const { nextMaintenances, car } = loaderData
+    if (!nextMaintenances || (nextMaintenances[0] === null && nextMaintenances[1] === null)) {
+      return 'Aucun entretien à venir'
+    }
+
+    const [firstMaintenance, secondMaintenance] = nextMaintenances
+
+    if (firstMaintenance && firstMaintenance.dueMileage) {
+      const remainingMileage = firstMaintenance.dueMileage - car.mileage
+      return `Dans ${remainingMileage} km`
+    }
+
+    if (secondMaintenance && secondMaintenance.dueDate) {
+      return `Le ${secondMaintenance.dueDate.toLocaleDateString('fr-FR')}`
+    }
+
+    if (firstMaintenance && firstMaintenance.dueDate) {
+      return `Le ${firstMaintenance.dueDate.toLocaleDateString('fr-FR')}`
+    }
+
+    return 'Date ou kilométrage non spécifié'
+  }, [loaderData])
+
+  if (loaderData._tag !== 'data') {
+    return <div>Error loading data</div>
+  }
 
   const handleToggleForm = () => {
     if (updateTrip) {
@@ -185,7 +231,8 @@ export default function Dashboard(
               />
               <StatsCard
                 title="Prochain entretien"
-                value={'PAS ENCORE FAIT'}
+                value={maintenanceInfo}
+                subtitle={`${loaderData.car.name} - ${loaderData.car.mileage} km`}
                 icon={Wrench}
                 bgColor="entretien"
               />

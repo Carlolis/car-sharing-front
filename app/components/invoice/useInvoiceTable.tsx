@@ -4,11 +4,10 @@ import {
   getCoreRowModel,
   useReactTable
 } from '@tanstack/react-table'
-import { Download, Receipt } from 'lucide-react'
+import { Receipt } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useEffect, useMemo, useState } from 'react'
 
-import { Link } from 'react-router'
 import type { Invoice } from '~/types/Invoice'
 import { TableEditAndDelete } from '../buttons/TableEditAndDelete'
 import { Badge } from '../ui/badge'
