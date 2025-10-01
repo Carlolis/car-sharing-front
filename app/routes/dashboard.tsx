@@ -16,9 +16,10 @@ import {
 
 import { HttpServerRequest } from '@effect/platform'
 
-import { Bug, Car, Gauge, MapPin, Minus, Plus, Wrench } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { Bug, Car, Gauge, MapPin, Minus, Plus } from 'lucide-react'
+import { useState } from 'react'
 import { matcherTripActions } from '~/components/dashboard/matcherTripActions'
+import { MaintenanceCard } from '~/components/dashboard/MaintenanceCard'
 import { StatsCard } from '~/components/dashboard/StatsCard'
 import { TripActions } from '~/components/dashboard/TripActions'
 import { NewTripForm } from '~/components/dashboard/tripForm'
@@ -98,52 +99,7 @@ export default function Dashboard(
     setUpdateTrip
   )
 
-  const maintenanceInfo = useMemo(() => {
-    if (loaderData._tag !== 'data') {
-      return 'Données non disponibles'
-    }
 
-    const { nextMaintenances, car } = loaderData
-    if (!nextMaintenances || !nextMaintenances[0]) {
-      return 'Aucun entretien à venir'
-    }
-
-    const [prioMaint, sndMaint] = nextMaintenances
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-
-    const remainingMileage = prioMaint.dueMileage ? prioMaint.dueMileage - car.mileage : null
-    const isOverdueByMileage = remainingMileage !== null && remainingMileage <= 0
-
-    const maintDate = sndMaint?.dueDate || prioMaint.dueDate
-    const isOverdueByDate = maintDate && maintDate < today
-
-    // Case 1: Overdue states
-    if (isOverdueByMileage && isOverdueByDate) {
-      return `Entretien dépassé de ${Math.abs(remainingMileage)} km (devait être fait avant le ${maintDate.toLocaleDateString('fr-FR')})`
-    }
-    if (isOverdueByMileage) {
-      return `Entretien kilométrique dépassé de ${Math.abs(remainingMileage)} km`
-    }
-    if (isOverdueByDate) {
-      return `Entretien en retard (devait être fait avant le ${maintDate.toLocaleDateString('fr-FR')})`
-    }
-
-    // Case 2: Upcoming states
-    const textParts: string[] = []
-    if (remainingMileage !== null) {
-      textParts.push(`Dans ${remainingMileage} km`)
-    }
-    if (maintDate) {
-      textParts.push(`le ${maintDate.toLocaleDateString('fr-FR')}`)
-    }
-
-    if (textParts.length > 0) {
-      return textParts.join(' ou ')
-    }
-
-    return 'Date ou kilométrage non spécifié'
-  }, [loaderData])
 
   if (loaderData._tag !== 'data') {
     return <div>Error loading data</div>
@@ -248,13 +204,7 @@ export default function Dashboard(
                 icon={Car}
                 bgColor="distance"
               />
-              <StatsCard
-                title="Prochain entretien"
-                value={maintenanceInfo}
-                subtitle={`${loaderData.car.name} - ${loaderData.car.mileage} km`}
-                icon={Wrench}
-                bgColor="entretien"
-              />
+              <MaintenanceCard car={loaderData.car} nextMaintenances={loaderData.nextMaintenances} />
             </motion.div>
 
             <motion.div

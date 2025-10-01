@@ -6,6 +6,7 @@ import { NotAuthenticated } from '~/runtime/errors/NotAuthenticatedError'
 import { Car } from '~/types/Car'
 import { HttpService } from './httpClient'
 
+// @effect-diagnostics-next-line leakingRequirements:off
 export class CarService extends T.Service<CarService>()('CarService', {
   effect: T.gen(function* () {
     const { defaultClient, getRequest, putRequest } = yield* HttpService
