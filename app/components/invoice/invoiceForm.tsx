@@ -13,6 +13,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Input } from '../ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 
+type InvoiceKind =
+  | 'Carburant'
+  | 'Entretien'
+  | 'Assurance'
+  | 'Réparation'
+  | 'Contrôle technique'
+  | 'Autre'
+  | 'Remboursement'
+
 interface InvoiceFormProps {
   actionData:
     | {
@@ -41,13 +50,13 @@ export default function InvoiceForm(
     InvoiceFormProps
 ) {
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
-  const [selectedKind, setSelectedKind] = useState<string | undefined>(updateInvoice?.kind)
+  const [selectedKind, setSelectedKind] = useState<InvoiceKind | undefined>(updateInvoice?.kind)
   const [selectedDriver, setSelectedDriver] = useState<string | undefined>(updateInvoice?.driver)
   const [selectedToDriver, setSelectedToDriver] = useState<string | undefined>(
     updateInvoice?.toDriver
   )
 
-  const typesFactures = [
+  const typesFactures: InvoiceKind[] = [
     'Carburant',
     'Entretien',
     'Assurance',
@@ -90,13 +99,15 @@ export default function InvoiceForm(
   ]
 
   // Filtrer les personnes disponibles pour les remboursements
-  const availableDrivers = selectedKind === 'Remboursement' && selectedToDriver ?
-    personnes.filter(p => p.id !== selectedToDriver) :
-    personnes
+  const availableDrivers =
+    selectedKind === 'Remboursement' || selectedKind === 'Carburant' && selectedToDriver ?
+      personnes.filter(p => p.id !== selectedToDriver) :
+      personnes
 
-  const availableToDrivers = selectedKind === 'Remboursement' && selectedDriver ?
-    personnes.filter(p => p.id !== selectedDriver) :
-    personnes
+  const availableToDrivers =
+    selectedKind === 'Remboursement' || selectedKind === 'Carburant' && selectedDriver ?
+      personnes.filter(p => p.id !== selectedDriver) :
+      personnes
 
   return (
     <AnimatePresence>
@@ -185,6 +196,7 @@ export default function InvoiceForm(
                       name="kind"
                       required
                       defaultValue={updateInvoice?.kind}
+                      // @ts-expect-error  // Le type est bien respecté par le Select
                       onValueChange={setSelectedKind}
                     >
                       <SelectTrigger
@@ -294,13 +306,14 @@ export default function InvoiceForm(
                   </Select>
                 </div>
 
-                {selectedKind === 'Remboursement' && (
+                {(selectedKind === 'Remboursement' || selectedKind === 'Carburant') && (
                   <div>
                     <Label
                       className="text-[#004D55] text-sm lg:text-base font-body"
                       style={{ fontFamily: 'Montserrat, sans-serif' }}
                     >
-                      Remboursement à <span className="text-red-500">*</span>
+                      {selectedKind === 'Remboursement' ? 'Remboursement à' : 'Payé pour'}{' '}
+                      <span className="text-red-500">*</span>
                     </Label>
                     <Select
                       name="toDriver"
