@@ -159,7 +159,7 @@ export default function InvoicesPage({ loaderData, actionData }: Route.Component
         <Reimbursement
           reimbursements={loaderData.reimbursements}
           fairPart={invoices.reduce(
-            (acc, v) => acc + (v.kind === 'Remboursement' ? 0 : v.amount),
+            (acc, v) => acc + (v.kind === 'Remboursement' || v.kind === 'Carburant' ? 0 : v.amount),
             0
           )
             / 3}
