@@ -1,13 +1,11 @@
 import { HttpServerRequest } from '@effect/platform'
 import { Loader } from 'components/ui/shadcn-io/ai/loader'
-import { pipe } from 'effect'
-import * as A from 'effect/Array'
 import * as T from 'effect/Effect'
-import * as O from 'effect/Option'
 import { Minus, Plus, Wrench } from 'lucide-react'
 import { motion } from 'motion/react'
-import { useCallback, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigation } from 'react-router'
+import { StatsCard } from '~/components/dashboard/StatsCard'
 import { MaintenanceActions } from '~/components/maintenance/MaintenanceActions'
 import MaintenanceForm from '~/components/maintenance/maintenanceForm'
 import { matcherMaintenanceActions } from '~/components/maintenance/matcherMaintenanceActions'
@@ -16,21 +14,34 @@ import { Button } from '~/components/ui/button'
 import { DataTable } from '~/components/ui/data-table'
 import { Remix } from '~/runtime/Remix'
 import { Redirect, Unexpected } from '~/runtime/ServerResponse'
+import { CarService } from '~/services/car'
 import { InvoiceService } from '~/services/invoice'
 import { MaintenanceService } from '~/services/maintenance'
+import type { Car } from '~/types/Car'
 import type { Invoice } from '~/types/Invoice'
 import type { Maintenance } from '~/types/Maintenance'
+import type { NextMaintenances } from '~/types/NextMaintenance'
 
 export const loader = Remix.loader(
   T.gen(function* () {
     const maintenanceService = yield* MaintenanceService
     const invoiceService = yield* InvoiceService
-    const maintenances = yield* maintenanceService.getAllMaintenance()
-    const invoicesWithoutMaintenance = yield* invoiceService.getInvoicesWithoutMaintenance()
-    return { maintenances, invoicesWithoutMaintenance }
+    const carService = yield* CarService
+
+    const [maintenances, invoicesWithoutMaintenance, car, nextMaintenances] = yield* T.all(
+      [
+        maintenanceService.getAllMaintenance(),
+        invoiceService.getInvoicesWithoutMaintenance(),
+        carService.getCar(),
+        maintenanceService.getNextMaintenances()
+      ],
+      { concurrency: 'inherit' }
+    )
+
+    return { maintenances, invoicesWithoutMaintenance, car, nextMaintenances }
   }).pipe(
-    T.catchTag('RequestError', error => new Unexpected({ error: error.message })),
-    T.catchTag('ResponseError', error => new Unexpected({ error: error.message }))
+    T.catchTag('RequestError', error => T.fail(new Unexpected({ error: error.message }))),
+    T.catchTag('ResponseError', error => T.fail(new Unexpected({ error: error.message })))
   )
 )
 
@@ -51,6 +62,8 @@ interface MaintenancePageProps {
   loaderData: {
     maintenances: readonly Maintenance[]
     invoicesWithoutMaintenance: readonly Invoice[]
+    car: Car
+    nextMaintenances: NextMaintenances
   }
   actionData?:
     | {
@@ -71,10 +84,12 @@ interface MaintenancePageProps {
 export default function MaintenancePage({ loaderData, actionData }: MaintenancePageProps) {
   const navigation = useNavigation()
   const isLoading = navigation.formAction == '/maintenance'
-  const [maintenanceUpdate, setMaintenanceUpdate] = useState<Maintenance | undefined>(undefined)
+  const [maintenanceUpdate, setMaintenanceUpdate] = useState<Maintenance | undefined>(
+    undefined
+  )
 
   const [showForm, setShowForm] = useState<boolean>(false)
-  const { maintenances, invoicesWithoutMaintenance } = loaderData
+  const { maintenances, invoicesWithoutMaintenance, car, nextMaintenances } = loaderData
   const table = useMaintenanceTable(maintenances, setMaintenanceUpdate)
 
   const handleToggleForm = () => {
@@ -86,41 +101,52 @@ export default function MaintenancePage({ loaderData, actionData }: MaintenanceP
     setShowForm(!showForm)
   }
 
-  // Calculate next maintenance due
-
-  const getNextMaintenanceText = useCallback((maintenances: readonly Maintenance[]) => {
-    const nextMaintenance = pipe(
-      maintenances,
-      A.filter(m => m.dueDate !== undefined),
-      A.sortBy((m1, m2) =>
-        m1.dueDate !== undefined && m2.dueDate !== undefined
-          && m1?.dueDate.getTime() < m2?.dueDate.getTime() ?
-          -1 :
-          1
-      ),
-      A.findFirst(m => (!m.isCompleted) && (m.dueDate !== undefined || m.dueMileage !== undefined))
-    )
-
-    if (O.isNone(nextMaintenance)) return 'Aucun entretien prévu'
-
-    if (nextMaintenance.value.dueDate && nextMaintenance.value.dueMileage) {
-      const date = new Date(nextMaintenance.value.dueDate)
-      return `${nextMaintenance.value.type} - ${
-        date.toLocaleDateString('fr-FR')
-      } - ${nextMaintenance.value.dueMileage} km`
+  const maintenanceInfo = useMemo(() => {
+    if (!nextMaintenances || !nextMaintenances[0]) {
+      return 'Aucun entretien à venir'
     }
 
-    if (nextMaintenance.value.dueDate) {
-      const date = new Date(nextMaintenance.value.dueDate)
-      return `${nextMaintenance.value.type} - ${date.toLocaleDateString('fr-FR')}`
+    const [prioMaint, sndMaint] = nextMaintenances
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    const remainingMileage = prioMaint.dueMileage ? prioMaint.dueMileage - car.mileage : null
+    const isOverdueByMileage = remainingMileage !== null && remainingMileage <= 0
+
+    const maintDateStr = sndMaint?.dueDate || prioMaint.dueDate
+    const maintDate = maintDateStr ? new Date(maintDateStr) : null
+    const isOverdueByDate = maintDate && maintDate < today
+
+    // Case 1: Overdue states
+    if (isOverdueByMileage && isOverdueByDate) {
+      return `Entretien dépassé de ${Math.abs(
+        remainingMileage!
+      )} km (devait être fait avant le ${maintDate!.toLocaleDateString('fr-FR')})`
+    }
+    if (isOverdueByMileage) {
+      return `Entretien kilométrique dépassé de ${Math.abs(remainingMileage!)} km`
+    }
+    if (isOverdueByDate) {
+      return `Entretien en retard (devait être fait avant le ${maintDate!.toLocaleDateString(
+        'fr-FR'
+      )})`
     }
 
-    if (nextMaintenance.value.dueMileage) {
-      return `${nextMaintenance.value.type} - ${nextMaintenance.value.dueMileage} km`
+    // Case 2: Upcoming states
+    const textParts: string[] = []
+    if (remainingMileage !== null) {
+      textParts.push(`Dans ${remainingMileage} km`)
+    }
+    if (maintDate) {
+      textParts.push(`le ${maintDate.toLocaleDateString('fr-FR')}`)
     }
 
-    return nextMaintenance.value.type
-  }, [])
+    if (textParts.length > 0) {
+      return textParts.join(' ou ')
+    }
+
+    return 'Date ou kilométrage non spécifié'
+  }, [car, nextMaintenances])
 
   return (
     <div className="relative z-10 p-3 lg:p-12 w-full">
@@ -188,23 +214,13 @@ export default function MaintenancePage({ loaderData, actionData }: MaintenanceP
           </motion.div>
         </motion.div>
 
-        {/* Next Maintenance Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="bg-gradient-to-r from-[#059669] to-[#047857] rounded-2xl p-6 text-white shadow-lg"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-              <Wrench className="h-6 w-6" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold">Prochain entretien</h3>
-              <p className="text-white/90">{getNextMaintenanceText(maintenances)}</p>
-            </div>
-          </div>
-        </motion.div>
+        <StatsCard
+          title="Prochain entretien"
+          value={maintenanceInfo}
+          subtitle={`${car.name} - ${car.mileage} km`}
+          icon={Wrench}
+          bgColor="entretien"
+        />
 
         <MaintenanceForm
           actionData={actionData}
