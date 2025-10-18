@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { Form, Link } from 'react-router'
 import { Label } from '~/components/ui/label'
-import type { Invoice, InvoiceKind } from '~/types/Invoice'
+import type { InvoiceKind } from '~/types/Invoice'
 
 import { Loader } from 'components/ui/shadcn-io/ai/loader'
 import { Download, Edit3, Plus, Receipt, Trash2 } from 'lucide-react'

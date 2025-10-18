@@ -16,7 +16,6 @@ import { useIsMobile } from '~/components/ui/use-mobile'
 import { Remix } from '~/runtime/Remix'
 import { Redirect, Unexpected } from '~/runtime/ServerResponse'
 import { InvoiceService } from '~/services/invoice'
-import type { Invoice } from '~/types/Invoice'
 import type { InvoiceUpdate } from '~/types/InvoiceUpdate'
 import type { Route } from './+types/invoices'
 
