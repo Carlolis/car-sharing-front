@@ -9,6 +9,7 @@ import { motion } from 'motion/react'
 import { useEffect, useMemo, useState } from 'react'
 
 import type { Invoice } from '~/types/Invoice'
+import type { InvoiceUpdate } from '~/types/InvoiceUpdate'
 import { TableEditAndDelete } from '../buttons/TableEditAndDelete'
 import { Badge } from '../ui/badge'
 import { useIsMobile } from '../ui/use-mobile'
@@ -52,7 +53,7 @@ const getTypeColors = (type: string) => {
 }
 export function useInvoiceTable(
   loaderInvoices: readonly Invoice[],
-  setInvoiceUpdate: (tripUpdate: Invoice | undefined) => void
+  setInvoiceUpdate: (tripUpdate: InvoiceUpdate | undefined) => void
 ) {
   const isMobile = useIsMobile()
   const [invoices, setInvoices] = useState<Invoice[]>([])
@@ -238,7 +239,7 @@ export function useInvoiceTable(
             ),
             cell: ({ getValue, row }) => (
               <TableEditAndDelete
-                data={row.original}
+                data={{ ...row.original, mileage: row.original.mileage?.toString() ?? '' }}
                 getValue={getValue}
                 setDataUpdate={setInvoiceUpdate}
                 entityType="invoice"

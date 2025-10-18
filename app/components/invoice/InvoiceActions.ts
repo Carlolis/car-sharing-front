@@ -1,5 +1,6 @@
 import { FilesSchema } from '@effect/platform/Multipart'
 import { Schema as Sc } from 'effect'
+import { InvoiceKinds } from '~/types/Invoice'
 import { FormattedLocalDate } from '../../types/FormattedLocalDate'
 
 export const InvoiceCreateFormTagged = Sc.Struct({
@@ -22,7 +23,7 @@ export const InvoiceUpdateFormTagged = Sc.Struct({
   mileage: Sc.String,
   driver: Sc.String,
   fileBytes: Sc.optional(FilesSchema),
-  kind: Sc.String,
+  kind: InvoiceKinds,
   amount: Sc.NumberFromString,
   toDriver: Sc.optional(Sc.String)
 })

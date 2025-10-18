@@ -171,7 +171,7 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
 
         formData.append('amount', JSON.stringify(invoice.amount))
 
-        formData.append('fileName', JSON.stringify(invoice.fileName))
+        if (invoice.fileName) formData.append('fileName', JSON.stringify(invoice.fileName))
         formData.append('kind', invoice.kind)
         formData.append('driver', invoice.driver)
 

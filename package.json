@@ -91,11 +91,11 @@
     "vite-tsconfig-paths": "5.1.4"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=23"
   },
-  "packageManager": "pnpm@10.17.0",
+  "packageManager": "pnpm@10.18.3",
   "volta": {
     "node": "23.10.0",
-    "pnpm": "10.13.1"
+    "pnpm": "10.18.3"
   }
 }

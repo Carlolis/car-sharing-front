@@ -1,6 +1,7 @@
 import { Schema as Sc } from 'effect'
 import { Uint8Array } from 'effect/Schema'
 import { FormattedLocalDate } from './FormattedLocalDate'
+import { InvoiceKinds } from './Invoice'
 
 export const InvoiceUpdate = Sc.Struct({
   id: Sc.UUID,
@@ -11,7 +12,7 @@ export const InvoiceUpdate = Sc.Struct({
   driver: Sc.String,
   fileBytes: Sc.optional(Uint8Array),
   fileName: Sc.optional(Sc.String),
-  kind: Sc.String,
+  kind: InvoiceKinds,
   toDriver: Sc.optional(Sc.String)
 })
 

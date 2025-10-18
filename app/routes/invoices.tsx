@@ -17,6 +17,7 @@ import { Remix } from '~/runtime/Remix'
 import { Redirect, Unexpected } from '~/runtime/ServerResponse'
 import { InvoiceService } from '~/services/invoice'
 import type { Invoice } from '~/types/Invoice'
+import type { InvoiceUpdate } from '~/types/InvoiceUpdate'
 import type { Route } from './+types/invoices'
 
 export const loader = Remix.loader(
@@ -48,7 +49,7 @@ export default function InvoicesPage({ loaderData, actionData }: Route.Component
   const isMobile = useIsMobile()
   const navigation = useNavigation()
   const isLoading = navigation.formAction == '/invoices'
-  const [invoiceUpdate, setInvoiceUpdate] = useState<Invoice | undefined>(undefined)
+  const [invoiceUpdate, setInvoiceUpdate] = useState<InvoiceUpdate | undefined>(undefined)
 
   const [showForm, setShowForm] = useState<boolean>(false)
   const { invoices } = loaderData

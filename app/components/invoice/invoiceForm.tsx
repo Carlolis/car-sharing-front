@@ -3,24 +3,16 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { Form, Link } from 'react-router'
 import { Label } from '~/components/ui/label'
-import type { Invoice } from '~/types/Invoice'
+import type { Invoice, InvoiceKind } from '~/types/Invoice'
 
 import { Loader } from 'components/ui/shadcn-io/ai/loader'
-import { Download, Edit3, Plus, Receipt } from 'lucide-react'
+import { Download, Edit3, Plus, Receipt, Trash2 } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 
+import type { InvoiceUpdate } from '~/types/InvoiceUpdate'
 import { Input } from '../ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
-
-type InvoiceKind =
-  | 'Carburant'
-  | 'Entretien'
-  | 'Assurance'
-  | 'Réparation'
-  | 'Contrôle technique'
-  | 'Autre'
-  | 'Remboursement'
 
 interface InvoiceFormProps {
   actionData:
@@ -39,10 +31,10 @@ interface InvoiceFormProps {
     | undefined
 
   showForm: boolean
-  updateInvoice?: Invoice
+  updateInvoice?: InvoiceUpdate
   isLoading: boolean
   setShowForm: (showForm: boolean) => void
-  setInvoiceUpdate?: (invoice: Invoice | undefined) => void
+  setInvoiceUpdate?: (invoice: InvoiceUpdate | undefined) => void
 }
 
 export default function InvoiceForm(
@@ -56,7 +48,7 @@ export default function InvoiceForm(
     updateInvoice?.toDriver
   )
 
-  const typesFactures: InvoiceKind[] = [
+  const facturesKinds: InvoiceKind[] = [
     'Carburant',
     'Entretien',
     'Assurance',
@@ -206,7 +198,7 @@ export default function InvoiceForm(
                         <SelectValue placeholder="Sélectionner un type" />
                       </SelectTrigger>
                       <SelectContent className="bg-white">
-                        {typesFactures.map(type => (
+                        {facturesKinds.map(type => (
                           <SelectItem key={type} value={type}>
                             <span
                               className="text-sm lg:text-base font-body"
@@ -356,29 +348,43 @@ export default function InvoiceForm(
                     
                      border border-blue-200 rounded-md">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2  flex-row justify-between w-full">
-                          <div className="flex  flex-row gap-2 items-center">
+                        <div className="flex w-full items-center justify-between">
+                          <div className="flex items-center gap-2">
                             <Receipt className="h-4 w-4 text-blue-600 " />
                             <div className="font-bold">
                               Télécharger la facture actuelle :
                             </div>
                           </div>
-                          <Link
-                            to={{
-                              pathname: '/invoices/download',
-                              search: `?fileName=${updateInvoice.fileName}&id=${updateInvoice.id}`
-                            }}
-                            download
-                            reloadDocument
-                          >
-                            <div className="flex flex-row gap-8 items-center hover:underline">
+                          <div className="flex items-center gap-2">
+                            <Link
+                              to={{
+                                pathname: '/invoices/download',
+                                search: `?fileName=${updateInvoice.fileName}&id=${updateInvoice.id}`
+                              }}
+                              download
+                              reloadDocument
+                              className="flex items-center gap-2 hover:underline"
+                            >
                               <span className="text-sm text-blue-800 font-medium">
                                 {updateInvoice.fileName}
                               </span>
-
-                              <Download className="h-6 w-6" />
-                            </div>
-                          </Link>
+                              <Download className="h-5 w-5" />
+                            </Link>
+                            <Button
+                              onClick={() =>
+                                setInvoiceUpdate && setInvoiceUpdate({
+                                  ...updateInvoice,
+                                  fileName: undefined
+                                })}
+                              name="_tag"
+                              value="delete-attachment"
+                              variant="destructive"
+                              size="icon"
+                              className="h-8 w-8"
+                            >
+                              <Trash2 className="h-4 w-4 hover:bg-red-50 text-red-600 hover:text-red-700  cursor-pointer" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
                       {updateInvoice && (
@@ -408,7 +414,7 @@ export default function InvoiceForm(
                     (
                       <>
                         <Edit3 className="h-4 w-4 mr-2" />
-                        Modifier la facture
+                        Valider
                       </>
                     ) :
                     (
