@@ -336,72 +336,76 @@ export default function InvoiceForm(
                 )}
 
                 <div>
-                  <Label
-                    className="text-[#004D55] text-sm lg:text-base font-body"
-                    style={{ fontFamily: 'Montserrat, sans-serif' }}
-                  >
-                    Un fichier pdf/image ?
-                  </Label>
-
-                  {updateInvoice?.fileName && (
-                    <div className="mb-3 p-3 bg-blue-50
+                  {updateInvoice?.fileName ?
+                    (
+                      <div className="mb-3 p-3 bg-blue-50
                     
                      border border-blue-200 rounded-md">
-                      <div className="flex items-center justify-between">
-                        <div className="flex w-full items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Receipt className="h-4 w-4 text-blue-600 " />
-                            <div className="font-bold">
-                              Télécharger la facture actuelle :
+                        <div className="flex items-center justify-between">
+                          <div className="flex w-full items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Receipt className="h-4 w-4 text-blue-600 " />
+                              <div className="font-bold">
+                                Télécharger la facture actuelle :
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Link
+                                to={{
+                                  pathname: '/invoices/download',
+                                  search:
+                                    `?fileName=${updateInvoice.fileName}&id=${updateInvoice.id}`
+                                }}
+                                download
+                                reloadDocument
+                                className="flex items-center gap-2 hover:underline"
+                              >
+                                <span className="text-sm text-blue-800 font-medium">
+                                  {updateInvoice.fileName}
+                                </span>
+                                <Download className="h-5 w-5" />
+                              </Link>
+                              <Button
+                                onClick={() =>
+                                  setInvoiceUpdate && setInvoiceUpdate({
+                                    ...updateInvoice,
+                                    fileName: undefined
+                                  })}
+                                name="_tag"
+                                value="delete-attachment"
+                                variant="destructive"
+                                size="icon"
+                                className="h-8 w-8"
+                              >
+                                <Trash2 className="h-4 w-4 hover:bg-red-50 text-red-600 hover:text-red-700  cursor-pointer" />
+                              </Button>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Link
-                              to={{
-                                pathname: '/invoices/download',
-                                search: `?fileName=${updateInvoice.fileName}&id=${updateInvoice.id}`
-                              }}
-                              download
-                              reloadDocument
-                              className="flex items-center gap-2 hover:underline"
-                            >
-                              <span className="text-sm text-blue-800 font-medium">
-                                {updateInvoice.fileName}
-                              </span>
-                              <Download className="h-5 w-5" />
-                            </Link>
-                            <Button
-                              onClick={() =>
-                                setInvoiceUpdate && setInvoiceUpdate({
-                                  ...updateInvoice,
-                                  fileName: undefined
-                                })}
-                              name="_tag"
-                              value="delete-attachment"
-                              variant="destructive"
-                              size="icon"
-                              className="h-8 w-8"
-                            >
-                              <Trash2 className="h-4 w-4 hover:bg-red-50 text-red-600 hover:text-red-700  cursor-pointer" />
-                            </Button>
-                          </div>
                         </div>
+                        {updateInvoice && (
+                          <p className="text-xs text-blue-600 mt-1">
+                            Vous pouvez uploader un nouveau fichier pour une facture existante.
+                          </p>
+                        )}
                       </div>
-                      {updateInvoice && (
-                        <p className="text-xs text-blue-600 mt-1">
-                          Vous pouvez uploader un nouveau fichier pour une facture existante.
-                        </p>
-                      )}
-                    </div>
-                  )}
-
-                  <Input
-                    type="file"
-                    accept=".pdf, .png, .jpg, .jpeg"
-                    name="fileBytes"
-                    className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
-                    style={{ fontFamily: 'Montserrat, sans-serif' }}
-                  />
+                    ) :
+                    (
+                      <>
+                        <Label
+                          className="text-[#004D55] text-sm lg:text-base font-body"
+                          style={{ fontFamily: 'Montserrat, sans-serif' }}
+                        >
+                          Un fichier pdf/image ?
+                        </Label>
+                        <Input
+                          type="file"
+                          accept=".pdf, .png, .jpg, .jpeg"
+                          name="fileBytes"
+                          className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px] focus:border-[#004D55] focus:ring-[#004D55]/20 font-body"
+                          style={{ fontFamily: 'Montserrat, sans-serif' }}
+                        />
+                      </>
+                    )}
                 </div>
 
                 <Button
