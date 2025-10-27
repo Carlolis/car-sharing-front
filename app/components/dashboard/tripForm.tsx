@@ -12,6 +12,7 @@ import { Checkbox } from '../ui/checkbox'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Textarea } from '../ui/textarea'
+import { DistanceCalculator } from './DistanceCalculator'
 import {
   TaggedCreateTrip,
   TaggedUpdateTrip,
@@ -52,6 +53,8 @@ export const NewTripForm = (
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
     undefined
   )
+  const [calculatedDistance, setCalculatedDistance] = useState<number | null>(null)
+
   const personnes = [
     { id: 'maé' as const, name: 'Maé' },
     { id: 'charles' as const, name: 'Charles' },
@@ -241,9 +244,26 @@ export const NewTripForm = (
                         name="distance"
                         type="number"
                         step="0.1"
-                        defaultValue={updateTrip?.distance}
-                        className="bg-white/80 border-slate-300/60 focus:border-[#2fd1d1] focus:ring-[#2fd1d1]/20 text-sm lg:text-base min-h-[44px]"
+                        value={calculatedDistance !== null ?
+                          calculatedDistance :
+                          updateTrip?.distance ?? ''}
+                        onChange={e => {
+                          // Permettre la saisie manuelle, ce qui réinitialise le calcul automatique
+                          const value = e.target.value
+                          if (value === '') {
+                            setCalculatedDistance(null)
+                          } else {
+                            setCalculatedDistance(parseFloat(value))
+                          }
+                        }}
+                        className="bg-white/80 border-slate-300/60 focus:border-[#2fd1d1] focus:ring-[#2fd1d1]/20 text-sm lg:text-base min-h-[44px] "
                         style={{ fontFamily: 'Lato, sans-serif' }}
+                      />
+
+                      {/* Section de calcul de distance */}
+                      <DistanceCalculator
+                        onDistanceCalculated={setCalculatedDistance}
+                        initialDistance={updateTrip?.distance}
                       />
                     </div>
                   </div>
