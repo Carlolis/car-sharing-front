@@ -20,6 +20,7 @@ import { Calendar1, Minus, Plus } from 'lucide-react'
 import { NewTripForm } from '~/components/dashboard/tripForm'
 import { Button } from '~/components/ui/button'
 import { useIsMobile } from '~/components/ui/use-mobile'
+import { DistanceService } from '~/services/distance'
 import type { Route as t } from './+types/calendar'
 
 export const TripCalendar = Sc.Struct({
@@ -36,6 +37,8 @@ export const loader = Remix.loader(
     const cookieSession = yield* CookieSessionStorage
     const user = yield* cookieSession.getUserName()
     const api = yield* TripService
+    const distance = yield* DistanceService
+    yield* distance.calculateDistance('paris', 'lyon')
     const trips = yield* api.getAllTrips()
 
     yield* T.logDebug(
@@ -70,11 +73,13 @@ export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps
   const myEvents = pipe(
     trips,
     A.map(trip => ({
-      title: trip.drivers.length > 0 ? (
-        <span>
-          <strong>{trip.drivers.join(', ')}</strong> : {trip.name}
-        </span>
-      ) : trip.name,
+      title: trip.drivers.length > 0 ?
+        (
+          <span>
+            <strong>{trip.drivers.join(', ')}</strong> : {trip.name}
+          </span>
+        ) :
+        trip.name,
       start: new Date(trip.startDate),
       end: new Date(trip.endDate),
       resource: trip

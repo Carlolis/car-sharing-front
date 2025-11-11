@@ -1,6 +1,8 @@
+import type { google } from '@googlemaps/places/build/protos/protos'
+import { PlacesClient } from '@googlemaps/places/build/src/v1'
 import * as T from 'effect/Effect'
+import { stringify } from 'effect/FastCheck'
 import { HttpService } from './httpClient'
-
 // Types pour les villes et distances
 export interface City {
   id: string
@@ -145,6 +147,13 @@ const MOCK_DISTANCES: Record<string, Record<string, number>> = {
 export class DistanceService extends T.Service<DistanceService>()('DistanceService', {
   effect: T.gen(function* () {
     const { _tag } = yield* HttpService
+
+    const API_KEY = 'AIzaSyD5uaArhTkvDvD416y-N9PNbrABJ-pUhCU'
+
+    // Création du client Google Places côté serveur
+    const client = new PlacesClient({
+      apiKey: API_KEY
+    })
     const getCities = (): T.Effect<City[]> =>
       T.succeed(MOCK_CITIES).pipe(
         T.tap(() => T.logInfo('Getting available cities')),
@@ -158,6 +167,21 @@ export class DistanceService extends T.Service<DistanceService>()('DistanceServi
       T.gen(function* () {
         yield* T.logInfo(`Calculating distance from ${fromCityId} to ${toCityId}`)
 
+        const request = {
+          textQuery: 'toulouse'
+        }
+
+        const place = yield* (T.promise(() =>
+          client.searchText(request, {
+            otherArgs: {
+              // FieldMask au niveau des headers !
+              headers: {
+                'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.location'
+              }
+            }
+          })
+        ))
+        yield* T.logInfo(`Result :  ${stringify(place[0].places?.[0]?.types)}`)
         // Vérifier que les villes existent
         const fromCity = MOCK_CITIES.find(c => c.id === fromCityId)
         const toCity = MOCK_CITIES.find(c => c.id === toCityId)

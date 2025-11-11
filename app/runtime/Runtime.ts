@@ -17,6 +17,7 @@ import { InvoiceLayer } from '~/services/invoice'
 import { MaintenanceLayer } from '~/services/maintenance'
 import { TripLayer } from '~/services/trip'
 
+import { DistanceLayer } from '~/services/distance'
 import { Config, ConfigLive } from './Config'
 
 export const DevToolsLive = DevTools.layerWebSocket().pipe(
@@ -39,6 +40,7 @@ export const AppLayer = pipe(
   L.provideMerge(TripLayer),
   L.provideMerge(InvoiceLayer),
   L.provideMerge(MaintenanceLayer),
+  L.provideMerge(DistanceLayer),
   L.provideMerge(CarLayer),
   L.provideMerge(IALayer),
   L.provide(HttpLayer),
