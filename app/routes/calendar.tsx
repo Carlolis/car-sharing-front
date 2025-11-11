@@ -11,7 +11,7 @@ import { matcherTripActions } from '~/components/dashboard/matcherTripActions'
 import { TripActions } from '~/components/dashboard/TripActions'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import { Remix } from '~/runtime/Remix'
-import { NotFound, Redirect } from '~/runtime/ServerResponse'
+import { NotFound, Redirect, Unexpected } from '~/runtime/ServerResponse'
 import { TripService } from '~/services/trip'
 import type { TripUpdate } from '~/types/api'
 import { DriversArrayEnsure } from '~/types/api'
@@ -38,16 +38,16 @@ export const loader = Remix.loader(
     const user = yield* cookieSession.getUserName()
     const api = yield* TripService
     const distance = yield* DistanceService
-    yield* distance.calculateDistance('paris', 'lyon')
+    // yield* distance.calculateDistance('paris', 'lyon')
     const trips = yield* api.getAllTrips()
 
-    yield* T.logDebug(
+    yield* T.logInfo(
       `Trips and stats fetched: ${stringify(trips)}, stringify(userStats)}`
     )
     return { user, trips }
   }).pipe(
-    T.catchAll(error => T.fail(new NotFound({ message: stringify(error) }))),
-    T.annotateLogs('Calendar', 'Loader')
+    T.catchTag('RequestError', error => T.fail(new Unexpected({ error: error.message }))),
+    T.catchTag('ResponseError', error => T.fail(new Unexpected({ error: error.message })))
   )
 )
 

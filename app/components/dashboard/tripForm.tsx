@@ -12,7 +12,6 @@ import { Checkbox } from '../ui/checkbox'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Textarea } from '../ui/textarea'
-import { DistanceCalculator } from './DistanceCalculator'
 import {
   TaggedCreateTrip,
   TaggedUpdateTrip,
@@ -261,10 +260,12 @@ export const NewTripForm = (
                       />
 
                       {/* Section de calcul de distance */}
-                      <DistanceCalculator
+                      {
+                        /* <DistanceCalculator
                         onDistanceCalculated={setCalculatedDistance}
                         initialDistance={updateTrip?.distance}
-                      />
+                      /> */
+                      }
                     </div>
                   </div>
                 </div>
@@ -315,7 +316,7 @@ export const NewTripForm = (
                   />
                 </motion.div>
 
-                <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                <div className="flex flex-col sm:flex-row gap-3 py-4">
                   <Button
                     type="submit"
                     className="order-1 sm:order-2 flex-1 bg-[#004D55] hover:bg-[#003640] text-[#f6f6f6] text-sm lg:text-base py-2 lg:py-3 min-h-[44px] font-body"
