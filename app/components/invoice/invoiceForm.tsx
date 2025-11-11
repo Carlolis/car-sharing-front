@@ -49,6 +49,7 @@ export default function InvoiceForm(
   )
 
   const facturesKinds: InvoiceKind[] = [
+    'Péage',
     'Carburant',
     'Entretien',
     'Assurance',
@@ -298,7 +299,8 @@ export default function InvoiceForm(
                   </Select>
                 </div>
 
-                {(selectedKind === 'Remboursement' || selectedKind === 'Carburant') && (
+                {(selectedKind === 'Remboursement' || selectedKind === 'Carburant'
+                  || selectedKind == 'Péage') && (
                   <div>
                     <Label
                       className="text-[#004D55] text-sm lg:text-base font-body"

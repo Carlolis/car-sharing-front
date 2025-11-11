@@ -8,7 +8,8 @@ export const InvoiceKinds = Sc.Literal(
   'Réparation',
   'Contrôle technique',
   'Autre',
-  'Remboursement'
+  'Remboursement',
+  'Péage'
 )
 
 export type InvoiceKind = Sc.Schema.Type<typeof InvoiceKinds>
