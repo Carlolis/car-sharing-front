@@ -112,7 +112,8 @@ export const Reimbursement = ({ reimbursements, fairPart }: ReimbursementProps) 
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between border-gray-200 ">
-                      <span
+                      {
+                        /* <span
                         className="text-xs lg:text-sm text-[#6B7280] font-body"
                         style={{ fontFamily: 'Montserrat, sans-serif' }}
                       >
@@ -124,7 +125,8 @@ export const Reimbursement = ({ reimbursements, fairPart }: ReimbursementProps) 
                         style={{ fontFamily: 'Montserrat, sans-serif' }}
                       >
                         {Math.abs(fairPart - reimbursement.totalAmount).toFixed(2)} €
-                      </span>
+                      </span> */
+                      }
                     </div>
                     <div className="flex justify-between  border-gray-200 ">
                       <span
