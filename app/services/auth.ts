@@ -13,7 +13,7 @@ export class AuthService extends T.Service<AuthService>()('AuthService', {
         yield* T.logInfo(`AuthService login url : ${postRequest.url}/login`)
         const loginUrl = pipe(postRequest, HttpClientRequest.appendUrl('/login'))
 
-        const body = yield* HttpBody.json({ name: username })
+        const body = yield* HttpBody.json({ name: username.trim() })
         const loginRequest = pipe(
           loginUrl,
           HttpClientRequest.setHeader('Content-Type', 'application/json'),

@@ -85,20 +85,7 @@ export default function Login() {
               </div>
             </div>
           )}
-          {isTokenExpired && (
-            <>
-              <div className="rounded-md bg-red-50  p-4">
-                <div className="text-sm text-red-700 ">
-                  Merci de vous reconnecter !
-                </div>
-              </div>
-              <div className="rounded-md bg-red-50  p-4">
-                <div className="text-sm text-red-500 ">
-                  Erreur technique, si il y a un bug : {errorMessage}
-                </div>
-              </div>
-            </>
-          )}
+
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <input
@@ -140,6 +127,20 @@ export default function Login() {
               </motion.div>
             </motion.div>
           </Button>
+          {isTokenExpired && (
+            <>
+              <div className="rounded-md bg-red-50  p-4">
+                <div className="text-sm  ">
+                  Merci de vous reconnecter !
+                </div>
+              </div>
+              <div className="rounded-md bg-red-50  p-4">
+                <div className="text-sm  ">
+                  Erreur technique, si il y a un bug : {errorMessage}
+                </div>
+              </div>
+            </>
+          )}
         </Form>
       </div>
     </div>

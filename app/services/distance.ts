@@ -148,7 +148,7 @@ export class DistanceService extends T.Service<DistanceService>()('DistanceServi
   effect: T.gen(function* () {
     const { _tag } = yield* HttpService
 
-    const API_KEY = 'AIzaSyD5uaArhTkvDvD416y-N9PNbrABJ-pUhCU'
+    const API_KEY = 'Put key in env variable' // Replace with your actual API key
 
     // Création du client Google Places côté serveur
     const client = new PlacesClient({
