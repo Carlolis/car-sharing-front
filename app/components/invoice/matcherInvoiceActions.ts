@@ -38,7 +38,7 @@ export const matcherInvoiceActions = (request: InvoiceActions) =>
             O.fromNullable,
             O.flatMapNullable(fileBytes => fileBytes[0]),
             O.map(r => r.name),
-            O.getOrUndefined
+            O.getOrElse(() => invoiceUpdate.fileName)
           )
 
           const invoiceId = yield* api.updateInvoice({

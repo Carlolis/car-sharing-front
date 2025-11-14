@@ -1,6 +1,7 @@
 import { HttpServerRequest } from '@effect/platform'
 import { Loader } from 'components/ui/shadcn-io/ai/loader'
 import * as T from 'effect/Effect'
+import { stringify } from 'effect/FastCheck'
 import { Minus, Plus, Receipt } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useState } from 'react'
@@ -33,9 +34,8 @@ export const loader = Remix.loader(
 
 export const action = Remix.action(
   T.gen(function* () {
-    yield* T.logInfo(`Invoice actions trigged....`)
-
     const request = yield* HttpServerRequest.schemaBodyForm(InvoiceActions)
+    yield* T.logInfo(`Invoice actions trigged.... ${stringify(request)}`)
     return yield* matcherInvoiceActions(request)
   }).pipe(
     T.tapError(T.logError),

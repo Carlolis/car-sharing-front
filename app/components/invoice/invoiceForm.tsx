@@ -151,11 +151,21 @@ export default function InvoiceForm(
                       defaultValue={updateInvoice ? 'update' : 'create'}
                     />
                     {updateInvoice && (
-                      <Input
-                        type="hidden"
-                        name="id"
-                        defaultValue={updateInvoice.id}
-                      />
+                      <>
+                        <Input
+                          type="hidden"
+                          name="id"
+                          defaultValue={updateInvoice.id}
+                        />
+                        {updateInvoice.fileName
+                          && (
+                            <Input
+                              type="hidden"
+                              name="fileName"
+                              defaultValue={updateInvoice.fileName}
+                            />
+                          )}
+                      </>
                     )}
                   </div>
                   <div>

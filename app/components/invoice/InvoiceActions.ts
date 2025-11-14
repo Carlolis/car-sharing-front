@@ -23,6 +23,7 @@ export const InvoiceUpdateFormTagged = Sc.Struct({
   mileage: Sc.String,
   driver: Sc.String,
   fileBytes: Sc.optional(FilesSchema),
+  fileName: Sc.optional(Sc.String),
   kind: InvoiceKinds,
   amount: Sc.NumberFromString,
   toDriver: Sc.optional(Sc.String)
