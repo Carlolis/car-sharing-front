@@ -322,7 +322,7 @@ export const NewTripForm = (
                     className="order-1 sm:order-2 flex-1 bg-[#004D55] hover:bg-[#003640] text-[#f6f6f6] text-sm lg:text-base py-2 lg:py-3 min-h-[44px] font-body"
                     style={{ fontFamily: 'Montserrat, sans-serif' }}
                   >
-                    {updateTrip ? 'Modifier le trajet' : 'Enregistrer le trajet'}
+                    {updateTrip ? 'Valider' : 'Enregistrer le trajet'}
                   </Button>
                   <Button
                     onClick={() => {
