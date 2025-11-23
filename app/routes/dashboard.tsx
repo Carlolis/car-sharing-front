@@ -18,8 +18,8 @@ import { HttpServerRequest } from '@effect/platform'
 
 import { Bug, Car, Gauge, MapPin, Minus, Plus } from 'lucide-react'
 import { useState } from 'react'
-import { matcherTripActions } from '~/components/dashboard/matcherTripActions'
 import { MaintenanceCard } from '~/components/dashboard/MaintenanceCard'
+import { matcherTripActions } from '~/components/dashboard/matcherTripActions'
 import { StatsCard } from '~/components/dashboard/StatsCard'
 import { TripActions } from '~/components/dashboard/TripActions'
 import { NewTripForm } from '~/components/dashboard/tripForm'
@@ -91,6 +91,8 @@ export default function Dashboard(
   const isMobile = useIsMobile()
   const [updateTrip, setUpdateTrip] = useState<TripUpdate | undefined>(undefined)
   const [showForm, setShowForm] = useState<boolean>(false)
+  const citiesSuggestions = actionData?._tag === 'city' ? actionData.citiesSuggestions : []
+  const calculatedDistance = actionData?._tag === 'distance' ? actionData.distance : undefined
 
   const trips = loaderData._tag === 'data' ? loaderData.trips || [] : []
 
@@ -98,8 +100,6 @@ export default function Dashboard(
     trips,
     setUpdateTrip
   )
-
-
 
   if (loaderData._tag !== 'data') {
     return <div>Error loading data</div>
@@ -144,15 +144,7 @@ export default function Dashboard(
             </p>
           </div>
         </motion.div>
-        <>
-          {actionData?._tag === 'create' ?
-            (
-              <>
-                {actionData.tripId}
-              </>
-            ) :
-            <></>}
-        </>
+
         {actionData?._tag === 'SimpleTaggedError' && (
           <div className="rounded-md bg-red-50  p-4">
             <div className="text-sm text-red-700 ">
@@ -204,7 +196,10 @@ export default function Dashboard(
                 icon={Car}
                 bgColor="distance"
               />
-              <MaintenanceCard car={loaderData.car} nextMaintenances={loaderData.nextMaintenances} />
+              <MaintenanceCard
+                car={loaderData.car}
+                nextMaintenances={loaderData.nextMaintenances}
+              />
             </motion.div>
 
             <motion.div
@@ -268,6 +263,8 @@ export default function Dashboard(
               setShowForm={setShowForm}
               updateTrip={updateTrip}
               setTripUpdate={setUpdateTrip}
+              citiesSuggestions={citiesSuggestions}
+              calculatedDistance={calculatedDistance}
             />
             <DataTable table={table} />
           </>

@@ -15,10 +15,23 @@ export const TaggedDeleteTrip = Sc.TaggedStruct('delete', {
 })
 export type TaggedDeleteTrip = Sc.Schema.Type<typeof TaggedDeleteTrip>
 
+export const TaggedCalculateDistance = Sc.TaggedStruct('distance', {
+  from: Sc.String,
+  to: Sc.String
+})
+export type TaggedCalculateDistance = Sc.Schema.Type<typeof TaggedCalculateDistance>
+
+export const TaggedFindCities = Sc.TaggedStruct('city', {
+  city: Sc.String
+})
+export type TaggedFindCities = Sc.Schema.Type<typeof TaggedFindCities>
+
 export const TripActions = Sc.Union(
   TaggedDeleteTrip,
   TaggedUpdateTrip,
-  TaggedCreateTrip
+  TaggedCreateTrip,
+  TaggedCalculateDistance,
+  TaggedFindCities
 )
 
 export type TripActions = typeof TripActions.Type

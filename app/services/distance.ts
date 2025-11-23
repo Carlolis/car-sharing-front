@@ -1,7 +1,12 @@
-import type { google } from '@googlemaps/places/build/protos/protos'
+import { HttpBody, HttpClientRequest, HttpClientResponse } from '@effect/platform'
+import type { HttpBodyError } from '@effect/platform/HttpBody'
+import type { HttpClientError } from '@effect/platform/HttpClientError'
 import { PlacesClient } from '@googlemaps/places/build/src/v1'
+import { pipe, Schema as Sc } from 'effect'
 import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
+import type { ParseError } from 'effect/ParseResult'
+import { Config } from '../runtime/Config'
 import { HttpService } from './httpClient'
 // Types pour les villes et distances
 export interface City {
@@ -9,217 +14,125 @@ export interface City {
   name: string
 }
 
-export interface DistanceResult {
-  from: string
-  to: string
-  distance: number
-}
+// Schema for Google Routes API response
+const RoutesApiResponse = Sc.Struct({
+  routes: Sc.optional(Sc.Array(Sc.Struct({
+    distanceMeters: Sc.optional(Sc.Number)
+  })))
+})
 
-// Données mockées des villes
-const MOCK_CITIES: City[] = [
-  { id: 'paris', name: 'Paris' },
-  { id: 'lyon', name: 'Lyon' },
-  { id: 'marseille', name: 'Marseille' },
-  { id: 'toulouse', name: 'Toulouse' },
-  { id: 'nice', name: 'Nice' },
-  { id: 'nantes', name: 'Nantes' },
-  { id: 'bordeaux', name: 'Bordeaux' },
-  { id: 'lille', name: 'Lille' },
-  { id: 'strasbourg', name: 'Strasbourg' },
-  { id: 'benque', name: 'Benque' }
-]
-
-// Distances mockées entre les villes (en km)
-const MOCK_DISTANCES: Record<string, Record<string, number>> = {
-  paris: {
-    lyon: 465,
-    marseille: 775,
-    toulouse: 678,
-    nice: 930,
-    nantes: 385,
-    bordeaux: 584,
-    lille: 225,
-    strasbourg: 490,
-    benque: 820
-  },
-  lyon: {
-    paris: 465,
-    marseille: 315,
-    toulouse: 540,
-    nice: 470,
-    nantes: 660,
-    bordeaux: 560,
-    lille: 690,
-    strasbourg: 490,
-    benque: 425
-  },
-  marseille: {
-    paris: 775,
-    lyon: 315,
-    toulouse: 405,
-    nice: 200,
-    nantes: 900,
-    bordeaux: 650,
-    lille: 1000,
-    strasbourg: 780,
-    benque: 290
-  },
-  toulouse: {
-    paris: 678,
-    lyon: 540,
-    marseille: 405,
-    nice: 590,
-    nantes: 580,
-    bordeaux: 245,
-    lille: 900,
-    strasbourg: 890,
-    benque: 175
-  },
-  nice: {
-    paris: 930,
-    lyon: 470,
-    marseille: 200,
-    toulouse: 590,
-    nantes: 1100,
-    bordeaux: 840,
-    lille: 1150,
-    strasbourg: 690,
-    benque: 450
-  },
-  nantes: {
-    paris: 385,
-    lyon: 660,
-    marseille: 900,
-    toulouse: 580,
-    nice: 1100,
-    bordeaux: 345,
-    lille: 610,
-    strasbourg: 880,
-    benque: 700
-  },
-  bordeaux: {
-    paris: 584,
-    lyon: 560,
-    marseille: 650,
-    toulouse: 245,
-    nice: 840,
-    nantes: 345,
-    lille: 810,
-    strasbourg: 950,
-    benque: 230
-  },
-  lille: {
-    paris: 225,
-    lyon: 690,
-    marseille: 1000,
-    toulouse: 900,
-    nice: 1150,
-    nantes: 610,
-    bordeaux: 810,
-    strasbourg: 535,
-    benque: 1050
-  },
-  strasbourg: {
-    paris: 490,
-    lyon: 490,
-    marseille: 780,
-    toulouse: 890,
-    nice: 690,
-    nantes: 880,
-    bordeaux: 950,
-    lille: 535,
-    benque: 950
-  },
-  benque: {
-    paris: 820,
-    lyon: 425,
-    marseille: 290,
-    toulouse: 175,
-    nice: 450,
-    nantes: 700,
-    bordeaux: 230,
-    lille: 1050,
-    strasbourg: 950
-  }
-}
+// Schema for the request body
+const RoutesApiRequestBody = Sc.Struct({
+  origin: Sc.Struct({ placeId: Sc.String }),
+  destination: Sc.Struct({ placeId: Sc.String }),
+  travelMode: Sc.String,
+  routingPreference: Sc.String,
+  languageCode: Sc.String,
+  units: Sc.String
+})
 
 // @effect-diagnostics-next-line leakingRequirements:off
 export class DistanceService extends T.Service<DistanceService>()('DistanceService', {
   effect: T.gen(function* () {
-    const { _tag } = yield* HttpService
+    const { defaultClient } = yield* HttpService
 
-    const API_KEY = 'Put key in env variable' // Replace with your actual API key
+    const { GOOGLE_MAP_API_KEY } = yield* pipe(Config, T.flatMap(c => c.getConfig)) // Replace with your actual API key
 
     // Création du client Google Places côté serveur
     const client = new PlacesClient({
-      apiKey: API_KEY
+      apiKey: GOOGLE_MAP_API_KEY
     })
-    const getCities = (): T.Effect<City[]> =>
-      T.succeed(MOCK_CITIES).pipe(
-        T.tap(() => T.logInfo('Getting available cities')),
-        T.annotateLogs(DistanceService.name, 'getCities')
+    const findCities = (city: string): T.Effect<City[]> =>
+      T.gen(function* () {
+        yield* T.logInfo(`Finding cities matching: ${city}`)
+
+        const request = {
+          textQuery: city
+        }
+
+        const places = yield* (T.promise(() =>
+          client.searchText(request, {
+            otherArgs: {
+              // FieldMask au niveau des headers !
+              headers: {
+                'X-Goog-FieldMask': 'places.displayName,places.id'
+              }
+            }
+          })
+        ))
+        yield* T.logInfo(
+          `Result search places :  ${stringify(places[0].places)}`
+        )
+        // Extract text values, filter out null/undefined/empty, then map to City[]
+        const raw = places[0].places ?? []
+        const names = raw
+          .map(p => ({ name: p.displayName?.text, id: p.id }))
+          .filter((n): n is { name: string; id: string } => n.name != null && n.id != null)
+        const cities: City[] = names.map(n => ({ id: n.id, name: n.name }))
+        yield* T.logInfo(
+          `Result search city :  ${stringify(cities)}`
+        )
+        return cities
+      }).pipe(
+        T.tapError(T.logError),
+        T.annotateLogs(DistanceService.name, 'findCities')
       )
 
     const calculateDistance = (
       fromCityId: string,
       toCityId: string
-    ): T.Effect<DistanceResult, Error> =>
+    ): T.Effect<number, Error | HttpClientError | HttpBodyError | ParseError> =>
       T.gen(function* () {
         yield* T.logInfo(`Calculating distance from ${fromCityId} to ${toCityId}`)
 
-        const request = {
-          textQuery: 'toulouse'
-        }
-
-        const place = yield* (T.promise(() =>
-          client.searchText(request, {
-            otherArgs: {
-              // FieldMask au niveau des headers !
-              headers: {
-                'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.location'
-              }
-            }
-          })
-        ))
-        yield* T.logInfo(`Result :  ${stringify(place[0].places?.[0]?.types)}`)
-        // Vérifier que les villes existent
-        const fromCity = MOCK_CITIES.find(c => c.id === fromCityId)
-        const toCity = MOCK_CITIES.find(c => c.id === toCityId)
-
-        if (!fromCity || !toCity) {
-          return yield* T.fail(new Error('Ville non trouvée'))
-        }
-
         // Si les villes sont identiques, distance = 0
         if (fromCityId === toCityId) {
-          return {
-            from: fromCity.name,
-            to: toCity.name,
-            distance: 0
-          }
+          return 0
         }
 
-        // Chercher la distance
-        const distance = MOCK_DISTANCES[fromCityId]?.[toCityId]
+        const reqBodyData = {
+          origin: { placeId: fromCityId },
+          destination: { placeId: toCityId },
+          travelMode: 'DRIVE',
+          routingPreference: 'TRAFFIC_UNAWARE',
+          languageCode: 'fr-FR',
+          units: 'METRIC'
+        }
 
-        if (distance === undefined) {
+        const body = yield* HttpBody.jsonSchema(RoutesApiRequestBody)(reqBodyData)
+
+        const routesRequest = pipe(
+          HttpClientRequest.post('https://routes.googleapis.com/directions/v2:computeRoutes'),
+          HttpClientRequest.setHeader('Content-Type', 'application/json'),
+          HttpClientRequest.setHeader('X-Goog-Api-Key', GOOGLE_MAP_API_KEY),
+          HttpClientRequest.setHeader('X-Goog-FieldMask', 'routes.distanceMeters'),
+          HttpClientRequest.setBody(body)
+        )
+
+        const response = yield* defaultClient.execute(routesRequest).pipe(
+          T.tapError(T.logError)
+        )
+
+        const apiResp = yield* HttpClientResponse.schemaBodyJson(RoutesApiResponse)(response)
+
+        const meters: number | undefined = apiResp?.routes?.[0]?.distanceMeters
+
+        if (meters === undefined) {
           return yield* T.fail(new Error('Distance non disponible entre ces villes'))
         }
 
-        yield* T.logInfo(`Distance calculated: ${distance} km`)
+        const distanceKm = Math.round(meters / 1000)
 
-        return {
-          from: fromCity.name,
-          to: toCity.name,
-          distance
-        }
+        yield* T.logInfo(`Distance calculated: ${distanceKm} km`)
+
+        return distanceKm
       }).pipe(
         T.tapError(T.logError),
         T.annotateLogs(DistanceService.name, 'calculateDistance')
       )
 
     return {
-      getCities,
+      findCities,
       calculateDistance
     }
   })

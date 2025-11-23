@@ -18,6 +18,7 @@ export class Config extends Context.Tag('Config')<
       readonly SECRET: string
       readonly DOMAIN: string
       readonly API_URL: string
+      readonly GOOGLE_MAP_API_KEY: string
     }, ConfigError>
   }
 >() {}
@@ -44,6 +45,12 @@ export const ConfigLive = L.succeed(Config, {
       EConfig.string('DOMAIN'),
       EConfig.withDefault('localhost')
     )
+
+    const GOOGLE_MAP_API_KEY = yield* pipe(
+      EConfig.string('GOOGLE_MAP_API_KEY'),
+      EConfig.withDefault('YOUR_DEFAULT_API_KEY')
+    )
+
     yield* T.logDebug(
       `ConfigLive - Loaded configuration: logLevel=${
         stringify(logLevel.label)
@@ -54,7 +61,8 @@ export const ConfigLive = L.succeed(Config, {
       logLevel,
       API_URL,
       SECRET,
-      DOMAIN
+      DOMAIN,
+      GOOGLE_MAP_API_KEY
     })
   })
 })

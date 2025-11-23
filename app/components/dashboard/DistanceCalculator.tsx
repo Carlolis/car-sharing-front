@@ -1,86 +1,117 @@
 import { ArrowRight, Calculator } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
-import { calculateDistance, CITIES, type City } from '~/lib/distanceCalculator'
+import { useSubmit } from 'react-router'
+
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
+import { TaggedCalculateDistance, TaggedFindCities } from './TripActions'
 
 interface DistanceCalculatorProps {
-  onDistanceCalculated: (distance: number | null) => void
-  initialDistance?: number
+  onDistanceCalculated: (distance?: number) => void
+  distance?: number
+  citiesSuggestions: City[]
+}
+
+interface City {
+  id: string
+  name: string
 }
 
 export const DistanceCalculator = ({
   onDistanceCalculated,
-  initialDistance
+  distance,
+  citiesSuggestions
 }: DistanceCalculatorProps) => {
+  const submit = useSubmit()
+
+  const handleCalculateCityDistance = (from: string, to: string) => {
+    submit(
+      TaggedCalculateDistance.make({ from, to }),
+      {
+        // action: '/dashboard',
+        method: 'post',
+        encType: 'application/json'
+      }
+    )
+  }
+
   const [fromCityInput, setFromCityInput] = useState<string>('')
   const [toCityInput, setToCityInput] = useState<string>('')
   const [fromCitySelected, setFromCitySelected] = useState<City | null>(null)
   const [toCitySelected, setToCitySelected] = useState<City | null>(null)
   const [showFromSuggestions, setShowFromSuggestions] = useState(false)
   const [showToSuggestions, setShowToSuggestions] = useState(false)
-  const [calculatedDistance, setCalculatedDistance] = useState<number | null>(
-    initialDistance ?? null
-  )
+
   const fromContainerRef = useRef<HTMLDivElement>(null)
   const toContainerRef = useRef<HTMLDivElement>(null)
-
-  // Filtrer les villes en fonction de l'entrée (à partir de 3 caractères)
-  const getFilteredCities = (input: string): City[] => {
-    if (input.length < 3) return []
-    const normalizedInput = input.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    return CITIES.filter(city =>
-      city.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(normalizedInput)
-    )
-  }
 
   // Gérer la sélection d'une ville
   const handleCitySelect = (type: 'from' | 'to', city: City) => {
     if (type === 'from') {
       setFromCitySelected(city)
       setFromCityInput(city.name)
+
       setShowFromSuggestions(false)
+
       if (toCitySelected) {
-        const distance = calculateDistance(city.id, toCitySelected.id)
-        setCalculatedDistance(distance)
+        handleCalculateCityDistance(city.id, toCitySelected.id)
+
         onDistanceCalculated(distance)
       }
     } else {
       setToCitySelected(city)
       setToCityInput(city.name)
       setShowToSuggestions(false)
+
       if (fromCitySelected) {
-        const distance = calculateDistance(fromCitySelected.id, city.id)
-        setCalculatedDistance(distance)
+        handleCalculateCityDistance(fromCitySelected.id, city.id)
         onDistanceCalculated(distance)
       }
     }
   }
 
   // Gérer le changement d'input
-  const handleInputChange = (type: 'from' | 'to', value: string) => {
+  const handleInputChange = (type: 'from' | 'to', city: string) => {
     if (type === 'from') {
-      setFromCityInput(value)
+      setFromCityInput(city)
       setFromCitySelected(null)
-      setShowFromSuggestions(value.length >= 3)
-      if (!value) {
-        setCalculatedDistance(null)
-        onDistanceCalculated(null)
+      const isLengthValid = city.length >= 3
+      if (isLengthValid) {
+        setShowFromSuggestions(isLengthValid)
+        submit(
+          TaggedFindCities.make({ city }),
+          {
+            // action: '/dashboard',
+            method: 'post',
+            encType: 'application/json'
+          }
+        )
+      }
+
+      if (!city) {
+        onDistanceCalculated(undefined)
       }
     } else {
-      setToCityInput(value)
+      setToCityInput(city)
       setToCitySelected(null)
-      setShowToSuggestions(value.length >= 3)
-      if (!value) {
-        setCalculatedDistance(null)
-        onDistanceCalculated(null)
+      const isLengthValid = city.length >= 3
+      if (isLengthValid) {
+        setShowToSuggestions(isLengthValid)
+        submit(
+          TaggedFindCities.make({ city }),
+          {
+            // action: '/dashboard',
+            method: 'post',
+            encType: 'application/json'
+          }
+        )
+      }
+      if (!city) {
+        onDistanceCalculated(undefined)
       }
     }
   }
-
-  const fromCitySuggestions = getFilteredCities(fromCityInput)
-  const toCitySuggestions = getFilteredCities(toCityInput)
 
   // Fermer les suggestions quand on clique en dehors
   useEffect(() => {
@@ -129,13 +160,13 @@ export const DistanceCalculator = ({
             placeholder="Saisir au moins 3 caractères..."
             className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px]"
           />
-          {showFromSuggestions && fromCitySuggestions.length > 0 && (
+          {showFromSuggestions && citiesSuggestions.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
               className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto"
             >
-              {fromCitySuggestions.map(city => (
+              {citiesSuggestions.map(city => (
                 <button
                   key={city.id}
                   type="button"
@@ -147,7 +178,7 @@ export const DistanceCalculator = ({
               ))}
             </motion.div>
           )}
-          {showFromSuggestions && fromCitySuggestions.length === 0 && fromCityInput.length >= 3 && (
+          {showFromSuggestions && citiesSuggestions.length === 0 && fromCityInput.length >= 3 && (
             <motion.div
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
@@ -179,13 +210,13 @@ export const DistanceCalculator = ({
             placeholder="Saisir au moins 3 caractères..."
             className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px]"
           />
-          {showToSuggestions && toCitySuggestions.length > 0 && (
+          {showToSuggestions && citiesSuggestions.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
               className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto"
             >
-              {toCitySuggestions.map(city => (
+              {citiesSuggestions.map(city => (
                 <button
                   key={city.id}
                   type="button"
@@ -197,7 +228,7 @@ export const DistanceCalculator = ({
               ))}
             </motion.div>
           )}
-          {showToSuggestions && toCitySuggestions.length === 0 && toCityInput.length >= 3 && (
+          {showToSuggestions && citiesSuggestions.length === 0 && toCityInput.length >= 3 && (
             <motion.div
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
@@ -209,7 +240,7 @@ export const DistanceCalculator = ({
         </div>
       </div>
 
-      {calculatedDistance !== null && (
+      {fromCitySelected && toCitySelected && (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -218,7 +249,7 @@ export const DistanceCalculator = ({
           <div className="flex items-center justify-between">
             <span className="text-sm text-[#004D55]">Distance calculée :</span>
             <span className="text-lg font-semibold text-[#2fd1d1]">
-              {calculatedDistance} km
+              {distance} km
             </span>
           </div>
         </motion.div>

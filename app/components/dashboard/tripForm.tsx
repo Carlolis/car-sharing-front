@@ -2,8 +2,9 @@ import { ParseResult, pipe, Schema as Sc } from 'effect'
 import * as E from 'effect/Either'
 import { MapPin, Users } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
-import { type FormEvent, useState } from 'react'
+import { type FormEvent, useEffect, useState } from 'react'
 import { Form, useSubmit } from 'react-router'
+import type { City } from '~/services/distance'
 import type { TripUpdate } from '~/types/api'
 import { TripCreate } from '~/types/api'
 import { Button } from '../ui/button'
@@ -12,6 +13,7 @@ import { Checkbox } from '../ui/checkbox'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Textarea } from '../ui/textarea'
+import { DistanceCalculator } from './DistanceCalculator'
 import {
   TaggedCreateTrip,
   TaggedUpdateTrip,
@@ -23,6 +25,8 @@ interface NewTripFormProps {
   updateTrip?: TripUpdate
   setTripUpdate: (tripUpdate: TripUpdate | undefined) => void
   startDate?: Date
+  calculatedDistance?: number
+  citiesSuggestions: City[]
 }
 
 const ValidatedTripCreate = pipe(
@@ -43,7 +47,15 @@ const ValidatedTripCreate = pipe(
 )
 
 export const NewTripForm = (
-  { showForm, updateTrip, setShowForm, setTripUpdate, startDate }: NewTripFormProps
+  {
+    showForm,
+    updateTrip,
+    setShowForm,
+    setTripUpdate,
+    startDate,
+    citiesSuggestions,
+    calculatedDistance
+  }: NewTripFormProps
 ) => {
   {
     /* Formulaire */
@@ -52,7 +64,19 @@ export const NewTripForm = (
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
     undefined
   )
-  const [calculatedDistance, setCalculatedDistance] = useState<number | null>(null)
+
+  const [distance, setDistance] = useState<number | undefined>(undefined)
+
+  useEffect(() => {
+    if (calculatedDistance !== undefined) {
+      setDistance(calculatedDistance)
+      return
+    }
+    if (updateTrip?.distance !== undefined) {
+      setDistance(updateTrip.distance)
+      return
+    }
+  }, [calculatedDistance, updateTrip?.distance])
 
   const personnes = [
     { id: 'maé' as const, name: 'Maé' },
@@ -243,16 +267,14 @@ export const NewTripForm = (
                         name="distance"
                         type="number"
                         step="0.1"
-                        value={calculatedDistance !== null ?
-                          calculatedDistance :
-                          updateTrip?.distance ?? ''}
+                        value={distance}
                         onChange={e => {
                           // Permettre la saisie manuelle, ce qui réinitialise le calcul automatique
                           const value = e.target.value
                           if (value === '') {
-                            setCalculatedDistance(null)
+                            setDistance(undefined)
                           } else {
-                            setCalculatedDistance(parseFloat(value))
+                            setDistance(parseFloat(value))
                           }
                         }}
                         className="bg-white/80 border-slate-300/60 focus:border-[#2fd1d1] focus:ring-[#2fd1d1]/20 text-sm lg:text-base min-h-[44px] "
@@ -260,12 +282,11 @@ export const NewTripForm = (
                       />
 
                       {/* Section de calcul de distance */}
-                      {
-                        /* <DistanceCalculator
-                        onDistanceCalculated={setCalculatedDistance}
-                        initialDistance={updateTrip?.distance}
-                      /> */
-                      }
+                      <DistanceCalculator
+                        onDistanceCalculated={setDistance}
+                        distance={distance}
+                        citiesSuggestions={citiesSuggestions}
+                      />
                     </div>
                   </div>
                 </div>

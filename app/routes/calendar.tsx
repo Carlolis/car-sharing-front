@@ -11,7 +11,7 @@ import { matcherTripActions } from '~/components/dashboard/matcherTripActions'
 import { TripActions } from '~/components/dashboard/TripActions'
 import { CookieSessionStorage } from '~/runtime/CookieSessionStorage'
 import { Remix } from '~/runtime/Remix'
-import { NotFound, Redirect, Unexpected } from '~/runtime/ServerResponse'
+import { Redirect, Unexpected } from '~/runtime/ServerResponse'
 import { TripService } from '~/services/trip'
 import type { TripUpdate } from '~/types/api'
 import { DriversArrayEnsure } from '~/types/api'
@@ -20,7 +20,6 @@ import { Calendar1, Minus, Plus } from 'lucide-react'
 import { NewTripForm } from '~/components/dashboard/tripForm'
 import { Button } from '~/components/ui/button'
 import { useIsMobile } from '~/components/ui/use-mobile'
-import { DistanceService } from '~/services/distance'
 import type { Route as t } from './+types/calendar'
 
 export const TripCalendar = Sc.Struct({
@@ -37,8 +36,7 @@ export const loader = Remix.loader(
     const cookieSession = yield* CookieSessionStorage
     const user = yield* cookieSession.getUserName()
     const api = yield* TripService
-    const distance = yield* DistanceService
-    // yield* distance.calculateDistance('paris', 'lyon')
+
     const trips = yield* api.getAllTrips()
 
     yield* T.logInfo(
@@ -211,6 +209,7 @@ export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps
           setTripUpdate={setUpdateTrip}
           updateTrip={updateTrip}
           startDate={startDate}
+          citiesSuggestions={[]}
         />
         <Calendar
           className="w-full bg-white border-gray-200 shadow-sm rounded-xl"

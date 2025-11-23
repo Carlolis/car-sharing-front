@@ -3,43 +3,64 @@ import * as T from 'effect/Effect'
 import { stringify } from 'effect/FastCheck'
 import type { TripActions } from '~/components/dashboard/TripActions'
 import { SimpleTaggedError } from '~/runtime/errors/SimpleTaggedError'
+import { DistanceService } from '~/services/distance'
 
 import { TripService } from '~/services/trip'
 
 export const matcherTripActions = (request: TripActions) =>
   T.gen(function* () {
     yield* T.logDebug(`Trip action request: ${stringify(request)}`)
-    const api = yield* TripService
+    const tripService = yield* TripService
+    const distanceService = yield* DistanceService
+
+    const userStats = yield* tripService.getTripStatsByUser()
+
     return yield* Match.type<TripActions>().pipe(
       Match.tag('delete', ({ tripId }) =>
         T.gen(function* () {
           yield* T.logInfo('Deleting trip...')
-          yield* api.deleteTrip(tripId)
+          yield* tripService.deleteTrip(tripId)
 
           yield* T.logInfo(`Trip deleted: ${stringify(tripId)}`)
 
-          const userStats = yield* api.getTripStatsByUser()
           return { tripId, userStats, _tag: 'delete' as const }
         })),
       Match.tag('update', ({ tripUpdate }) =>
         T.gen(function* () {
           yield* T.logInfo(`Trip updating trip action .... ${stringify(tripUpdate)}`)
 
-          const tripId = yield* api.updateTrip(tripUpdate)
+          const tripId = yield* tripService.updateTrip(tripUpdate)
 
           yield* T.logInfo(`Trip updated .... ${stringify(tripId)}`)
-          const userStats = yield* api.getTripStatsByUser()
+
           return { tripId, userStats, _tag: 'update' as const }
         })),
       Match.tag('create', ({ tripCreate }) =>
         T.gen(function* () {
           yield* T.logInfo(`Trip creating trip action .... ${stringify(tripCreate)}`)
 
-          const tripId = yield* api.createTrip(tripCreate)
+          const tripId = yield* tripService.createTrip(tripCreate)
 
           yield* T.logInfo(`Trip created .... ${stringify(tripId)}`)
-          const userStats = yield* api.getTripStatsByUser()
+
           return { tripId, userStats, _tag: 'create' as const }
+        })),
+      Match.tag('distance', ({ from, to }) =>
+        T.gen(function* () {
+          yield* T.logInfo(`Calculating distance trip action .... from ${from} to ${to}`)
+
+          const distance = yield* distanceService.calculateDistance(from, to)
+
+          const userStats = yield* tripService.getTripStatsByUser()
+          return { distance, userStats, _tag: 'distance' as const }
+        })),
+      Match.tag('city', ({ city }) =>
+        T.gen(function* () {
+          yield* T.logInfo(`Finding cities matching .... ${city}`)
+
+          const citiesSuggestions = yield* distanceService.findCities(city)
+
+          return { citiesSuggestions, userStats, _tag: 'city' as const }
         })),
       Match.exhaustive
     )(request)
