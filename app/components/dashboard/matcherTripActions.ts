@@ -49,10 +49,10 @@ export const matcherTripActions = (request: TripActions) =>
         T.gen(function* () {
           yield* T.logInfo(`Calculating distance trip action .... from ${from} to ${to}`)
 
-          const distance = yield* distanceService.calculateDistance(from, to)
+          const distanceResult = yield* distanceService.calculateDistance(from, to)
 
           const userStats = yield* tripService.getTripStatsByUser()
-          return { distance, userStats, _tag: 'distance' as const }
+          return { distance: distanceResult, userStats, _tag: 'distance' as const }
         })),
       Match.tag('city', ({ city }) =>
         T.gen(function* () {

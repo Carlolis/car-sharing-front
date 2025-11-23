@@ -61,13 +61,16 @@ export const action = Remix.action(
   )
 )
 
-export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps) {
+export default function CalendarPage({ loaderData: { trips }, actionData }: t.ComponentProps) {
   const isMobile = useIsMobile()
 
   const [showForm, setShowForm] = useState(false)
   const [startDate, setStartDate] = useState<Date | undefined>(undefined)
 
   const [updateTrip, setUpdateTrip] = useState<TripUpdate | undefined>(undefined)
+
+  const citiesSuggestions = actionData?._tag === 'city' ? actionData.citiesSuggestions : []
+  const calculatedDistance = actionData?._tag === 'distance' ? actionData.distance : undefined
   const myEvents = pipe(
     trips,
     A.map(trip => ({
@@ -209,7 +212,8 @@ export default function CalendarPage({ loaderData: { trips } }: t.ComponentProps
           setTripUpdate={setUpdateTrip}
           updateTrip={updateTrip}
           startDate={startDate}
-          citiesSuggestions={[]}
+          citiesSuggestions={citiesSuggestions}
+          calculatedDistance={calculatedDistance}
         />
         <Calendar
           className="w-full bg-white border-gray-200 shadow-sm rounded-xl"
