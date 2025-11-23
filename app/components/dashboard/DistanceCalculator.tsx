@@ -42,6 +42,8 @@ export const DistanceCalculator = ({
   const [toCitySelected, setToCitySelected] = useState<City | null>(null)
   const [showFromSuggestions, setShowFromSuggestions] = useState(false)
   const [showToSuggestions, setShowToSuggestions] = useState(false)
+  const [showFromWarning, setShowFromWarning] = useState(false)
+  const [showToWarning, setShowToWarning] = useState(false)
 
   const fromContainerRef = useRef<HTMLDivElement>(null)
   const toContainerRef = useRef<HTMLDivElement>(null)
@@ -51,18 +53,18 @@ export const DistanceCalculator = ({
     if (type === 'from') {
       setFromCitySelected(city)
       setFromCityInput(city.name)
-
       setShowFromSuggestions(false)
+      setShowFromWarning(false)
 
       if (toCitySelected) {
         handleCalculateCityDistance(city.id, toCitySelected.id)
-
         onDistanceCalculated(distance)
       }
     } else {
       setToCitySelected(city)
       setToCityInput(city.name)
       setShowToSuggestions(false)
+      setShowToWarning(false)
 
       if (fromCitySelected) {
         handleCalculateCityDistance(fromCitySelected.id, city.id)
@@ -76,6 +78,8 @@ export const DistanceCalculator = ({
     if (type === 'from') {
       setFromCityInput(city)
       setFromCitySelected(null)
+      onDistanceCalculated(undefined)
+
       const isLengthValid = city.length >= 3
       if (isLengthValid) {
         setShowFromSuggestions(isLengthValid)
@@ -87,14 +91,14 @@ export const DistanceCalculator = ({
             encType: 'application/json'
           }
         )
-      }
-
-      if (!city) {
-        onDistanceCalculated(undefined)
+      } else {
+        setShowFromSuggestions(false)
       }
     } else {
       setToCityInput(city)
       setToCitySelected(null)
+      onDistanceCalculated(undefined)
+
       const isLengthValid = city.length >= 3
       if (isLengthValid) {
         setShowToSuggestions(isLengthValid)
@@ -106,9 +110,8 @@ export const DistanceCalculator = ({
             encType: 'application/json'
           }
         )
-      }
-      if (!city) {
-        onDistanceCalculated(undefined)
+      } else {
+        setShowToSuggestions(false)
       }
     }
   }
@@ -118,15 +121,23 @@ export const DistanceCalculator = ({
     const handleClickOutside = (event: MouseEvent) => {
       if (fromContainerRef.current && !fromContainerRef.current.contains(event.target as Node)) {
         setShowFromSuggestions(false)
+        // Afficher l'avertissement si du texte est saisi mais aucune ville n'est sélectionnée
+        if (fromCityInput.length >= 3 && !fromCitySelected) {
+          setShowFromWarning(true)
+        }
       }
       if (toContainerRef.current && !toContainerRef.current.contains(event.target as Node)) {
         setShowToSuggestions(false)
+        // Afficher l'avertissement si du texte est saisi mais aucune ville n'est sélectionnée
+        if (toCityInput.length >= 3 && !toCitySelected) {
+          setShowToWarning(true)
+        }
       }
     }
 
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+  }, [fromCityInput, fromCitySelected, toCityInput, toCitySelected])
 
   return (
     <motion.div
@@ -156,10 +167,20 @@ export const DistanceCalculator = ({
             type="text"
             value={fromCityInput}
             onChange={e => handleInputChange('from', e.target.value)}
-            onFocus={() => fromCityInput.length >= 3 && setShowFromSuggestions(true)}
+            onFocus={() => {
+              setShowFromWarning(false)
+              if (fromCityInput.length >= 3) setShowFromSuggestions(true)
+            }}
             placeholder="Saisir au moins 3 caractères..."
-            className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px]"
+            className={`bg-white text-sm lg:text-base min-h-[44px] ${
+              showFromWarning ? 'border-red-500' : 'border-gray-300'
+            }`}
           />
+          {showFromWarning && (
+            <p className="text-xs text-red-500 mt-1">
+              Veuillez sélectionner une ville dans la liste
+            </p>
+          )}
           {showFromSuggestions && citiesSuggestions.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: -5 }}
@@ -206,10 +227,20 @@ export const DistanceCalculator = ({
             type="text"
             value={toCityInput}
             onChange={e => handleInputChange('to', e.target.value)}
-            onFocus={() => toCityInput.length >= 3 && setShowToSuggestions(true)}
+            onFocus={() => {
+              setShowToWarning(false)
+              if (toCityInput.length >= 3) setShowToSuggestions(true)
+            }}
             placeholder="Saisir au moins 3 caractères..."
-            className="bg-white border-gray-300 text-sm lg:text-base min-h-[44px]"
+            className={`bg-white text-sm lg:text-base min-h-[44px] ${
+              showToWarning ? 'border-red-500' : 'border-gray-300'
+            }`}
           />
+          {showToWarning && (
+            <p className="text-xs text-red-500 mt-1">
+              Veuillez sélectionner une ville dans la liste
+            </p>
+          )}
           {showToSuggestions && citiesSuggestions.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: -5 }}
