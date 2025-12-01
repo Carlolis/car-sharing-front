@@ -87,7 +87,7 @@ export default function CalendarPage({ loaderData: { trips }, actionData }: t.Co
     }))
   )
 
-  const localizer = luxonLocalizer(DateTime, { firstDayOfWeek: 7 })
+  const localizer = luxonLocalizer(DateTime, { firstDayOfWeek: 1 })
 
   const { views } = useMemo(() => ({
     views: {
