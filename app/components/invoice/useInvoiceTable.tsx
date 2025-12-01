@@ -157,13 +157,15 @@ export function useInvoiceTable(
             ),
             cell: ({ getValue }) => (
               <div
-                className=" sm:p-4 text-[#004D55]  text-xs sm:text-sm truncate w-full"
+                className=" sm:p-4 text-[#004D55]  text-xs sm:text-sm w-full"
                 style={{ fontFamily: 'Montserrat, sans-serif' }}
               >
                 {getValue()}
               </div>
             ),
-            footer: props => props.column.id
+            footer: props => props.column.id,
+            size: isMobile ? 200 : undefined,
+            minSize: isMobile ? 150 : undefined
           }),
           columnHelper.accessor('amount', {
             header: () => (
@@ -185,28 +187,30 @@ export function useInvoiceTable(
             footer: props => props.column.id
           }),
 
-          columnHelper.accessor('mileage', {
-            header: () => (
-              <span
-                className="text-left sm:p-4 text-[#004D55] font-semibold text-xs sm:text-sm"
-                style={{ fontFamily: 'Montserrat, sans-serif' }}
-              >
-                {isMobile ? 'Km' : 'Kilométrage'}
-              </span>
-            ),
-            cell: ({ getValue }) => {
-              const mileage = getValue() as string
-              return (
+          ...(!isMobile ?
+            [columnHelper.accessor('mileage', {
+              header: () => (
                 <span
                   className="text-left sm:p-4 text-[#004D55] font-semibold text-xs sm:text-sm"
                   style={{ fontFamily: 'Montserrat, sans-serif' }}
                 >
-                  {mileage} {isMobile || mileage === undefined ? null : 'Km'}
+                  Kilométrage
                 </span>
-              )
-            },
-            footer: props => props.column.id
-          }),
+              ),
+              cell: ({ getValue }) => {
+                const mileage = getValue()
+                return (
+                  <span
+                    className="text-left sm:p-4 text-[#004D55] font-semibold text-xs sm:text-sm"
+                    style={{ fontFamily: 'Montserrat, sans-serif' }}
+                  >
+                    {mileage !== undefined ? `${mileage} Km` : ''}
+                  </span>
+                )
+              },
+              footer: props => props.column.id
+            })] :
+            []),
           columnHelper.accessor('driver', {
             header: () => (
               <span
