@@ -155,7 +155,7 @@ export default function InvoicesPage({ loaderData, actionData }: Route.Component
             {isMobile ? 'Voir les factures' : 'Voir les factures sur Nextcloud'}
           </a>
         </motion.div>
-        {isLoading ? <Loader /> : <DataTable table={table} />}
+
         <Reimbursement
           reimbursements={loaderData.reimbursements}
           fairPart={invoices.reduce(
@@ -164,6 +164,7 @@ export default function InvoicesPage({ loaderData, actionData }: Route.Component
           )
             / 3}
         />
+        {isLoading ? <Loader /> : <DataTable table={table} />}
       </div>
     </div>
   )
