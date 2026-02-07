@@ -4,6 +4,9 @@ FROM node:22-alpine
 # Installer pnpm
 RUN npm install -g pnpm
 
+# Installer tini pour gérer les processus zombies
+RUN apk add --no-cache tini
+
 # Installer wakeonlan
 RUN apk add python3 py3-pip
 RUN pip install --break-system-packages wakeonlan
@@ -27,6 +30,9 @@ RUN pnpm build
 
 # Exposer le port sur lequel l'application va tourner
 EXPOSE 3001
+
+# Utiliser tini comme entrypoint pour éviter les processus zombies
+ENTRYPOINT ["/sbin/tini", "--"]
 
 # Commande pour lancer l'application
 CMD ["pnpm", "start"]
