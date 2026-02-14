@@ -3,7 +3,7 @@ import { pipe } from 'effect'
 import * as A from 'effect/Array'
 import { Edit3, Plus, Wrench } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Form } from 'react-router'
 import { Label } from '~/components/ui/label'
 import type { Invoice } from '~/types/Invoice'
@@ -70,12 +70,17 @@ export default function MaintenanceForm(
     A.append(invoicesWithoutMaintenance, updateMaintenance.invoice) :
     invoicesWithoutMaintenance
 
-  useEffect(() => {
+  const [prevUpdateMaintenanceId, setPrevUpdateMaintenanceId] = useState<string | undefined>(updateMaintenance?.id)
+
+  if (updateMaintenance?.id !== prevUpdateMaintenanceId) {
     setSelectedType(updateMaintenance?.type)
     setIsCompleted(updateMaintenance?.isCompleted || false)
-  }, [updateMaintenance])
+    setPrevUpdateMaintenanceId(updateMaintenance?.id)
+  }
 
-  useEffect(() => {
+  const [prevActionData, setPrevActionData] = useState<typeof actionData>(actionData)
+  if (actionData !== prevActionData) {
+    setPrevActionData(actionData)
     if (actionData?._tag === 'MaintenanceName') {
       setShowForm(false)
       setMaintenanceUpdate?.(undefined)
@@ -83,7 +88,7 @@ export default function MaintenanceForm(
     } else if (actionData?._tag === 'SimpleTaggedError') {
       setErrorMessage(actionData.message)
     }
-  }, [actionData, setShowForm, setMaintenanceUpdate])
+  }
 
   const handleClose = () => {
     setShowForm(false)

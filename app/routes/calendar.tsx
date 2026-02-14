@@ -27,7 +27,7 @@ export const TripCalendar = Sc.Struct({
   name: Sc.String,
   startDate: Sc.DateFromSelf,
   endDate: Sc.DateFromSelf,
-  distance: Sc.Number,
+  distance: Sc.optional(Sc.Number),
   drivers: DriversArrayEnsure
 })
 
@@ -48,6 +48,28 @@ export const loader = Remix.loader(
     T.catchTag('ResponseError', error => T.fail(new Unexpected({ error: error.message })))
   )
 )
+
+const DRIVER_COLORS = [
+  '#0967C6', // Bleu par défaut
+  '#059669', // Vert
+  '#7C3AED', // Violet
+  '#DB2777', // Rose
+  '#0891B2', // Cyan
+  '#EA580C', // Orange
+  '#4F46E5', // Indigo
+  '#65A30D' // Lime
+]
+
+const getDriverColor = (drivers: readonly string[]) => {
+  if (drivers.length === 0) return '#0967C6'
+  const firstDriver = drivers[0]
+  let hash = 0
+  for (let i = 0; i < firstDriver.length; i++) {
+    hash = firstDriver.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  const index = Math.abs(hash) % DRIVER_COLORS.length
+  return DRIVER_COLORS[index]
+}
 
 export const action = Remix.action(
   T.gen(function* () {
@@ -128,7 +150,7 @@ export default function CalendarPage({ loaderData: { trips }, actionData }: t.Co
     const resourceTrip = Sc.decodeUnknownSync(TripCalendar)(event.resource)
     setShowForm(false)
     setStartDate(undefined)
-    setUpdateTrip({ ...resourceTrip })
+    setUpdateTrip({ ...resourceTrip } as TripUpdate)
   }
 
   const handleToggleForm = () => {
@@ -139,6 +161,20 @@ export default function CalendarPage({ loaderData: { trips }, actionData }: t.Co
     }
 
     setShowForm(!showForm)
+  }
+
+  interface CalendarEvent extends Event {
+    resource: TripUpdate
+  }
+
+  const eventPropGetter = (event: CalendarEvent) => {
+    const backgroundColor = getDriverColor(event.resource.drivers)
+    return {
+      style: {
+        backgroundColor,
+        border: 'none'
+      }
+    }
   }
 
   return (
@@ -221,6 +257,7 @@ export default function CalendarPage({ loaderData: { trips }, actionData }: t.Co
           onSelectSlot={handleSelectSlot}
           selectable="ignoreEvents"
           onSelectEvent={handleSelectEvent}
+          eventPropGetter={eventPropGetter}
         />
       </div>
     </div>

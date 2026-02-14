@@ -1,9 +1,9 @@
 import { HttpServerRequest } from '@effect/platform'
 
-import { Match, pipe, Schema as Sc } from 'effect'
+import { pipe, Schema as Sc } from 'effect'
 import * as T from 'effect/Effect'
 import { motion } from 'motion/react'
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 import { Form, useActionData, useSearchParams } from 'react-router'
 import { Remix } from '~/runtime/Remix'
 
@@ -38,36 +38,26 @@ export const action = Remix.action(
 )
 
 export default function Login() {
-  const [isNotFound, setIsNotFound] = useState(false)
-  const [isTokenExpired, setIsTokenExpired] = useState(false)
-  const [errorMessage, setErrorMessage] = useState('')
-
   const actionData = useActionData<typeof action>()
-
-  useEffect(() => {
-    const match = Match.type<typeof actionData>().pipe(
-      Match.when(undefined, () => setIsNotFound(false)),
-      Match.tag('NotFound', ({ message }) => {
-        setIsNotFound(true)
-        setErrorMessage(message)
-      }),
-      Match.tag('SimpleTaggedError', ({ message }) => {
-        setIsNotFound(true)
-        setErrorMessage(message)
-      }),
-      Match.orElse(() => '')
-    )
-    match(actionData)
-  }, [actionData])
-
   const [searchParams] = useSearchParams()
 
-  useEffect(() => {
-    if (searchParams.has('error')) {
-      setIsTokenExpired(true)
-      setErrorMessage(searchParams.get('error') || '')
+  const { isNotFound, isTokenExpired, errorMessage } = useMemo(() => {
+    let isNotFound = false
+    let isTokenExpired = false
+    let errorMessage = ''
+
+    if (actionData?._tag === 'NotFound' || actionData?._tag === 'SimpleTaggedError') {
+      isNotFound = true
+      errorMessage = actionData.message
     }
-  }, [searchParams])
+
+    if (searchParams.has('error')) {
+      isTokenExpired = true
+      errorMessage = searchParams.get('error') || ''
+    }
+
+    return { isNotFound, isTokenExpired, errorMessage }
+  }, [actionData, searchParams])
 
   return (
     <div className="p-24 w-full">

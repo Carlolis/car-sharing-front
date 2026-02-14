@@ -1,6 +1,6 @@
 import { ArrowRight, Check, CreditCard, DollarSign, User } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useFetcher } from 'react-router'
 import type { Reimbursement as ReimbursementType } from '~/types/Reimbursement'
 import { Button } from '../ui/button'
@@ -35,11 +35,13 @@ export const Reimbursement = ({ reimbursements, fairPart }: ReimbursementProps) 
     fetcher.submit(formData, { method: 'post' })
   }
 
-  useEffect(() => {
+  const [prevFetcherState, setPrevFetcherState] = useState(fetcher.state)
+  if (fetcher.state !== prevFetcherState) {
+    setPrevFetcherState(fetcher.state)
     if (fetcher.state === 'idle') {
       setLoadingIds(new Set())
     }
-  }, [fetcher.state])
+  }
 
   const suggestions = reimbursements.map(reimbursement => {
     const toEntries = Object.entries(reimbursement.to)

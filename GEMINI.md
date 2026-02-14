@@ -1,139 +1,84 @@
-# GEMINI.md
+# GEMINI Context: Car-Sharing Frontend
 
-This file provides guidance to Gemini Code Assist when working with code in this repository.
+This document provides a comprehensive overview of the car-sharing frontend application, its architecture, and development conventions to guide future interactions and development.
 
-## Project Overview
+## 1. Project Overview
 
-This is a car-sharing application built with React Router v7 (formerly Remix) using TypeScript and Effect-TS for functional programming patterns. The application features trip management, invoice tracking, calendar views, and an AI chat interface.
+This is a sophisticated full-stack TypeScript web application for a car-sharing service, built with a modern, functional-first approach.
 
-## Development Commands
+- **Core Framework**: [React Router v7 (Remix)](https://reactrouter.com/) for server-side rendering (SSR), routing, and data loading.
+- **Build Tool**: [Vite](https://vitejs.dev/) for fast development and bundling.
+- **Language**: [TypeScript](https://www.typescriptlang.org/).
+- **Package Manager**: [pnpm](https://pnpm.io/).
+- **State & Logic Management**: [Effect-TS](https://effect.website/) is the foundational library for all business logic, side effects, and dependency injection.
 
-### Core Development
+## 2. Core Architecture & Concepts
 
-- `pnpm dev` - Start development server
-- `pnpm build` - Build for production
-- `pnpm start` - Start production server
+### Effect-TS Integration
 
-### Code Quality
+The application is architected around the Effect-TS ecosystem, which provides type-safe, composable, and testable logic.
 
-- `pnpm typecheck` - Run TypeScript compiler and generate types
-- `pnpm lint` - Run ESLint
-- `pnpm effectLint` - Run Effect-TS specific linting
-- `pnpm check` - Run all quality checks (typecheck + lint + effectLint)
-- `pnpm knip` - Check for unused dependencies and exports
+- **Business Logic**: Route `loader` (data fetching) and `action` (mutations) functions are Effect programs wrapped in custom helpers found in `app/runtime/Remix.ts`.
+- **Dependency Injection**: Uses Effect's `Layer` and `Tag` system. The `AppLayer` in `app/runtime/Runtime.ts` assembles all services (Auth, Trip, Car, Invoice, Maintenance, etc.).
+- **Error Handling**: Uses a functional approach with custom error types (e.g., `Unexpected`, `NotFound`, `NotAuthenticated`) defined in `app/runtime/ServerResponse.ts` and `app/runtime/errors/`.
+- **API Communication**: Services use `@effect/platform/HttpClient` for robust, type-safe HTTP requests.
 
-### Formatting
+**Key Directory: `app/services/`**
+Contains the heart of the business logic. Each service is defined as an Effect `Service` and has a corresponding `Layer` for injection.
 
-- `dprint fmt` - Format code using dprint (configured for TypeScript, JSON, Markdown, TOML)
+### File-Based Routing (React Router v7)
 
-## Architecture
+The application uses the standard file-based routing of React Router v7 (Remix).
 
-### Core Technologies
+- **`app/routes/`**: Each route file exports a `loader`, an `action` (using `Remix.loader` and `Remix.action`), and a default React component.
+- **`app/root.tsx`**: The root layout and entry point for the application.
 
-- **React Router v7** (formerly Remix) for SSR framework
-- **Effect-TS** for functional programming and error handling
-- **TypeScript** with strict configuration
-- **Tailwind CSS** for styling
-- **Radix UI** for accessible component primitives
-- **pnpm** for package management
+### AI Integration
 
-### Project Structure
+The application integrates with local language models (Ollama) and the Vercel AI SDK.
+- **`app/services/ia.ts`**: Service for AI-related operations.
+- **`app/components/ia/`**: UI components for AI interaction (Chat, Select, etc.).
 
-- `app/routes/` - Route components (dashboard, calendar, invoices, ia, login)
-- `app/routes.ts` - Route definitions. **IMPORTANT**: When adding a new route, you must add it to this file.
-- `app/components/` - Reusable UI components organized by feature
-- `app/services/` - Business logic services (auth, trip, invoice, ia)
-- `app/runtime/` - Effect-TS runtime configuration and server setup
-- `app/lib/` - Data models and utilities
-- `app/types/` - TypeScript type definitions
+## 3. Development Workflow
 
-### Effect-TS Architecture
-The application uses Effect-TS for:
+### Key Commands
 
-- **Dependency Injection** via Layers (see `app/runtime/Runtime.ts`)
-- **Error Handling** with structured error types
-- **HTTP Client** abstraction
-- **Session Management** with cookie-based authentication
-- **Service Layer** pattern for business logic
+- **Install dependencies**: `pnpm install`
+- **Development mode**: `pnpm dev` (starts on http://localhost:3000)
+- **Production build**: `pnpm build`
+- **Production start**: `pnpm start`
+- **Code quality check**: `pnpm check` (runs type-checking, linting, and `effect-language-service` checks)
 
-Key Effect layers:
+### Coding Standards
 
-- `AuthLayer` - Authentication service
-- `TripLayer` - Trip management
-- `InvoiceLayer` - Invoice management  
-- `IALayer` - AI chat functionality
-- `HttpLayer` - HTTP client configuration
+- **Functional Programming**: Prefer pure functions and Effect programs over imperative code.
+- **Type Safety**: Use TypeScript strictly. Use Effect Schema where appropriate for data validation.
+- **UI Components**: Follow [shadcn/ui](https://ui.shadcn.com/) patterns. Components are in `app/components/ui/`.
+- **Styling**: Use utility-first Tailwind CSS classes.
+- **Icons**: Use `lucide-react`.
 
-### Authentication
+## 4. Key Directory Structure
 
-- Cookie-based session storage via `CookieSessionStorage`
-- Authentication required for most routes except `/login` and `/health`
-- Logout functionality integrated in root layout
+```text
+/app
+├── components/         # React components (UI, features, layout).
+│   └── ui/             # shadcn-ui base components.
+├── lib/                # Core libraries and data models.
+├── routes/             # Application routes (loader/action + components).
+├── runtime/            # Effect-Remix integration and core runtime setup.
+│   └── errors/         # Custom error definitions.
+├── services/           # Effect Services for business logic (API, Auth, etc.).
+├── types/              # TypeScript types and Effect Schemas.
+├── entry.client.tsx    # Client-side entry point.
+├── entry.server.tsx    # Server-side entry point.
+└── root.tsx            # Root application layout.
+```
 
-### Special Features
+## 5. Summary for AI Assistants
 
-- **Multi-domain support** - Different behavior for `ia.ilieff.fr` subdomain
-- **AI Chat Interface** - Integrated AI functionality with streaming responses
-- **Calendar Integration** - Trip booking and visualization
-- **Invoice Management** - Full CRUD operations with table interface
-
-## Code Style & Standards
-
-### TypeScript Configuration
-
-- Strict mode enabled
-- Path aliases: `~/*` maps to `./app/*`
-- Effect-TS language service plugin enabled
-- Verbatim module syntax for better import/export handling
-
-### ESLint Rules
-
-- Effect-TS specific rules enabled
-- Consistent type imports required (`@typescript-eslint/consistent-type-imports`)
-- No console statements allowed in production code
-- Arrow functions prefer no parentheses when possible
-- Object shorthand syntax enforced
-
-### Formatting Standards (dprint)
-
-- Single quotes for TypeScript, double quotes for JSX
-- No semicolons (ASI)
-- 2-space indentation
-- 100 character line width
-- Trailing commas for type parameters only
-
-### Effect-TS Conventions
-
-- Use generators (`T.gen`) for Effect composition
-- When creating Remix loaders, use `Remix.loader(T.gen(function* () { ... }))` and import `Remix` from `~/runtime/Remix`.
-- Structured error handling with tagged unions
-- Layer-based dependency injection
-- Prefer `pipe` for transformation chains
-- Log operations use structured logging levels
-
-### VS Code Snippets
-
-This project includes a set of useful VS Code snippets to speed up development, especially when working with Effect-TS.
-The snippets are defined in `.vscode/common-imports.code-snippets`.
-
-To use them, type the prefix and press Tab.
-
-Here are some examples:
-- `+T`: `import * as T from 'effect/Effect'`
-- `+O`: `import * as O from 'effect/Option'`
-- `+SC`: `import {Schema as Sc}  from 'effect'`
-- `+L`: `import * as L from 'effect/Layer'`
-
-
-## Testing & Quality Assurance
-
-- ALWAYS ALWAYS Run `pnpm check` before commits to ensure code quality
-- Effect linting catches Effect-TS specific issues
-- TypeScript strict mode prevents runtime errors
-- Husky pre-commit hooks ensure code standards
-
-## Environment Requirements
-
-- Node.js >= 22
-- pnpm 10.13.1
-- Volta configuration available for version management
+When working on this project:
+1.  **Always look for an Effect Service first** when you need to fetch data or perform actions.
+2.  **Respect the `Remix.loader` and `Remix.action` wrappers**; they are essential for the Effect runtime to function correctly within React Router.
+3.  **Check `app/runtime/Runtime.ts`** to see which services are available in the `AppLayer`.
+4.  **Use functional error handling**; do not throw errors unless absolutely necessary. Use `T.fail` with tagged errors.
+5.  **Follow the established UI pattern** using Tailwind and shadcn/ui components for a consistent look and feel.

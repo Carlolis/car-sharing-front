@@ -39,7 +39,7 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
         const formData = new FormData()
         formData.append('name', invoice.name)
         if (invoice.fileBytes) {
-          formData.append('fileBytes', new Blob([invoice.fileBytes]), 'invoice.pdf')
+          formData.append('fileBytes', new Blob([invoice.fileBytes.buffer as ArrayBuffer]), 'invoice.pdf')
         }
 
         formData.append('date', invoice.date.toISOString().split('T')[0])
@@ -162,7 +162,7 @@ export class InvoiceService extends T.Service<InvoiceService>()('InvoiceService'
         formData.append('id', invoice.id)
         formData.append('name', invoice.name)
         if (invoice.fileBytes) {
-          formData.append('fileBytes', new Blob([invoice.fileBytes]), 'invoice.pdf')
+          formData.append('fileBytes', new Blob([invoice.fileBytes.buffer as ArrayBuffer]), 'invoice.pdf')
         }
 
         formData.append('date', invoice.date.toISOString().split('T')[0])

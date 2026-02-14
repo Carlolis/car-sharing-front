@@ -2,7 +2,7 @@ import { ParseResult, pipe, Schema as Sc } from 'effect'
 import * as E from 'effect/Either'
 import { MapPin, Users } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
-import { type FormEvent, useEffect, useState } from 'react'
+import { type FormEvent, useState } from 'react'
 import { Form, useSubmit } from 'react-router'
 import type { City } from '~/services/distance'
 import type { TripUpdate } from '~/types/api'
@@ -65,18 +65,13 @@ export const NewTripForm = (
     undefined
   )
 
-  const [distance, setDistance] = useState<number | undefined>(undefined)
+  const [distance, setDistance] = useState<number | undefined>(updateTrip?.distance)
+  const [prevCalculatedDistance, setPrevCalculatedDistance] = useState<number | undefined>(calculatedDistance)
 
-  useEffect(() => {
-    if (calculatedDistance !== undefined) {
-      setDistance(calculatedDistance)
-      return
-    }
-    if (updateTrip?.distance !== undefined) {
-      setDistance(updateTrip.distance)
-      return
-    }
-  }, [calculatedDistance, updateTrip?.distance])
+  if (calculatedDistance !== prevCalculatedDistance) {
+    setDistance(calculatedDistance)
+    setPrevCalculatedDistance(calculatedDistance)
+  }
 
   const personnes = [
     { id: 'maé' as const, name: 'Maé' },

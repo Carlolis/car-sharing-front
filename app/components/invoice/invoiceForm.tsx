@@ -1,6 +1,5 @@
-import { identity, Match } from 'effect'
 import { AnimatePresence, motion } from 'motion/react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Form, Link } from 'react-router'
 import { Label } from '~/components/ui/label'
 import type { InvoiceKind } from '~/types/Invoice'
@@ -48,6 +47,26 @@ export default function InvoiceForm(
     updateInvoice?.toDriver
   )
 
+  const [prevUpdateInvoiceId, setPrevUpdateInvoiceId] = useState<string | undefined>(updateInvoice?.id)
+
+  if (updateInvoice?.id !== prevUpdateInvoiceId) {
+    setSelectedKind(updateInvoice?.kind)
+    setSelectedDriver(updateInvoice?.driver)
+    setSelectedToDriver(updateInvoice?.toDriver)
+    setPrevUpdateInvoiceId(updateInvoice?.id)
+  }
+
+  const [prevActionData, setPrevActionData] = useState<typeof actionData>(actionData)
+  if (actionData !== prevActionData) {
+    setPrevActionData(actionData)
+    if (actionData?._tag === 'InvoiceName') {
+      setShowForm(false)
+      if (setInvoiceUpdate) setInvoiceUpdate(undefined)
+    } else if (actionData?._tag === 'SimpleTaggedError') {
+      setErrorMessage(actionData.message)
+    }
+  }
+
   const facturesKinds: InvoiceKind[] = [
     'Péage',
     'Carburant',
@@ -58,32 +77,6 @@ export default function InvoiceForm(
     'Autre',
     'Remboursement'
   ]
-
-  useEffect(() => {
-    setSelectedKind(updateInvoice?.kind)
-    setSelectedDriver(updateInvoice?.driver)
-    setSelectedToDriver(updateInvoice?.toDriver)
-  }, [updateInvoice?.kind, updateInvoice?.driver, updateInvoice?.toDriver])
-  useEffect(() => {
-    const match = Match.type<typeof actionData>().pipe(
-      Match.when(
-        undefined,
-        identity
-      ),
-      Match.tag('InvoiceName', () => {
-        setShowForm(false)
-        if (setInvoiceUpdate) setInvoiceUpdate(undefined)
-      }),
-      Match.tag('SimpleTaggedError', ({ message }) => {
-        setErrorMessage(message)
-      }),
-      Match.orElse(() => {
-        setErrorMessage('Une erreur inconnue est survenue lors de la création de la facture.')
-      })
-    )
-
-    match(actionData)
-  }, [actionData, setShowForm, setInvoiceUpdate])
 
   const personnes = [
     { id: 'maé' as const, name: 'Maé' },
