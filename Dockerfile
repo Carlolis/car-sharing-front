@@ -1,5 +1,5 @@
 # Utiliser une image de base officielle de Node.js
-FROM node:22-alpine
+FROM node:24-alpine
 
 # Installer pnpm
 RUN npm install -g pnpm
