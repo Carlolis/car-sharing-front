@@ -65,11 +65,12 @@ const NavigationMobile: React.FC<NavigationMobileProps> = ({
           {/* Menu Items avec espacement amélioré */}
           <div className="flex-1 p-6 bg-[#004D55]">
             <div className="space-y-3">
-              {menuItems.map((item, index) => (
-                <NavLink
-                  onClick={onClose}
-                  key={item.id}
-                  to={item.id}
+              {isAuthenticated
+                && menuItems.map((item, index) => (
+                  <NavLink
+                    onClick={onClose}
+                    key={item.id}
+                    to={item.id}
                   className={`transition-colors duration-200 text-base font-body cursor-pointer  ${
                     currentPage === '/' + item.id ?
                       'text-white font-medium' :
