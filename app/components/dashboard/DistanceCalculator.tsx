@@ -158,13 +158,7 @@ export const DistanceCalculator = ({
       <div className="grid grid-cols-1 sm:grid-cols-[1fr,auto,1fr] gap-3 items-start">
         {/* Ville de départ */}
         <div ref={fromContainerRef} className="relative">
-          <Label
-            htmlFor="fromCity"
-            className="text-[#004D55] text-sm font-body mb-1 block"
-          >
-            Ville de départ
-          </Label>
-          <div className="space-y-2 flex items-center pt-2">
+          <div className="space-y-2 flex items-center py-2">
             <Checkbox
               name="drivers"
               defaultChecked={isWayAround}
@@ -179,6 +173,13 @@ export const DistanceCalculator = ({
               Aller/retour (kilométrage x2)
             </Label>
           </div>
+          <Label
+            htmlFor="fromCity"
+            className="text-[#004D55] text-sm font-body mb-1 block"
+          >
+            Ville de départ
+          </Label>
+
           <Input
             id="fromCity"
             type="text"
@@ -227,7 +228,7 @@ export const DistanceCalculator = ({
           )}
         </div>
 
-        <div className="hidden sm:flex items-center justify-center pt-8">
+        <div className="hidden sm:flex items-center justify-center ">
           <ArrowRight className="h-5 w-5 text-[#2fd1d1]" />
         </div>
 
