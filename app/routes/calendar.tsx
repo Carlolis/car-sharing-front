@@ -129,12 +129,6 @@ export default function CalendarPage({ loaderData: { trips }, actionData }: t.Co
     setShowForm(false)
     setStartDate(undefined)
     setUpdateTrip({ ...resourceTrip })
-
-    // // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    // if (event.resource && event.resource.id) {
-    //   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-    //   setTripIdToDelete(event.resource.id)
-    // }
   }
 
   const handleToggleForm = () => {

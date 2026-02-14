@@ -45,14 +45,19 @@ export const matcherTripActions = (request: TripActions) =>
 
           return { tripId, userStats, _tag: 'create' as const }
         })),
-      Match.tag('distance', ({ from, to }) =>
+      Match.tag('distance', ({ from, to, isWayAround }) =>
         T.gen(function* () {
           yield* T.logInfo(`Calculating distance trip action .... from ${from} to ${to}`)
 
           const distanceResult = yield* distanceService.calculateDistance(from, to)
 
           const userStats = yield* tripService.getTripStatsByUser()
-          return { distance: distanceResult, userStats, _tag: 'distance' as const }
+
+          return {
+            distance: isWayAround ? distanceResult * 2 : distanceResult,
+            userStats,
+            _tag: 'distance' as const
+          }
         })),
       Match.tag('city', ({ city }) =>
         T.gen(function* () {

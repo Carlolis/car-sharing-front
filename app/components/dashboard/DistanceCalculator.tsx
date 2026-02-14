@@ -3,6 +3,7 @@ import { motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 import { useSubmit } from 'react-router'
 
+import { Checkbox } from '../ui/checkbox'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { TaggedCalculateDistance, TaggedFindCities } from './TripActions'
@@ -27,7 +28,7 @@ export const DistanceCalculator = ({
 
   const handleCalculateCityDistance = (from: string, to: string) => {
     submit(
-      TaggedCalculateDistance.make({ from, to }),
+      TaggedCalculateDistance.make({ from, to, isWayAround }),
       {
         // action: '/dashboard',
         method: 'post',
@@ -36,6 +37,7 @@ export const DistanceCalculator = ({
     )
   }
 
+  const [isWayAround, setIsWayAround] = useState(true)
   const [fromCityInput, setFromCityInput] = useState<string>('')
   const [toCityInput, setToCityInput] = useState<string>('')
   const [fromCitySelected, setFromCitySelected] = useState<City | null>(null)
@@ -162,6 +164,21 @@ export const DistanceCalculator = ({
           >
             Ville de départ
           </Label>
+          <div className="space-y-2 flex items-center pt-2">
+            <Checkbox
+              name="drivers"
+              defaultChecked={isWayAround}
+              onCheckedChange={() => setIsWayAround(!isWayAround)}
+              className="min-w-[20px] min-h-[20px] data-[state=checked]:bg-[#2fd1d1] data-[state=checked]:border-[#2fd1d1] cursor-pointer"
+            />{' '}
+            <Label
+              htmlFor="isCompleted"
+              className="text-sm font-semibold text-[#004D55] cursor-pointer px-2"
+              style={{ fontFamily: 'Montserrat, sans-serif' }}
+            >
+              Aller/retour (kilométrage x2)
+            </Label>
+          </div>
           <Input
             id="fromCity"
             type="text"
@@ -175,7 +192,7 @@ export const DistanceCalculator = ({
             className={`bg-white text-sm lg:text-base min-h-[44px] ${
               showFromWarning ? 'border-red-500' : 'border-gray-300'
             }`}
-          />
+          />{' '}
           {showFromWarning && (
             <p className="text-xs text-red-500 mt-1">
               Veuillez sélectionner une ville dans la liste
@@ -278,7 +295,9 @@ export const DistanceCalculator = ({
           className="mt-4 p-3 bg-white rounded-md border border-[#2fd1d1]/30"
         >
           <div className="flex items-center justify-between">
-            <span className="text-sm text-[#004D55]">Distance calculée :</span>
+            <span className="text-sm text-[#004D55]">
+              Distance calculée {isWayAround ? '(aller/retour)' : ''} :
+            </span>
             <span className="text-lg font-semibold text-[#2fd1d1]">
               {distance} km
             </span>

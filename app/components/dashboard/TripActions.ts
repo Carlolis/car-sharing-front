@@ -17,7 +17,8 @@ export type TaggedDeleteTrip = Sc.Schema.Type<typeof TaggedDeleteTrip>
 
 export const TaggedCalculateDistance = Sc.TaggedStruct('distance', {
   from: Sc.String,
-  to: Sc.String
+  to: Sc.String,
+  isWayAround: Sc.Boolean
 })
 export type TaggedCalculateDistance = Sc.Schema.Type<typeof TaggedCalculateDistance>
 
